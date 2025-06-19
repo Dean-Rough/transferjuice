@@ -3,7 +3,8 @@
  * Provides realistic mock responses for OpenAI/Anthropic API calls
  */
 
-import { ContentGenerationRequest } from '@/lib/validations/api';
+import { GenerateContentRequest } from '@/lib/validations/api';
+import { TransferRelevance } from '@/lib/validations/twitter';
 
 // Mock AI-generated article content
 export const mockArticleContent = {
@@ -79,7 +80,7 @@ export const mockContentQuality = {
 
 // Mock AI generation metadata
 export const mockAIGeneration = {
-  model: 'gpt-4-turbo',
+  model: 'gpt-4.5',
   prompt:
     'Generate a witty Transfer Juice article based on the provided tweets...',
   temperature: 0.7,
@@ -151,6 +152,7 @@ export const mockTransferRelevance = {
       agents: [],
       journalists: [],
     },
+    transferType: 'rumour' as const,
     priority: 'low' as const,
   },
 };
@@ -184,7 +186,7 @@ export class MockAIService {
   }
 
   async generateArticle(
-    request: ContentGenerationRequest
+    _request: GenerateContentRequest
   ): Promise<typeof mockArticleContent> {
     if (this.responseDelay > 0) {
       await new Promise((resolve) => setTimeout(resolve, this.responseDelay));
@@ -210,9 +212,7 @@ export class MockAIService {
     return content;
   }
 
-  async assessTransferRelevance(
-    tweetText: string
-  ): Promise<typeof mockTransferRelevance.high> {
+  async assessTransferRelevance(tweetText: string): Promise<TransferRelevance> {
     if (this.responseDelay > 0) {
       await new Promise((resolve) => setTimeout(resolve, this.responseDelay));
     }

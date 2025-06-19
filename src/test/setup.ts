@@ -3,11 +3,87 @@
  * Configures global test environment and utilities
  */
 
+import '@testing-library/jest-dom';
+
 // Import types for proper typing
 import type { z } from 'zod';
 import type { TwitterUser, TwitterTweet } from '../lib/validations/twitter';
 import type { Subscriber } from '../lib/validations/subscriber';
 import type { Article } from '../lib/validations/article';
+
+// Mock Next.js components
+jest.mock('next/link', () => {
+  const MockedLink = ({ children, href, ...props }: any) => {
+    const React = require('react');
+    return React.createElement('a', { href, ...props }, children);
+  };
+  MockedLink.displayName = 'MockedLink';
+  return MockedLink;
+});
+
+jest.mock('next/font/google', () => ({
+  Inter: () => ({
+    className: 'mocked-inter',
+    variable: '--font-inter',
+  }),
+}));
+
+jest.mock('geist/font/sans', () => ({
+  GeistSans: {
+    className: 'mocked-geist-sans',
+    variable: '--font-geist-sans',
+  },
+}));
+
+jest.mock('geist/font/mono', () => ({
+  GeistMono: {
+    className: 'mocked-geist-mono',
+    variable: '--font-geist-mono',
+  },
+}));
+
+// Mock window.matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
+// Mock IntersectionObserver
+global.IntersectionObserver = class IntersectionObserver {
+  constructor() {}
+  observe() {
+    return null;
+  }
+  disconnect() {
+    return null;
+  }
+  unobserve() {
+    return null;
+  }
+};
+
+// Mock ResizeObserver
+global.ResizeObserver = class ResizeObserver {
+  constructor() {}
+  observe() {
+    return null;
+  }
+  disconnect() {
+    return null;
+  }
+  unobserve() {
+    return null;
+  }
+};
 
 // Import test utilities
 import { factories } from './factories';
@@ -41,7 +117,7 @@ expect.extend({
 
     if (!result.success) {
       if (expectedErrorMessage) {
-        const hasExpectedError = result.error.issues.some((issue) =>
+        const hasExpectedError = result.error.issues.some((issue: any) =>
           issue.message.includes(expectedErrorMessage)
         );
 

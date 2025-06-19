@@ -369,7 +369,7 @@ export class ContentGenerator {
 
     try {
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4-turbo',
+        model: 'gpt-4.5',
         messages: [
           {
             role: 'system',

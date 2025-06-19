@@ -250,7 +250,7 @@ npx prisma db seed
    ```bash
    curl -H "Authorization: Bearer $OPENAI_API_KEY" \
      -H "Content-Type: application/json" \
-     -d '{"model":"gpt-3.5-turbo","messages":[{"role":"user","content":"Test"}]}' \
+     -d '{"model":"gpt-4o","messages":[{"role":"user","content":"Test"}]}' \
      https://api.openai.com/v1/chat/completions
    ```
 

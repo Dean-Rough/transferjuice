@@ -867,7 +867,7 @@ components:
           properties:
             model:
               type: string
-              enum: [gpt-4, gpt-4-turbo, claude-3-opus]
+              enum: [gpt-4, gpt-4.5, claude-3-opus]
               description: AI model to use for content generation
             temperature:
               type: number

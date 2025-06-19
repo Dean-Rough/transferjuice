@@ -18,19 +18,25 @@ export const ArticleStatusSchema = z.enum([
   'archived',
 ]);
 
-// Content quality metrics
+// Content quality metrics (The Terry Standard)
 export const ContentQualitySchema = z.object({
   grammarScore: z.number().min(0).max(100),
   readabilityScore: z.number().min(0).max(100),
-  brandVoiceScore: z.number().min(0).max(100),
+  brandVoiceScore: z.number().min(0).max(100), // How Terry-esque is it?
   factualAccuracy: z.number().min(0).max(100),
   engagementPotential: z.number().min(0).max(100),
+  snarkLevel: z.number().min(0).max(100), // Weaponised irritation coefficient
+  specificityScore: z.number().min(0).max(100), // Absurd detail density
+  emotionalIntelligence: z.number().min(0).max(100), // Smart chaos factor
   overallScore: z.number().min(0).max(100),
   flags: z.array(
     z.enum([
       'grammar_issues',
       'readability_low',
-      'off_brand',
+      'off_brand', // Not Terry enough
+      'too_corporate', // Sounds like a press release
+      'lacks_snark', // Insufficiently weaponised irritation
+      'too_generic', // Needs more wet pasta and sad Babybels
       'fact_check_needed',
       'inappropriate_content',
       'copyright_concern',

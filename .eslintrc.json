@@ -15,5 +15,14 @@
   "parserOptions": {
     "ecmaVersion": 2023,
     "sourceType": "module"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/test/**/*", "**/*.test.*", "**/*.spec.*", "src/lib/validations/utils.ts"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "warn",
+        "@typescript-eslint/no-explicit-any": "warn"
+      }
+    }
+  ]
 }

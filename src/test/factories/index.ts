@@ -4,22 +4,22 @@
  */
 
 import {
-  TwitterUser,
-  TwitterTweet,
-  ProcessedTweet,
-  TransferRelevance,
-} from '@/lib/validations/twitter';
-import {
+  AIGeneration,
   Article,
   ArticleSection,
   ContentQuality,
-  AIGeneration,
 } from '@/lib/validations/article';
 import {
-  Subscriber,
   EmailCampaign,
+  Subscriber,
   SubscriberPreferences,
 } from '@/lib/validations/subscriber';
+import {
+  ProcessedTweet,
+  TransferRelevance,
+  TwitterTweet,
+  TwitterUser,
+} from '@/lib/validations/twitter';
 
 // Utility function to generate random IDs
 const generateId = (prefix: string = '') =>
@@ -285,7 +285,7 @@ export const createContentQuality = (
       level === 'low'
         ? ['grammar_issues', 'readability_low']
         : level === 'medium'
-          ? ['minor_issues']
+          ? ['off_brand']
           : [],
     humanReviewRequired: level === 'low',
   };
@@ -296,7 +296,7 @@ export const createAIGeneration = (
   overrides: Partial<AIGeneration> = {}
 ): AIGeneration => {
   const baseGeneration: AIGeneration = {
-    model: 'gpt-4-turbo',
+    model: 'gpt-4.5',
     prompt:
       'Generate a witty Transfer Juice article based on the provided tweets...',
     temperature: 0.7,

@@ -152,7 +152,9 @@ export const mockDatabaseRecords = {
 
 // Mock database operations
 export class MockDatabase {
-  private data: typeof mockDatabaseRecords;
+  private data: typeof mockDatabaseRecords = JSON.parse(
+    JSON.stringify(mockDatabaseRecords)
+  );
   private shouldThrowError = false;
   private responseDelay = 0;
   private transactionMode = false;

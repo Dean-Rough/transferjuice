@@ -105,7 +105,7 @@ export function validateQueryParams<T extends z.ZodTypeAny>(schema: T) {
 }
 
 /**
- * Custom validation error class
+ * Custom validation error class (Terry-approved)
  */
 export class ValidationError extends Error {
   public readonly code = 'VALIDATION_ERROR';
@@ -113,9 +113,20 @@ export class ValidationError extends Error {
   public readonly errors: string[];
 
   constructor(message: string, errors: string[] = []) {
-    super(message);
+    // Add some Terry flair to error messages
+    const terryMessage = message.includes('validation')
+      ? `${message} (The Terry suggests checking your input, because something has gone magnificently wrong)`
+      : message;
+
+    super(terryMessage);
     this.name = 'ValidationError';
-    this.errors = errors;
+    this.errors = errors.map((error) =>
+      error.includes('required')
+        ? `${error} - apparently this field is more important than we thought`
+        : error.includes('invalid')
+          ? `${error} - which is the digital equivalent of bringing a spoon to a knife fight`
+          : error
+    );
   }
 
   toJSON() {
@@ -250,7 +261,7 @@ export function createPaginationSchema(maxLimit = 100) {
  */
 export function createSortSchema<T extends readonly string[]>(fields: T) {
   return z.object({
-    field: z.enum(fields as [string, ...string[]]),
+    field: z.enum(fields as any),
     order: z.enum(['asc', 'desc']).default('desc'),
   });
 }
@@ -359,7 +370,7 @@ export function createUrlSchema(protocols: string[] = ['http', 'https']) {
  * Utility to create enum schemas from arrays
  */
 export function createEnumSchema<T extends readonly string[]>(values: T) {
-  return z.enum(values as [string, ...string[]]);
+  return z.enum(values as unknown as [string, ...string[]]);
 }
 
 /**

@@ -1,0 +1,544 @@
+// Transfer Juice Database Schema
+// Optimized for Neon PostgreSQL with performance indexing and relationships
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================================================
+// CORE ENTITIES
+// ============================================================================
+
+model Tweet {
+  id                String   @id
+  text              String   @db.Text
+  authorId          String   @map("author_id")
+  authorHandle      String   @map("author_handle") @db.VarChar(50)
+  authorName        String   @map("author_name") @db.VarChar(100)
+  authorVerified    Boolean  @default(false) @map("author_verified")
+  authorFollowers   Int      @default(0) @map("author_followers")
+  createdAt         DateTime @map("created_at")
+  fetchedAt         DateTime @default(now()) @map("fetched_at")
+  
+  // Engagement metrics
+  retweetCount      Int      @default(0) @map("retweet_count")
+  likeCount         Int      @default(0) @map("like_count")
+  replyCount        Int      @default(0) @map("reply_count")
+  quoteCount        Int      @default(0) @map("quote_count")
+  viewCount         Int?     @map("view_count")
+  
+  // Content analysis
+  language          String?  @db.VarChar(10)
+  hashtags          String[] @default([])
+  mentions          String[] @default([])
+  urls              String[] @default([])
+  
+  // Media attachments
+  mediaUrls         String[] @default([]) @map("media_urls")
+  mediaTypes        String[] @default([]) @map("media_types")
+  
+  // Transfer relevance analysis
+  isTransferRelated Boolean  @default(false) @map("is_transfer_related")
+  confidence        Float    @default(0.0) @db.DoublePrecision
+  transferType      TransferType? @map("transfer_type")
+  priority          Priority @default(LOW)
+  keywords          String[] @default([])
+  
+  // Extracted entities
+  playersExtracted  String[] @default([]) @map("players_extracted")
+  clubsExtracted    String[] @default([]) @map("clubs_extracted")
+  agentsExtracted   String[] @default([]) @map("agents_extracted")
+  
+  // Processing status
+  processed         Boolean  @default(false)
+  processedAt       DateTime? @map("processed_at")
+  processingError   String?  @map("processing_error") @db.Text
+  
+  // Relationships
+  articles          ArticleTweet[]
+  
+  @@map("tweets")
+  @@index([authorHandle])
+  @@index([createdAt])
+  @@index([isTransferRelated, confidence])
+  @@index([transferType, priority])
+  @@index([processed, fetchedAt])
+}
+
+model Article {
+  id                String   @id @default(cuid())
+  title             String   @db.VarChar(200)
+  slug              String   @unique @db.VarChar(200)
+  content           Json     // Structured article content with sections
+  summary           String   @db.Text
+  metaDescription   String   @map("meta_description") @db.VarChar(160)
+  
+  // Article metadata
+  briefingType      BriefingType @map("briefing_type")
+  wordCount         Int      @default(0) @map("word_count")
+  estimatedReadTime Int      @default(1) @map("estimated_read_time")
+  tags              String[] @default([])
+  
+  // Publication workflow
+  status            ArticleStatus @default(DRAFT)
+  createdAt         DateTime @default(now()) @map("created_at")
+  lastModified      DateTime @updatedAt @map("last_modified")
+  publishedAt       DateTime? @map("published_at")
+  scheduledFor      DateTime? @map("scheduled_for")
+  
+  // AI generation metadata
+  aiModel           String?  @map("ai_model") @db.VarChar(50)
+  aiPromptVersion   String?  @map("ai_prompt_version") @db.VarChar(20)
+  generationTime    Float?   @map("generation_time") // seconds
+  tokensUsed        Int?     @map("tokens_used")
+  
+  // Quality assessment
+  qualityScore      Float    @default(0.0) @map("quality_score") @db.DoublePrecision
+  brandVoiceScore   Float    @default(0.0) @map("brand_voice_score") @db.DoublePrecision
+  factualityScore   Float    @default(0.0) @map("factuality_score") @db.DoublePrecision
+  readabilityScore  Float    @default(0.0) @map("readability_score") @db.DoublePrecision
+  qualityFlags      QualityFlag[] @map("quality_flags")
+  humanReviewRequired Boolean @default(false) @map("human_review_required")
+  
+  // Images and media
+  featuredImageUrl  String?  @map("featured_image_url")
+  featuredImageAlt  String?  @map("featured_image_alt")
+  imageCredits      String?  @map("image_credits")
+  
+  // Analytics
+  views             Int      @default(0)
+  emailOpens        Int      @default(0) @map("email_opens")
+  emailClicks       Int      @default(0) @map("email_clicks")
+  
+  // Relationships
+  sourceTweets      ArticleTweet[]
+  newsletters       NewsletterArticle[]
+  
+  @@map("articles")
+  @@index([briefingType, publishedAt])
+  @@index([status, scheduledFor])
+  @@index([qualityScore])
+  @@index([createdAt])
+}
+
+// Junction table for article-tweet relationships
+model ArticleTweet {
+  articleId        String @map("article_id")
+  tweetId          String @map("tweet_id")
+  relevanceScore   Float  @default(0.0) @map("relevance_score") @db.DoublePrecision
+  usedInSections   String[] @default([]) @map("used_in_sections")
+  quotedDirectly   Boolean @default(false) @map("quoted_directly")
+  addedAt          DateTime @default(now()) @map("added_at")
+  
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tweet   Tweet   @relation(fields: [tweetId], references: [id], onDelete: Cascade)
+  
+  @@id([articleId, tweetId])
+  @@map("article_tweets")
+  @@index([relevanceScore])
+}
+
+model Newsletter {
+  id              String   @id @default(cuid())
+  subject         String   @db.VarChar(200)
+  preheader       String?  @db.VarChar(100)
+  briefingType    BriefingType @map("briefing_type")
+  briefingDate    DateTime @map("briefing_date") @db.Date
+  
+  // Email content
+  htmlContent     String   @map("html_content") @db.Text
+  textContent     String   @map("text_content") @db.Text
+  
+  // Sending metadata
+  status          NewsletterStatus @default(DRAFT)
+  scheduledFor    DateTime? @map("scheduled_for")
+  sentAt          DateTime? @map("sent_at")
+  recipientCount  Int      @default(0) @map("recipient_count")
+  
+  // Performance metrics
+  deliveredCount  Int      @default(0) @map("delivered_count")
+  openCount       Int      @default(0) @map("open_count")
+  clickCount      Int      @default(0) @map("click_count")
+  unsubscribeCount Int     @default(0) @map("unsubscribe_count")
+  bounceCount     Int      @default(0) @map("bounce_count")
+  spamCount       Int      @default(0) @map("spam_count")
+  
+  // Timestamps
+  createdAt       DateTime @default(now()) @map("created_at")
+  lastModified    DateTime @updatedAt @map("last_modified")
+  
+  // Relationships
+  articles        NewsletterArticle[]
+  deliveries      EmailDelivery[]
+  
+  @@map("newsletters")
+  @@index([briefingType, briefingDate])
+  @@index([status, scheduledFor])
+  @@index([sentAt])
+}
+
+// Junction table for newsletter-article relationships
+model NewsletterArticle {
+  newsletterId String @map("newsletter_id")
+  articleId    String @map("article_id")
+  order        Int    @default(0)
+  
+  newsletter Newsletter @relation(fields: [newsletterId], references: [id], onDelete: Cascade)
+  article    Article    @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  
+  @@id([newsletterId, articleId])
+  @@map("newsletter_articles")
+  @@index([order])
+}
+
+model Subscriber {
+  id                    String   @id @default(cuid())
+  email                 String   @unique @db.VarChar(254)
+  
+  // Personal information
+  firstName             String?  @map("first_name") @db.VarChar(50)
+  lastName              String?  @map("last_name") @db.VarChar(50)
+  timezone              String?  @db.VarChar(50)
+  country               String?  @db.VarChar(2) // ISO country code
+  
+  // Subscription preferences
+  status                SubscriberStatus @default(PENDING)
+  subscribedAt          DateTime @default(now()) @map("subscribed_at")
+  confirmedAt           DateTime? @map("confirmed_at")
+  unsubscribedAt        DateTime? @map("unsubscribed_at")
+  
+  // Email preferences
+  morningBriefing       Boolean  @default(true) @map("morning_briefing")
+  afternoonBriefing     Boolean  @default(true) @map("afternoon_briefing")
+  eveningBriefing       Boolean  @default(true) @map("evening_briefing")
+  weekendBriefing       Boolean  @default(false) @map("weekend_briefing")
+  
+  // Content preferences
+  favoriteTeams         String[] @default([]) @map("favorite_teams")
+  excludedTeams         String[] @default([]) @map("excluded_teams")
+  contentPreferences    ContentPreference[] @map("content_preferences")
+  
+  // Engagement tracking
+  totalOpens            Int      @default(0) @map("total_opens")
+  totalClicks           Int      @default(0) @map("total_clicks")
+  lastOpenAt            DateTime? @map("last_open_at")
+  lastClickAt           DateTime? @map("last_click_at")
+  engagementScore       Float    @default(0.0) @map("engagement_score") @db.DoublePrecision
+  
+  // Source tracking
+  source                String?  @db.VarChar(50) // referral source
+  campaign              String?  @db.VarChar(50) // marketing campaign
+  
+  // Technical
+  confirmationToken     String?  @map("confirmation_token") @db.VarChar(100)
+  unsubscribeToken      String   @unique @default(cuid()) @map("unsubscribe_token")
+  
+  // Relationships
+  deliveries            EmailDelivery[]
+  analytics             SubscriberAnalytics[]
+  
+  @@map("subscribers")
+  @@index([status, subscribedAt])
+  @@index([engagementScore])
+  @@index([lastOpenAt])
+}
+
+model EmailDelivery {
+  id              String   @id @default(cuid())
+  subscriberId    String   @map("subscriber_id")
+  newsletterId    String   @map("newsletter_id")
+  
+  // Delivery tracking
+  status          DeliveryStatus @default(PENDING)
+  sentAt          DateTime? @map("sent_at")
+  deliveredAt     DateTime? @map("delivered_at")
+  
+  // Engagement tracking
+  openedAt        DateTime? @map("opened_at")
+  openCount       Int      @default(0) @map("open_count")
+  clickCount      Int      @default(0) @map("click_count")
+  lastClickAt     DateTime? @map("last_click_at")
+  
+  // Failure tracking
+  bounceType      BounceType? @map("bounce_type")
+  bounceReason    String?  @map("bounce_reason") @db.Text
+  unsubscribedAt  DateTime? @map("unsubscribed_at")
+  spamReportedAt  DateTime? @map("spam_reported_at")
+  
+  // Technical metadata
+  messageId       String?  @map("message_id") @db.VarChar(100)
+  userAgent       String?  @map("user_agent") @db.Text
+  ipAddress       String?  @map("ip_address") @db.VarChar(45)
+  
+  // Relationships
+  subscriber Subscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  newsletter Newsletter @relation(fields: [newsletterId], references: [id], onDelete: Cascade)
+  
+  @@map("email_deliveries")
+  @@index([status, sentAt])
+  @@index([subscriberId, newsletterId])
+  @@index([openedAt])
+}
+
+// ============================================================================
+// ANALYTICS AND TRACKING
+// ============================================================================
+
+model SubscriberAnalytics {
+  subscriberId    String   @map("subscriber_id")
+  date            DateTime @db.Date
+  
+  // Daily metrics
+  emailsReceived  Int      @default(0) @map("emails_received")
+  emailsOpened    Int      @default(0) @map("emails_opened")
+  emailsClicked   Int      @default(0) @map("emails_clicked")
+  timeSpentReading Int     @default(0) @map("time_spent_reading") // seconds
+  
+  // Content engagement
+  articlesRead    String[] @default([]) @map("articles_read")
+  topicsEngaged   String[] @default([]) @map("topics_engaged")
+  
+  // Calculated metrics
+  engagementScore Float    @default(0.0) @map("engagement_score") @db.DoublePrecision
+  
+  subscriber Subscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  
+  @@id([subscriberId, date])
+  @@map("subscriber_analytics")
+  @@index([date])
+  @@index([engagementScore])
+}
+
+model ContentAnalytics {
+  articleId       String   @map("article_id")
+  date            DateTime @db.Date
+  
+  // View metrics
+  webViews        Int      @default(0) @map("web_views")
+  emailViews      Int      @default(0) @map("email_views")
+  uniqueReaders   Int      @default(0) @map("unique_readers")
+  
+  // Engagement metrics
+  timeOnPage      Int      @default(0) @map("time_on_page") // seconds
+  scrollDepth     Float    @default(0.0) @map("scroll_depth") @db.DoublePrecision
+  socialShares    Int      @default(0) @map("social_shares")
+  
+  // Performance metrics
+  loadTime        Float    @default(0.0) @map("load_time") @db.DoublePrecision
+  bounceRate      Float    @default(0.0) @map("bounce_rate") @db.DoublePrecision
+  
+  @@id([articleId, date])
+  @@map("content_analytics")
+  @@index([date])
+  @@index([webViews])
+}
+
+model SystemAnalytics {
+  date              DateTime @id @db.Date
+  
+  // Tweet processing metrics
+  tweetsProcessed   Int      @default(0) @map("tweets_processed")
+  transferRelevant  Int      @default(0) @map("transfer_relevant")
+  articlesGenerated Int      @default(0) @map("articles_generated")
+  
+  // Email metrics
+  emailsSent        Int      @default(0) @map("emails_sent")
+  emailsDelivered   Int      @default(0) @map("emails_delivered")
+  emailsOpened      Int      @default(0) @map("emails_opened")
+  emailsClicked     Int      @default(0) @map("emails_clicked")
+  
+  // Performance metrics
+  avgProcessingTime Float    @default(0.0) @map("avg_processing_time") @db.DoublePrecision
+  errorRate         Float    @default(0.0) @map("error_rate") @db.DoublePrecision
+  systemUptime      Float    @default(0.0) @map("system_uptime") @db.DoublePrecision
+  
+  // Costs
+  aiTokensUsed      Int      @default(0) @map("ai_tokens_used")
+  estimatedCost     Float    @default(0.0) @map("estimated_cost") @db.DoublePrecision
+  
+  @@map("system_analytics")
+  @@index([date])
+}
+
+// ============================================================================
+// CONFIGURATION AND SETTINGS
+// ============================================================================
+
+model JobQueue {
+  id              String   @id @default(cuid())
+  type            JobType
+  payload         Json
+  
+  // Execution tracking
+  status          JobStatus @default(PENDING)
+  attempts        Int      @default(0)
+  maxAttempts     Int      @default(3) @map("max_attempts")
+  
+  // Timing
+  scheduledFor    DateTime @map("scheduled_for")
+  startedAt       DateTime? @map("started_at")
+  completedAt     DateTime? @map("completed_at")
+  failedAt        DateTime? @map("failed_at")
+  
+  // Error handling
+  lastError       String?  @map("last_error") @db.Text
+  errorStack      String?  @map("error_stack") @db.Text
+  
+  // Metadata
+  createdAt       DateTime @default(now()) @map("created_at")
+  priority        Priority @default(MEDIUM)
+  
+  @@map("job_queue")
+  @@index([status, scheduledFor])
+  @@index([type, status])
+  @@index([priority, scheduledFor])
+}
+
+model AppConfig {
+  key             String   @id @db.VarChar(100)
+  value           Json
+  description     String?  @db.Text
+  category        String   @db.VarChar(50)
+  isSecret        Boolean  @default(false) @map("is_secret")
+  lastModified    DateTime @updatedAt @map("last_modified")
+  modifiedBy      String?  @map("modified_by") @db.VarChar(100)
+  
+  @@map("app_config")
+  @@index([category])
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum TransferType {
+  RUMOUR
+  TALKS
+  ADVANCED
+  MEDICAL
+  CONFIRMED
+  OFFICIAL
+  COMPLETE
+  
+  @@map("transfer_type")
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+  
+  @@map("priority")
+}
+
+enum BriefingType {
+  MORNING
+  AFTERNOON
+  EVENING
+  WEEKEND
+  SPECIAL
+  
+  @@map("briefing_type")
+}
+
+enum ArticleStatus {
+  DRAFT
+  REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+  
+  @@map("article_status")
+}
+
+enum QualityFlag {
+  GRAMMAR_ISSUES
+  READABILITY_LOW
+  OFF_BRAND
+  FACT_CHECK_NEEDED
+  INAPPROPRIATE_CONTENT
+  COPYRIGHT_CONCERN
+  
+  @@map("quality_flag")
+}
+
+enum NewsletterStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  CANCELLED
+  FAILED
+  
+  @@map("newsletter_status")
+}
+
+enum SubscriberStatus {
+  PENDING
+  CONFIRMED
+  UNSUBSCRIBED
+  BOUNCED
+  SPAM_REPORTED
+  
+  @@map("subscriber_status")
+}
+
+enum ContentPreference {
+  TRANSFERS_ONLY
+  INJURY_NEWS
+  MATCH_ANALYSIS
+  FINANCIAL_NEWS
+  YOUTH_ACADEMY
+  WOMEN_FOOTBALL
+  
+  @@map("content_preference")
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  DELIVERED
+  BOUNCED
+  FAILED
+  DEFERRED
+  
+  @@map("delivery_status")
+}
+
+enum BounceType {
+  HARD
+  SOFT
+  SPAM
+  UNSUBSCRIBED
+  
+  @@map("bounce_type")
+}
+
+enum JobType {
+  FETCH_TWEETS
+  PROCESS_TWEETS
+  GENERATE_ARTICLE
+  SEND_NEWSLETTER
+  PROCESS_ANALYTICS
+  CLEANUP_OLD_DATA
+  
+  @@map("job_type")
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+  RETRYING
+  
+  @@map("job_status")
+}

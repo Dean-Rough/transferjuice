@@ -366,12 +366,7 @@ Error: The model `gpt-4` does not exist
 
 ```typescript
 // Check available models and use fallbacks
-const AVAILABLE_MODELS = [
-  'gpt-4-turbo-preview',
-  'gpt-4',
-  'gpt-3.5-turbo-16k',
-  'gpt-3.5-turbo',
-];
+const AVAILABLE_MODELS = ['gpt-4.1', 'gpt-4', 'gpt-4o-16k', 'gpt-4o'];
 
 async function generateContent(prompt: string) {
   for (const model of AVAILABLE_MODELS) {

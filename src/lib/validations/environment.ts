@@ -65,8 +65,8 @@ const AIConfigSchema = z.object({
     .min(1, { message: 'OPENAI_ORGANIZATION is required' })
     .optional(),
   OPENAI_MODEL: z
-    .enum(['gpt-4', 'gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-3.5-turbo'])
-    .default('gpt-4-turbo'),
+    .enum(['gpt-4', 'gpt-4.5', 'gpt-4.1', 'gpt-4o'])
+    .default('gpt-4.5'),
   OPENAI_TEMPERATURE: z.coerce
     .number()
     .min(0, { message: 'OPENAI_TEMPERATURE must be >= 0' })

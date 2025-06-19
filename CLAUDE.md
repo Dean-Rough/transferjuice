@@ -50,23 +50,24 @@ npm run test:e2e     # End-to-end tests
 **API Integrations:**
 
 - X API v2 Bearer Token authentication for tweet fetching
-- OpenAI/Anthropic API for content processing
+- OpenAI/Anthropic API for Terry-style content processing
 - Wikipedia Commons API for player images
 - Email service API integration
 
 **Data Storage:**
 
 - Tweet content, timestamps, media URLs, and links
-- Processed articles with embedded images
+- Processed articles with embedded images and Terry's magnificent chaos
 - Email subscriber management
 - Delivery logs and error tracking
 
-**Content Processing Logic:**
+**Content Processing Logic (The Terry System):**
 
 - Transfer keyword filtering ("signing", "fee", "medical", "contract")
-- AI prompt engineering for editorial-style article generation
-- Image context matching and embedding
-- HTML email template generation
+- AI prompt engineering for Terry's acerbic editorial style
+- Voice quality assessment (snark level, specificity score, emotional intelligence)
+- Image context matching with Terry-style captions
+- HTML email template generation with weaponised irritation
 
 **Automation Requirements:**
 
@@ -161,12 +162,14 @@ src/
 **Testing Infrastructure Setup** has been fully implemented and validated:
 
 #### 1.1 ESLint & Prettier Configuration ✅
+
 - **Location**: `.eslintrc.json`, `.prettierrc`, `.prettierignore`
 - **Features**: Strict TypeScript rules, Next.js optimized, security linting
 - **Scripts**: `npm run lint`, `npm run format`, `npm run lint:check`, `npm run format:check`
 - **Husky Integration**: Pre-commit hooks enforce code quality
 
 #### 1.2 Zod Runtime Type Safety ✅
+
 - **Location**: `src/lib/validations/`
 - **Coverage**: Complete schemas for all data structures
 - **Environment Validation**: Comprehensive startup validation with clear error messages
@@ -178,6 +181,7 @@ src/
   - `subscriber.ts` - Email subscriber validation
 
 #### 1.3 Jest Unit Testing ✅
+
 - **Configuration**: `jest.config.js` with comprehensive coverage thresholds
 - **Coverage Targets**: 90% global, 95% for validations, 85% for mocks
 - **Test Structure**: Proper test organization with factories and mocks
@@ -185,6 +189,7 @@ src/
 - **Performance**: Parallel execution, sub-30 second runtime
 
 #### 1.4 Playwright E2E Testing ✅
+
 - **Configuration**: `playwright.config.ts` with multi-browser support
 - **Browsers**: Chrome, Firefox, Safari, Mobile Chrome/Safari
 - **Features**: Visual regression, performance budgets, CI/CD integration
@@ -216,6 +221,7 @@ npm run test:e2e:headed # Run E2E in headed mode
 ```
 
 ### Current Test Coverage
+
 - **Environment Validation**: 88.15% coverage, 26 tests passing
 - **Integration Tests**: Content pipeline and Twitter service tests
 - **Mock Framework**: Comprehensive mocks for AI, database, email, Twitter services
@@ -224,16 +230,19 @@ npm run test:e2e:headed # Run E2E in headed mode
 ### Next Steps (Phase 2: Core Data Pipeline)
 
 1. **Database Schema Design with Prisma**
+
    - Implement comprehensive schema for tweets, articles, subscribers
    - Set up Neon PostgreSQL database
    - Configure migrations and seeding
 
 2. **Twitter API Integration**
+
    - Bearer token authentication with rate limiting
    - ITK account monitoring and tweet fetching
    - Transfer relevance filtering
 
 3. **AI Content Processing Pipeline**
+
    - GPT-4/Claude integration for article generation
    - Content quality validation and scoring
    - Joel Golby style voice implementation

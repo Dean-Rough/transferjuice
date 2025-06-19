@@ -1,7 +1,6 @@
 /** @type {import('jest').Config} */
 const config = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
 
   // Test file patterns - expanded to include integration tests
   testMatch: [
@@ -21,14 +20,17 @@ const config = {
   // Coverage configuration - enhanced
   collectCoverage: true,
   collectCoverageFrom: [
+    'src/components/**/*.{ts,tsx}',
     'src/lib/**/*.{ts,tsx}',
+    'src/app/**/*.{ts,tsx}',
     'src/test/mocks/**/*.{ts,tsx}',
     'src/test/factories/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
     '!src/test/setup.ts',
     '!src/**/__tests__/**/*',
     '!src/**/*.stories.*',
-    '!src/app/**/*',
+    '!src/app/layout.tsx',
+    '!src/app/globals.css',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
@@ -76,11 +78,14 @@ const config = {
 
   // Transform configuration
   transform: {
-    '^.+\\.(ts|tsx)$': [
-      'ts-jest',
+    '^.+\\.(js|jsx|ts|tsx)$': [
+      'babel-jest',
       {
-        tsconfig: 'tsconfig.json',
-        isolatedModules: true, // Faster compilation
+        presets: [
+          '@babel/preset-env',
+          ['@babel/preset-react', { runtime: 'automatic' }],
+          '@babel/preset-typescript',
+        ],
       },
     ],
   },
