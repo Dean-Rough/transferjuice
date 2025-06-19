@@ -31,8 +31,9 @@ Brand assets are located in the `/brand/` directory, featuring our distinctive l
 ## Documentation
 
 For detailed information, see:
+
 - [Product Requirements Document](docs/PRD.md)
 
 ## Development
 
-*Coming soon* 
+_Coming soon_
