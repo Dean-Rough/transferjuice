@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Container } from './Container';
 
 const footerNavigation = {
@@ -41,15 +42,14 @@ export function Footer() {
           <div className='xl:grid xl:grid-cols-3 xl:gap-8'>
             {/* Brand section */}
             <div className='space-y-8'>
-              <div className='flex items-center space-x-3'>
-                <div className='w-8 h-8 bg-orange-gradient rounded-lg flex items-center justify-center'>
-                  <span className='text-brand-black font-black text-lg'>
-                    TJ
-                  </span>
-                </div>
-                <span className='text-xl font-black text-dark-text-primary'>
-                  Transfer Juice
-                </span>
+              <div className='h-10'>
+                <Image
+                  src='/transfer-logo-white.svg'
+                  alt='Transfer Juice'
+                  width={200}
+                  height={40}
+                  className='h-full w-auto'
+                />
               </div>
               <p className='text-base text-dark-text-muted max-w-md'>
                 Premier League ITK Transfer Digest. All the rumours, for people
@@ -73,8 +73,8 @@ export function Footer() {
             <div className='mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0'>
               <div className='md:grid md:grid-cols-2 md:gap-8'>
                 <div>
-                  <h3 className='text-sm font-semibold leading-6 text-dark-text-primary'>
-                    Briefings
+                  <h3 className='text-sm font-mono font-semibold leading-6 text-dark-text-primary tracking-wide'>
+                    BRIEFINGS
                   </h3>
                   <ul role='list' className='mt-6 space-y-4'>
                     {footerNavigation.briefings.map((item) => (
@@ -90,8 +90,8 @@ export function Footer() {
                   </ul>
                 </div>
                 <div className='mt-10 md:mt-0'>
-                  <h3 className='text-sm font-semibold leading-6 text-dark-text-primary'>
-                    Company
+                  <h3 className='text-sm font-mono font-semibold leading-6 text-dark-text-primary tracking-wide'>
+                    COMPANY
                   </h3>
                   <ul role='list' className='mt-6 space-y-4'>
                     {footerNavigation.company.map((item) => (

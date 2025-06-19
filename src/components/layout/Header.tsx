@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Container } from './Container';
 import { Button } from '../ui/Button';
 
@@ -14,46 +15,55 @@ interface NavigationItem {
 const navigation: NavigationItem[] = [
   { name: 'Home', href: '/' },
   {
-    name: 'Morning Brief',
-    href: '/morning',
-    description: 'Latest morning transfer updates',
+    name: 'This Week',
+    href: '/weekly',
+    description: 'Last 7 days activity',
   },
   {
-    name: 'Afternoon Brief',
-    href: '/afternoon',
-    description: 'Midday transfer roundup',
+    name: 'Rumoured',
+    href: '/rumoured',
+    description: 'Latest transfer rumours',
   },
   {
-    name: 'Evening Brief',
-    href: '/evening',
-    description: 'End of day transfer digest',
+    name: 'Confirmed',
+    href: '/confirmed',
+    description: 'Completed transfers',
   },
-  { name: 'Archive', href: '/archive', description: 'Previous briefings' },
 ];
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className='sticky top-0 z-50 border-b border-dark-border bg-dark-bg/80 backdrop-blur-md'>
+    <header className='sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md'>
       <Container>
         <nav
           className='flex items-center justify-between py-4'
           aria-label='Global navigation'
         >
-          {/* Logo */}
+          {/* Logo Lockup */}
           <div className='flex lg:flex-1'>
             <Link href='/' className='-m-1.5 p-1.5 group'>
               <span className='sr-only'>Transfer Juice</span>
               <div className='flex items-center space-x-3'>
-                <div className='w-8 h-8 bg-orange-gradient rounded-lg flex items-center justify-center group-hover:shadow-glow transition-all duration-200'>
-                  <span className='text-brand-black font-black text-lg'>
-                    TJ
-                  </span>
+                <div className='w-10 h-10 group-hover:scale-105 transition-transform duration-200'>
+                  <Image
+                    src='/transfer-icon.svg'
+                    alt='Transfer Juice Icon'
+                    width={40}
+                    height={40}
+                    className='w-full h-full'
+                  />
                 </div>
-                <span className='text-xl font-black text-dark-text-primary group-hover:text-brand-orange-500 transition-colors duration-200'>
-                  Transfer Juice
-                </span>
+                <div className='h-8 group-hover:opacity-80 transition-opacity duration-200'>
+                  <Image
+                    src='/transfer-logo-cream.svg'
+                    alt='Transfer Juice'
+                    width={160}
+                    height={32}
+                    className='h-full w-auto'
+                  />
+                </div>
               </div>
             </Link>
           </div>
@@ -106,7 +116,7 @@ export function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className='text-sm font-semibold leading-6 text-dark-text-secondary hover:text-brand-orange-500 transition-colors duration-200'
+                className='text-sm font-mono font-semibold leading-6 text-gray-700 dark:text-gray-300 hover:text-orange-500 transition-colors duration-200 tracking-wide'
                 title={item.description}
               >
                 {item.name}
@@ -125,18 +135,18 @@ export function Header() {
         {/* Mobile navigation */}
         {mobileMenuOpen && (
           <div className='lg:hidden'>
-            <div className='space-y-2 py-6 border-t border-dark-border'>
+            <div className='space-y-2 py-6 border-t border-gray-200 dark:border-gray-800'>
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className='block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-dark-text-secondary hover:bg-dark-surface hover:text-brand-orange-500 transition-all duration-200'
+                  className='block rounded-lg px-3 py-2 text-base font-mono font-semibold leading-7 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-orange-500 transition-all duration-200 tracking-wide'
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <div>
                     <div>{item.name}</div>
                     {item.description && (
-                      <div className='text-sm text-dark-text-muted mt-1'>
+                      <div className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
                         {item.description}
                       </div>
                     )}

@@ -136,7 +136,8 @@ async function main() {
               id: 'intro',
               type: 'introduction',
               title: 'The Deal Takes Shape',
-              content: 'Arsenal are reportedly on the verge of securing a major midfield signing, with Brighton midfielder set to undergo medical examinations tomorrow.',
+              content:
+                'Arsenal are reportedly on the verge of securing a major midfield signing, with Brighton midfielder set to undergo medical examinations tomorrow.',
               sourceTweets: ['tweet_001'],
               order: 1,
               wordCount: 156,
@@ -145,15 +146,18 @@ async function main() {
               id: 'analysis',
               type: 'analysis',
               title: 'What This Means for Arsenal',
-              content: 'This potential signing would represent a significant investment in Arsenal\'s midfield, addressing key tactical needs identified by the coaching staff.',
+              content:
+                "This potential signing would represent a significant investment in Arsenal's midfield, addressing key tactical needs identified by the coaching staff.",
               sourceTweets: [],
               order: 2,
               wordCount: 134,
             },
           ],
         },
-        summary: 'Arsenal are close to finalizing a £75m deal for a Brighton midfielder, with medical scheduled for tomorrow.',
-        metaDescription: 'Arsenal nearing completion of major midfield signing from Brighton for £75m. Medical scheduled.',
+        summary:
+          'Arsenal are close to finalizing a £75m deal for a Brighton midfielder, with medical scheduled for tomorrow.',
+        metaDescription:
+          'Arsenal nearing completion of major midfield signing from Brighton for £75m. Medical scheduled.',
         briefingType: 'AFTERNOON',
         wordCount: 290,
         estimatedReadTime: 2,
@@ -229,11 +233,14 @@ async function main() {
   const newsletter = await prisma.newsletter.create({
     data: {
       subject: 'Transfer Juice Afternoon Brief - January 15, 2024',
-      preheader: 'Arsenal close to major signing, United exploring striker options',
+      preheader:
+        'Arsenal close to major signing, United exploring striker options',
       briefingType: 'AFTERNOON',
       briefingDate: new Date('2024-01-15'),
-      htmlContent: '<html><body><h1>Transfer Juice Afternoon Brief</h1><p>Arsenal are close...</p></body></html>',
-      textContent: 'Transfer Juice Afternoon Brief\n\nArsenal are close to completing...',
+      htmlContent:
+        '<html><body><h1>Transfer Juice Afternoon Brief</h1><p>Arsenal are close...</p></body></html>',
+      textContent:
+        'Transfer Juice Afternoon Brief\n\nArsenal are close to completing...',
       status: 'SENT',
       sentAt: new Date('2024-01-15T14:00:00Z'),
       recipientCount: 1250,
@@ -276,14 +283,16 @@ async function main() {
         status: 'DELIVERED',
         sentAt: new Date('2024-01-15T14:00:00Z'),
         deliveredAt: new Date('2024-01-15T14:02:00Z'),
-        openedAt: subscriber.email === 'john.smith@example.com' 
-          ? new Date('2024-01-15T14:30:00Z') 
-          : undefined,
+        openedAt:
+          subscriber.email === 'john.smith@example.com'
+            ? new Date('2024-01-15T14:30:00Z')
+            : undefined,
         openCount: subscriber.email === 'john.smith@example.com' ? 2 : 0,
         clickCount: subscriber.email === 'john.smith@example.com' ? 1 : 0,
-        lastClickAt: subscriber.email === 'john.smith@example.com' 
-          ? new Date('2024-01-15T14:35:00Z') 
-          : undefined,
+        lastClickAt:
+          subscriber.email === 'john.smith@example.com'
+            ? new Date('2024-01-15T14:35:00Z')
+            : undefined,
         messageId: `msg_${subscriber.id}_${newsletter.id}`,
       },
     });
@@ -292,7 +301,7 @@ async function main() {
   // Create analytics
   console.log('📊 Creating sample analytics...');
   const today = new Date('2024-01-15');
-  
+
   await prisma.systemAnalytics.create({
     data: {
       date: today,

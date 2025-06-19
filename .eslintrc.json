@@ -18,7 +18,12 @@
   },
   "overrides": [
     {
-      "files": ["src/test/**/*", "**/*.test.*", "**/*.spec.*", "src/lib/validations/utils.ts"],
+      "files": [
+        "src/test/**/*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "src/lib/validations/utils.ts"
+      ],
       "rules": {
         "@typescript-eslint/no-unused-vars": "warn",
         "@typescript-eslint/no-explicit-any": "warn"

@@ -1,21 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer utilities {
-  .bg-orange-gradient {
-    background: linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fb923c 100%);
-  }
-  
-  .text-transparent {
-    color: transparent;
-  }
-  
-  .bg-clip-text {
-    background-clip: text;
-    -webkit-background-clip: text;
-  }
-}
+@import 'tailwindcss';
 
 @layer base {
   :root {
@@ -61,7 +44,7 @@
   /* Selection styles */
   ::selection {
     background-color: #ea580c;
-    color: #F9F2DF;
+    color: #f9f2df;
   }
 
   /* Scrollbar styles */
@@ -86,125 +69,409 @@
 @layer components {
   /* Typography Components */
   .text-gradient {
-    @apply bg-orange-gradient bg-clip-text text-transparent;
+    background: linear-gradient(135deg, #ff8a4c 0%, #ff5a1f 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
   }
 
   .heading-xl {
-    @apply text-4xl md:text-5xl lg:text-6xl font-black tracking-tight;
+    font-size: 2.25rem;
+    font-weight: 900;
+    letter-spacing: -0.025em;
   }
 
   .heading-lg {
-    @apply text-3xl md:text-4xl lg:text-5xl font-black tracking-tight;
+    font-size: 1.875rem;
+    font-weight: 900;
+    letter-spacing: -0.025em;
   }
 
   .heading-md {
-    @apply text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
   }
 
   .heading-sm {
-    @apply text-xl md:text-2xl lg:text-3xl font-bold tracking-tight;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
   }
 
   .body-lg {
-    @apply text-lg md:text-xl leading-relaxed;
+    font-size: 1.125rem;
+    line-height: 1.75;
   }
 
   .body-md {
-    @apply text-base md:text-lg leading-relaxed;
+    font-size: 1rem;
+    line-height: 1.75;
   }
 
   .body-sm {
-    @apply text-sm md:text-base leading-relaxed;
+    font-size: 0.875rem;
+    line-height: 1.75;
+  }
+
+  @media (min-width: 768px) {
+    .heading-xl {
+      font-size: 3rem;
+    }
+
+    .heading-lg {
+      font-size: 2.25rem;
+    }
+
+    .heading-md {
+      font-size: 1.875rem;
+    }
+
+    .heading-sm {
+      font-size: 1.5rem;
+    }
+
+    .body-lg {
+      font-size: 1.25rem;
+    }
+
+    .body-md {
+      font-size: 1.125rem;
+    }
+
+    .body-sm {
+      font-size: 1rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .heading-xl {
+      font-size: 3.75rem;
+    }
+
+    .heading-lg {
+      font-size: 3rem;
+    }
+
+    .heading-md {
+      font-size: 2.25rem;
+    }
+
+    .heading-sm {
+      font-size: 1.875rem;
+    }
   }
 
   /* Button Components */
   .btn-primary {
-    @apply inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-200
-           bg-orange-gradient text-brand-black hover:shadow-glow focus:shadow-glow-lg
-           transform hover:scale-105 active:scale-95;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    color: #0a0808;
+    background: linear-gradient(135deg, #ff8a4c 0%, #ff5a1f 100%);
+    transform: scale(1);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 0 20px rgb(255 90 31 / 0.3);
+    transform: scale(1.05);
+  }
+
+  .btn-primary:focus {
+    box-shadow: 0 0 40px rgb(255 90 31 / 0.4);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.95);
   }
 
   .btn-secondary {
-    @apply inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-200
-           bg-dark-surface border border-dark-border text-dark-text-primary
-           hover:bg-dark-border hover:border-brand-orange-500 focus:border-brand-orange-500;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    background-color: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #f9f2df;
+  }
+
+  .btn-secondary:hover {
+    background-color: #2a2a2a;
+    border-color: #ff5a1f;
+  }
+
+  .btn-secondary:focus {
+    border-color: #ff5a1f;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200
-           text-dark-text-secondary hover:text-dark-text-primary hover:bg-dark-surface;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    color: #d1d5db;
+  }
+
+  .btn-ghost:hover {
+    color: #f9f2df;
+    background-color: #1a1a1a;
   }
 
   /* Card Components */
   .card {
-    @apply bg-dark-surface border border-dark-border rounded-xl p-6 
-           backdrop-blur-sm transition-all duration-200
-           hover:border-brand-orange-500/50 hover:shadow-lg;
+    background-color: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s;
+  }
+
+  .card:hover {
+    border-color: rgb(255 90 31 / 0.5);
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -2px rgb(0 0 0 / 0.05);
   }
 
   .card-elevated {
-    @apply card shadow-xl hover:shadow-2xl transform hover:-translate-y-1;
+    background-color: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    transform: translateY(0);
+  }
+
+  .card-elevated:hover {
+    border-color: rgb(255 90 31 / 0.5);
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    transform: translateY(-0.25rem);
   }
 
   /* Layout Components */
   .container-responsive {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    margin: 0 auto;
+    max-width: 80rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container-responsive {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-responsive {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
   }
 
   .section-padding {
-    @apply py-16 md:py-24 lg:py-32;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  @media (min-width: 768px) {
+    .section-padding {
+      padding-top: 6rem;
+      padding-bottom: 6rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-padding {
+      padding-top: 8rem;
+      padding-bottom: 8rem;
+    }
   }
 
   /* Navigation Components */
   .nav-link {
-    @apply text-dark-text-secondary hover:text-dark-text-primary
-           transition-colors duration-200 font-medium;
+    color: #d1d5db;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-link:hover {
+    color: #f9f2df;
   }
 
   .nav-link-active {
-    @apply nav-link text-brand-orange-500;
+    color: #ff5a1f;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-link-active:hover {
+    color: #f9f2df;
   }
 
   /* Form Components */
   .input-field {
-    @apply w-full px-4 py-3 bg-dark-surface border border-dark-border rounded-lg
-           text-dark-text-primary placeholder-dark-text-muted
-           focus:border-brand-orange-500 focus:ring-1 focus:ring-brand-orange-500
-           transition-colors duration-200;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 0.5rem;
+    color: #f9f2df;
+    transition: border-color 0.2s;
+  }
+
+  .input-field::placeholder {
+    color: #9ca3af;
+  }
+
+  .input-field:focus {
+    outline: none;
+    border-color: #ff5a1f;
+    box-shadow: 0 0 0 1px #ff5a1f;
   }
 
   .input-error {
-    @apply input-field border-red-500 focus:border-red-500 focus:ring-red-500;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: #1a1a1a;
+    border: 1px solid #ef4444;
+    border-radius: 0.5rem;
+    color: #f9f2df;
+    transition: border-color 0.2s;
+  }
+
+  .input-error::placeholder {
+    color: #9ca3af;
+  }
+
+  .input-error:focus {
+    outline: none;
+    border-color: #ef4444;
+    box-shadow: 0 0 0 1px #ef4444;
   }
 
   /* Article Content */
   .prose-custom {
-    @apply prose prose-invert prose-lg max-w-none
-           prose-headings:font-bold prose-headings:text-dark-text-primary
-           prose-p:text-dark-text-secondary prose-p:leading-relaxed
-           prose-a:text-brand-orange-500 prose-a:no-underline hover:prose-a:underline
-           prose-strong:text-dark-text-primary prose-em:text-dark-text-secondary
-           prose-code:text-brand-orange-400 prose-code:bg-dark-surface prose-code:rounded prose-code:px-1
-           prose-blockquote:border-l-brand-orange-500 prose-blockquote:text-dark-text-secondary;
+    max-width: none;
+    font-size: 1.125rem;
+    line-height: 1.75;
+    color: #d1d5db;
+  }
+
+  .prose-custom h1,
+  .prose-custom h2,
+  .prose-custom h3,
+  .prose-custom h4,
+  .prose-custom h5,
+  .prose-custom h6 {
+    font-weight: 700;
+    color: #f9f2df;
+  }
+
+  .prose-custom p {
+    color: #d1d5db;
+    line-height: 1.75;
+  }
+
+  .prose-custom a {
+    color: #ff5a1f;
+    text-decoration: none;
+  }
+
+  .prose-custom a:hover {
+    text-decoration: underline;
+  }
+
+  .prose-custom strong {
+    color: #f9f2df;
+  }
+
+  .prose-custom em {
+    color: #d1d5db;
+  }
+
+  .prose-custom code {
+    color: #ff8a4c;
+    background-color: #1a1a1a;
+    border-radius: 0.25rem;
+    padding: 0 0.25rem;
+  }
+
+  .prose-custom blockquote {
+    border-left: 4px solid #ff5a1f;
+    color: #d1d5db;
+    padding-left: 1rem;
   }
 
   /* Loading States */
   .skeleton {
-    @apply animate-pulse bg-dark-surface rounded;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    background-color: #1a1a1a;
+    border-radius: 0.25rem;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
   }
 
   .loading-spinner {
-    @apply animate-spin h-5 w-5 border-2 border-dark-border border-t-brand-orange-500 rounded-full;
+    animation: spin 1s linear infinite;
+    height: 1.25rem;
+    width: 1.25rem;
+    border: 2px solid #2a2a2a;
+    border-top-color: #ff5a1f;
+    border-radius: 50%;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   /* Responsive Image */
   .responsive-image {
-    @apply w-full h-auto rounded-lg shadow-lg;
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -2px rgb(0 0 0 / 0.05);
   }
 }
 
 @layer utilities {
   /* Custom utilities for Transfer Juice */
+  .bg-orange-gradient {
+    background: linear-gradient(135deg, #ff8a4c 0%, #ff5a1f 100%);
+  }
+
+  .text-transparent {
+    color: transparent;
+  }
+
+  .bg-clip-text {
+    background-clip: text;
+    -webkit-background-clip: text;
+  }
+
   .text-balance {
     text-wrap: balance;
   }
@@ -215,11 +482,15 @@
 
   /* Glassmorphism effects */
   .glass {
-    @apply backdrop-blur-md bg-white/10 border border-white/20;
+    backdrop-filter: blur(12px);
+    background-color: rgb(255 255 255 / 0.1);
+    border: 1px solid rgb(255 255 255 / 0.2);
   }
 
   .glass-dark {
-    @apply backdrop-blur-md bg-black/10 border border-white/10;
+    backdrop-filter: blur(12px);
+    background-color: rgb(0 0 0 / 0.1);
+    border: 1px solid rgb(255 255 255 / 0.1);
   }
 
   /* Animation utilities */
@@ -243,30 +514,50 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
 
-  /* Smooth gradient transitions */
+  /* Gradient transition effect */
   .gradient-transition {
+    background: linear-gradient(45deg, #ff8a4c, #ff5a1f, #ff8a4c);
     background-size: 200% 200%;
     animation: gradientShift 3s ease infinite;
   }
 
   @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* Parallax optimizations */
+  .parallax-container {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* Enhanced backdrop blur */
+  .backdrop-blur-enhanced {
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
   }
 }
 
-/* Dark mode specific overrides */
+/* Dark mode styles */
 .dark {
   color-scheme: dark;
 }
 
-/* Light mode overrides (when implemented) */
+/* Light mode styles */
 .light {
   color-scheme: light;
 }
@@ -276,13 +567,13 @@
   .no-print {
     display: none !important;
   }
-  
+
   .print-only {
     display: block !important;
   }
 }
 
-/* Reduce motion for accessibility */
+/* Reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -2,7 +2,7 @@ import { forwardRef, ButtonHTMLAttributes } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-lg font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-bg disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center rounded-lg font-mono font-semibold tracking-wide transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-bg disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
@@ -50,6 +50,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={buttonVariants({ variant, size, className })}
         ref={ref}
         disabled={isDisabled}
+        style={{
+          minHeight:
+            size === 'xl'
+              ? '4rem'
+              : size === 'lg'
+                ? '3.25rem'
+                : size === 'md'
+                  ? '2.75rem'
+                  : '2.25rem',
+        }}
         {...props}
       >
         {loading && (
@@ -58,6 +68,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             fill='none'
             viewBox='0 0 24 24'
             xmlns='http://www.w3.org/2000/svg'
+            aria-hidden='true'
           >
             <circle
               className='opacity-25'

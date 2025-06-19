@@ -1,30 +1,30 @@
 # Product Requirements Document (PRD)
 
-**Project Name:** Transfer Juice — Premier League ITK Transfer Digest
+**Project Name:** Transfer Juice — Global Football Transfer Feed
 
 **Website:** transferjuice.com
 
 **Owner:** Dean
 
-**Date:** June 18, 2025
+**Date:** June 19, 2025 (Updated with Pivot Strategy)
 
 ---
 
 ## Overview
 
-Transfer Juice is a fully automated football transfer newsletter and web digest that transforms the chaotic world of Premier League ITK (In The Know) Twitter into entertaining, readable content. The system monitors trusted sources three times daily, processes their tweets through AI with a distinctly ascerbic and witty voice, and delivers polished editorial-style briefings via email and a sleek dark-mode web interface.
+Transfer Juice is a live global football transfer feed that transforms the chaotic world of ITK (In The Know) Twitter into an addictive, continuously updated stream of entertainment. The system monitors trusted sources hourly, processes their tweets through AI with Terry's distinctly ascerbic voice, and delivers real-time commentary via a sleek dark-mode web interface with daily email summaries.
 
-**App Strapline:** _"All of the ITK rumours, for people who swear they're not obsessed with transfers."_
+**App Strapline:** _"All of the world's transfer chaos, for people who swear they're not obsessed with transfers."_
 
 ---
 
 ## Goals
 
-- **Transform Transfer Twitter Chaos** - Convert unreliable ITK Twitter noise into genuinely engaging, entertaining content
-- **Deliver Editorial Excellence** - Provide ascerbic, witty Premier League transfer summaries in the style of Joel Golby
-- **Automate Premium Content Creation** - Fully automated pipeline from source monitoring to distribution
-- **Build Engaged Audience** - Tri-daily email digests with growing subscriber base
-- **Create Content Archive** - Responsive web archive with dark-mode aesthetic and monetization potential
+- **Transform Global Transfer Chaos** - Convert worldwide ITK Twitter noise into an addictive live entertainment feed
+- **Deliver Continuous Terry Commentary** - Provide real-time ascerbic, witty football transfer commentary in Joel Golby style
+- **Create Addictive User Experience** - Live feed with hourly updates, infinite scroll, and intelligent content padding
+- **Build Daily Habit Formation** - Web-first experience with morning email summaries driving return visits
+- **Integrate Football Culture** - Organic attribution of football stories from quality sources across the ecosystem
 
 ---
 
@@ -39,9 +39,10 @@ Transfer Juice is a fully automated football transfer newsletter and web digest 
 
 ### Content Structure
 
-- **Morning Brief** (08:00 BST) - Overnight developments and absurdity
-- **Afternoon Brief** (14:00 BST) - Midday madness and emerging stories
-- **Evening Brief** (20:00 BST) - End-of-day roundup and weekend prep
+- **Live Feed** (Primary) - Hourly micro-updates with Terry's running commentary
+- **Smart Content Padding** - Organic integration of football stories during quiet periods
+- **Daily Morning Email** (08:00 BST) - "Yesterday's chaos while you pretended to have a life"
+- **Intelligent Tagging** - Club, Player, and Source tags for feed filtering
 
 ---
 
@@ -77,22 +78,21 @@ Transfer Juice is a fully automated football transfer newsletter and web digest 
 
 ## Technical Features
 
-### 1. Source Monitoring
+### 1. Global Source Monitoring
 
-- **ITK Accounts** - Monitor 10 verified trusted sources:
-  - Fabrizio Romano (@FabrizioRomano) - Official handle confirmed
-  - David Ornstein (@David_Ornstein) - BBC Sport journalist
-  - Sam Lee (@SamLee) - Verified via X profile
-  - Paul Joyce (@\_pauljoyce) - The Times journalist
-  - Laurie Whitwell (@lauriewhitwell) - The Athletic journalist
-  - Rob Dawson (@RobDawsonESPN) - ESPN journalist
-  - Luke Edwards (@LukeEdwardsTele) - Telegraph journalist
-  - John Percy (@JPercyTelegraph) - Telegraph journalist
-  - Craig Hope (@CraigHope_DM) - Daily Mail journalist
-  - Dean Jones (@DeanJonesSoccer) - Football journalist
+- **Primary ITK Sources** - Global football transfer experts:
+  - Fabrizio Romano (@FabrizioRomano) - Global transfers, all leagues
+  - David Ornstein (@David_Ornstein) - Premier League focus
+  - Gianluca Di Marzio (@DiMarzio) - Serie A and European transfers
+  - Marca, AS (@marca, @diarioas) - La Liga transfers
+  - L'Équipe (@lequipe) - Ligue 1 and French players
+  - Sky Sports Deutschland - Bundesliga transfers
+  - ESPN Brasil - South American transfers
+  - Additional regional specialists as identified
 - **API Integration** - X (Twitter) API v2 with Bearer Token authentication
-- **Frequency** - Query every 3-4 hours for comprehensive coverage
-- **Data Storage** - Tweet content, timestamp, media URLs, original links
+- **Frequency** - Hourly monitoring for real-time feed updates
+- **Global Scope** - All major leagues, international transfers, loan deals
+- **Data Storage** - Tweet content, timestamp, media URLs, original links, global context
 
 ### 2. Content Processing & AI
 

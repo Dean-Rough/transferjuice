@@ -4,26 +4,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Transfer Juice is a fully automated Premier League transfer newsletter and web digest. The system monitors ITK (In The Know) sources on X/Twitter, processes content with AI, and delivers polished briefings 3x daily via email and web archive.
+Transfer Juice is a live global football transfer feed that transforms ITK (In The Know) Twitter chaos into an addictive, continuously updated entertainment stream. The system monitors trusted sources hourly, processes content with Terry's ascerbic AI voice, and delivers real-time commentary via a web-first interface with daily email summaries.
 
 ## Architecture & Data Flow
 
-**Core Pipeline:**
+**Core Live Feed Pipeline:**
 
-1. **Source Monitoring** → X API v2 queries 10-15 ITK accounts every 3-4 hours
-2. **Content Processing** → Filter for transfer relevance, AI summarization into editorial articles
-3. **Image Integration** → Pull from tweet media or Wikipedia Commons API
-4. **Distribution** → Email delivery + web archive update
-5. **Scheduling** → Cron jobs at 08:00, 14:00, 20:00 BST
+1. **Global Source Monitoring** → X API v2 queries worldwide ITK accounts hourly
+2. **Real-time Processing** → Filter for transfer relevance, Terry commentary generation
+3. **Content Mixing** → Intelligent padding with football stories (properly attributed)
+4. **Live Distribution** → WebSocket/SSE updates to active feed viewers
+5. **Daily Summary** → Morning email with yesterday's highlights
 
 **Key Components:**
 
-- Next.js web app with TailwindCSS for public archive (/morning, /afternoon, /evening)
-- Email service integration (ConvertKit/MailerLite/Postmark)
-- X API v2 integration for tweet monitoring
-- AI processing (GPT-4/Claude) for content summarization
-- Wikipedia Commons API for contextual images
-- Automated cron job system
+- Next.js web app with live feed architecture (infinite scroll, tag filtering)
+- Real-time updates (WebSocket/Server-Sent Events)
+- Global ITK source monitoring (all major leagues)
+- Terry AI commentary generation with Joel Golby style
+- Content partnership framework (The Upshot, FourFourTwo, etc.)
+- Tag-based navigation (Club, Player, Source)
+- Daily email summaries driving return visits
 
 ## Development Setup
 

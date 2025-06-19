@@ -12,7 +12,7 @@ import {
 } from '../ui/Card';
 
 interface NewsletterSignupProps {
-  variant?: 'card' | 'inline' | 'hero';
+  variant?: 'card' | 'inline' | 'hero' | 'compact';
   className?: string;
 }
 
@@ -146,6 +146,62 @@ export function NewsletterSignup({
             >
               Subscribe
             </Button>
+          </form>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === 'compact') {
+    return (
+      <div className={className}>
+        {success ? (
+          <div className='text-center'>
+            <div className='w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2'>
+              <svg
+                className='w-4 h-4 text-white'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M5 13l4 4L19 7'
+                />
+              </svg>
+            </div>
+            <p className='text-sm font-semibold text-gray-900 dark:text-gray-50 mb-1'>
+              Subscribed!
+            </p>
+            <p className='text-xs text-gray-600 dark:text-gray-400'>
+              Check your email
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className='space-y-3'>
+            <Input
+              type='email'
+              placeholder='Your email'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              error={error}
+              size='sm'
+              required
+            />
+            <Button
+              type='submit'
+              loading={loading}
+              disabled={!validateEmail(email)}
+              size='sm'
+              className='w-full'
+            >
+              Subscribe
+            </Button>
+            <p className='text-xs text-gray-500 dark:text-gray-400 text-center'>
+              3x daily briefings
+            </p>
           </form>
         )}
       </div>
