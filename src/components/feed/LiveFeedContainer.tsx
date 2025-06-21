@@ -407,9 +407,9 @@ export function LiveFeedContainer() {
                 region: 'GLOBAL' as const
               },
               tags: {
-                clubs: item.tags.filter(tag => tag.type === 'club').map(tag => tag.name),
-                players: item.tags.filter(tag => tag.type === 'player').map(tag => tag.name),
-                sources: item.tags.filter(tag => tag.type === 'source').map(tag => tag.name)
+                clubs: Array.isArray(item.tags) ? item.tags.filter(tag => tag.type === 'club').map(tag => tag.name) : [],
+                players: Array.isArray(item.tags) ? item.tags.filter(tag => tag.type === 'player').map(tag => tag.name) : [],
+                sources: Array.isArray(item.tags) ? item.tags.filter(tag => tag.type === 'source').map(tag => tag.name) : []
               },
               media: item.images?.[0] ? {
                 type: 'image' as const,

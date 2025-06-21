@@ -413,3 +413,21 @@ export const getClassificationStats = (
     typeStats,
   };
 };
+
+/**
+ * Alias for classifyTransferContent to match expected import
+ */
+export const classifyTransferTweet = async (text: string): Promise<ClassificationResult> => {
+  // Create a minimal tweet object for classification
+  const tweet: TweetData = {
+    id: 'temp',
+    text,
+    author: {
+      username: 'unknown',
+      displayName: 'Unknown',
+    },
+    createdAt: new Date().toISOString(),
+  };
+  
+  return classifyTransferContent(tweet);
+};

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { Header } from '@/components/layout/Header';
+import { BreakingNewsTicker } from '@/components/ui/BreakingNewsTicker';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -77,6 +78,7 @@ export default function RootLayout({
         {/* <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXXX" crossOrigin="anonymous"></script> */}
       </head>
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased min-h-screen bg-background text-foreground flex flex-col`}>
+        <BreakingNewsTicker className="sticky top-0 z-50" />
         <Header />
         <main className="flex-1">{children}</main>
       </body>

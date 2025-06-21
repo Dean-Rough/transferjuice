@@ -1,5 +1,5 @@
 // Transfer Juice Database Schema
-// Live Transfer Feed Architecture - Optimized for real-time global ITK monitoring
+// Magazine-style briefing system with hourly longform articles
 
 generator client {
   provider = "prisma-client-js"
@@ -98,6 +98,7 @@ model FeedItem {
   // Relations
   tags             FeedItemTag[]
   media            FeedItemMedia[]
+  briefings        BriefingFeedItem[]
   
   @@map("feed_items")
   @@index([type, publishedAt])
@@ -133,6 +134,7 @@ model Tag {
   
   // Relations
   feedItems        FeedItemTag[]
+  briefings        BriefingTag[]
   
   @@map("tags")
   @@index([type, normalizedName])
@@ -207,6 +209,9 @@ model EmailSubscriber {
   unsubscribedAt   DateTime?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
+  
+  // Relations
+  briefingEmails   BriefingEmail[]
   
   @@map("email_subscribers")
   @@index([isActive, frequency])
@@ -288,6 +293,186 @@ model SystemConfig {
 }
 
 // ============================================================================
+// MAGAZINE-STYLE BRIEFINGS
+// ============================================================================
+
+model Briefing {
+  id               String    @id @default(cuid())
+  slug             String    @unique // URL-friendly slug
+  timestamp        DateTime  @unique // Hourly briefing timestamp
+  
+  // Content (JSON structure for flexibility)
+  title            Json      // { main: string, subtitle?: string }
+  content          Json      // Array of content sections
+  
+  // Metadata
+  readTime         Int       // Estimated read time in minutes
+  wordCount        Int       
+  terryScore       Float     @default(0.0) // Terry voice consistency score
+  
+  // Visual timeline data
+  visualTimeline   Json      // Array of timeline items with polaroids
+  
+  // Sidebar content
+  sidebarSections  Json      // Array of sidebar sections
+  
+  // Generation tracking
+  generatedAt      DateTime  @default(now())
+  publishedAt      DateTime?
+  isPublished      Boolean   @default(false)
+  version          Int       @default(1)
+  
+  // Performance metrics
+  viewCount        Int       @default(0)
+  shareCount       Int       @default(0)
+  avgReadDepth     Float     @default(0.0)
+  
+  // Relations
+  feedItems        BriefingFeedItem[]
+  tags             BriefingTag[]
+  media            BriefingMedia[]
+  emails           BriefingEmail[]
+  
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  @@map("briefings")
+  @@index([timestamp])
+  @@index([isPublished, timestamp])
+  @@index([slug])
+}
+
+// Link briefings to the feed items they include
+model BriefingFeedItem {
+  id           String    @id @default(cuid())
+  briefingId   String
+  feedItemId   String
+  position     Int       // Order in briefing
+  section      String    // Which section it appears in
+  
+  briefing     Briefing  @relation(fields: [briefingId], references: [id], onDelete: Cascade)
+  feedItem     FeedItem  @relation(fields: [feedItemId], references: [id])
+  
+  createdAt    DateTime  @default(now())
+  
+  @@unique([briefingId, feedItemId])
+  @@map("briefing_feed_items")
+}
+
+// Tags for briefings
+model BriefingTag {
+  id           String    @id @default(cuid())
+  briefingId   String
+  tagId        String
+  relevance    Float     @default(1.0) // How relevant this tag is to the briefing
+  
+  briefing     Briefing  @relation(fields: [briefingId], references: [id], onDelete: Cascade)
+  tag          Tag       @relation(fields: [tagId], references: [id])
+  
+  createdAt    DateTime  @default(now())
+  
+  @@unique([briefingId, tagId])
+  @@map("briefing_tags")
+}
+
+// Media for briefings (polaroids, images)
+model BriefingMedia {
+  id           String    @id @default(cuid())
+  briefingId   String
+  
+  type         MediaType
+  url          String
+  thumbnailUrl String?
+  altText      String?
+  caption      String?
+  
+  // For polaroids
+  playerName   String?
+  clubName     String?
+  frameColor   String?   // Hex color
+  
+  briefing     Briefing  @relation(fields: [briefingId], references: [id], onDelete: Cascade)
+  
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  @@map("briefing_media")
+}
+
+// Track which briefings were sent to which subscribers
+model BriefingEmail {
+  id               String          @id @default(cuid())
+  briefingId       String
+  subscriberId     String
+  
+  sentAt           DateTime        @default(now())
+  openedAt         DateTime?
+  clickedAt        DateTime?
+  clickCount       Int             @default(0)
+  
+  briefing         Briefing        @relation(fields: [briefingId], references: [id])
+  subscriber       EmailSubscriber @relation(fields: [subscriberId], references: [id])
+  
+  @@unique([briefingId, subscriberId])
+  @@map("briefing_emails")
+}
+
+// Player database for polaroid generation
+model Player {
+  id               String    @id @default(cuid())
+  name             String
+  normalizedName   String    @unique // Lowercase for matching
+  
+  // Wikipedia data
+  wikipediaUrl     String?
+  wikipediaPageId  String?
+  imageUrl         String?
+  imageLicense     String?
+  lastImageUpdate  DateTime?
+  
+  // Player info
+  position         String?
+  currentClub      String?
+  nationality      String?
+  birthDate        DateTime?
+  
+  // Cached polaroid data
+  polaroidUrl      String?   // Pre-generated polaroid
+  polaroidUpdatedAt DateTime?
+  
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  @@map("players")
+  @@index([normalizedName])
+}
+
+// Partner content tracking
+model PartnerContent {
+  id               String    @id @default(cuid())
+  sourceId         String    // From partnerSources.ts
+  
+  title            String
+  content          String
+  url              String
+  publishedAt      DateTime
+  
+  // Usage tracking
+  usedInBriefingId String?
+  usedAt           DateTime?
+  
+  // Metadata
+  category         String
+  tags             String[]
+  
+  createdAt        DateTime  @default(now())
+  
+  @@map("partner_content")
+  @@index([sourceId, publishedAt])
+  @@index([usedInBriefingId])
+}
+
+// ============================================================================
 // ENUMS
 // ============================================================================
 
@@ -339,6 +524,7 @@ enum MediaType {
   IMAGE
   VIDEO
   GIF
+  POLAROID     // Added for polaroid images
 }
 
 enum EmailFrequency {
