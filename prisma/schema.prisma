@@ -1,0 +1,349 @@
+// Transfer Juice Database Schema
+// Live Transfer Feed Architecture - Optimized for real-time global ITK monitoring
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ITK SOURCE MANAGEMENT
+// ============================================================================
+
+model ITKSource {
+  id               String    @id @default(cuid())
+  name             String    @unique
+  username         String    @unique // Twitter handle without @
+  twitterId        String?   @unique // Twitter user ID
+  tier             Int       @default(3) // 1 = Tier 1 (Romano, Ornstein), 2 = Tier 2, 3 = Tier 3
+  reliability      Float     @default(0.5) // 0.0 to 1.0
+  region           String    @default("GLOBAL") // UK, ES, IT, FR, DE, BR, GLOBAL
+  isActive         Boolean   @default(true)
+  isVerified       Boolean   @default(false)
+  
+  // Twitter metadata
+  followerCount    Int?
+  followingCount   Int?
+  tweetCount       Int?
+  profileImageUrl  String?
+  description      String?
+  
+  // Monitoring settings
+  lastFetchedAt    DateTime?
+  lastTweetId      String?   // For pagination
+  fetchInterval    Int       @default(900) // seconds between fetches
+  
+  // Performance tracking
+  totalTweets      Int       @default(0)
+  relevantTweets   Int       @default(0)
+  avgRelevance     Float     @default(0.0)
+  
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  // Relations
+  feedItems        FeedItem[]
+  
+  @@map("itk_sources")
+}
+
+// ============================================================================
+// CORE FEED ITEMS
+// ============================================================================
+
+model FeedItem {
+  id               String    @id @default(cuid())
+  type             FeedType  @default(ITK)
+  
+  // Content
+  content          String
+  terryCommentary  String?
+  originalText     String?   // Original tweet text before processing
+  
+  // Source information
+  sourceId         String
+  source           ITKSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  originalUrl      String?   // Link to original tweet/article
+  twitterId        String?   // Original tweet ID
+  
+  // Metadata
+  transferType     TransferType?
+  priority         Priority  @default(MEDIUM)
+  relevanceScore   Float     @default(0.5)
+  league           League?
+  
+  // Timestamps
+  publishedAt      DateTime  // When the original content was published
+  processedAt      DateTime  @default(now()) // When we processed it
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  // Engagement metrics
+  originalShares   Int       @default(0) // Original tweet/post shares
+  originalLikes    Int       @default(0)
+  originalReplies  Int       @default(0)
+  ourShares        Int       @default(0) // Our platform shares
+  ourReactions     Int       @default(0)
+  ourClicks        Int       @default(0)
+  
+  // Content flags
+  isProcessed      Boolean   @default(false)
+  isPublished      Boolean   @default(false)
+  isArchived       Boolean   @default(false)
+  
+  // Relations
+  tags             FeedItemTag[]
+  media            FeedItemMedia[]
+  
+  @@map("feed_items")
+  @@index([type, publishedAt])
+  @@index([priority, publishedAt])
+  @@index([league, publishedAt])
+  @@index([sourceId, publishedAt])
+  @@index([isPublished, publishedAt])
+}
+
+// ============================================================================
+// TAG MANAGEMENT
+// ============================================================================
+
+model Tag {
+  id               String    @id @default(cuid())
+  name             String    @unique
+  type             TagType
+  normalizedName   String    // Lowercase, no spaces for matching
+  
+  // Metadata
+  isPopular        Boolean   @default(false)
+  usageCount       Int       @default(0)
+  lastUsedAt       DateTime?
+  
+  // Club/Player specific data
+  league           League?
+  country          String?
+  position         String?   // For players
+  transferValue    BigInt?   // In cents for precision
+  
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  // Relations
+  feedItems        FeedItemTag[]
+  
+  @@map("tags")
+  @@index([type, normalizedName])
+  @@index([league, type])
+  @@index([usageCount])
+}
+
+// Many-to-many relationship between FeedItems and Tags
+model FeedItemTag {
+  id           String   @id @default(cuid())
+  feedItemId   String
+  tagId        String
+  
+  feedItem     FeedItem @relation(fields: [feedItemId], references: [id], onDelete: Cascade)
+  tag          Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  createdAt    DateTime @default(now())
+  
+  @@unique([feedItemId, tagId])
+  @@map("feed_item_tags")
+}
+
+// Media attachments for feed items
+model FeedItemMedia {
+  id           String    @id @default(cuid())
+  feedItemId   String
+  
+  type         MediaType
+  url          String
+  thumbnailUrl String?
+  altText      String?
+  width        Int?
+  height       Int?
+  size         BigInt?   // File size in bytes
+  
+  feedItem     FeedItem  @relation(fields: [feedItemId], references: [id], onDelete: Cascade)
+  
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  @@map("feed_item_media")
+}
+
+// ============================================================================
+// EMAIL SUBSCRIBERS
+// ============================================================================
+
+model EmailSubscriber {
+  id               String            @id @default(cuid())
+  email            String            @unique
+  isActive         Boolean           @default(true)
+  isVerified       Boolean           @default(false)
+  
+  // Preferences
+  frequency        EmailFrequency    @default(DAILY)
+  preferredTime    String            @default("08:00") // HH:MM format
+  timezone         String            @default("Europe/London")
+  
+  // Metadata
+  source           String?           // How they subscribed
+  ipAddress        String?
+  userAgent        String?
+  
+  // Email tracking
+  lastEmailSent    DateTime?
+  lastOpenedAt     DateTime?
+  totalEmailsSent  Int               @default(0)
+  totalOpens       Int               @default(0)
+  totalClicks      Int               @default(0)
+  
+  subscribedAt     DateTime          @default(now())
+  unsubscribedAt   DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  
+  @@map("email_subscribers")
+  @@index([isActive, frequency])
+}
+
+// Daily Email Summaries
+model EmailSummary {
+  id               String    @id @default(cuid())
+  date             DateTime  @unique @db.Date // Daily summaries
+  
+  // Content
+  subject          String
+  previewText      String
+  content          String    // HTML content
+  terryIntro       String?   // Terry's opening commentary
+  terryOutro       String?   // Terry's closing commentary
+  
+  // Metadata
+  itemCount        Int       @default(0)
+  topStoryId       String?   // Reference to featured feed item
+  
+  // Send tracking
+  isGenerated      Boolean   @default(false)
+  isSent           Boolean   @default(false)
+  sentAt           DateTime?
+  recipientCount   Int       @default(0)
+  
+  // Performance
+  openRate         Float     @default(0.0)
+  clickRate        Float     @default(0.0)
+  unsubscribeRate  Float     @default(0.0)
+  
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  @@map("email_summaries")
+}
+
+// ============================================================================
+// ANALYTICS AND PERFORMANCE TRACKING
+// ============================================================================
+
+model AnalyticsEvent {
+  id               String    @id @default(cuid())
+  type             String    // 'page_view', 'feed_item_click', 'share', 'tag_filter', etc.
+  
+  // Event data
+  feedItemId       String?
+  tagId            String?
+  sourceId         String?
+  
+  // User context
+  sessionId        String?
+  ipAddress        String?
+  userAgent        String?
+  referer          String?
+  
+  // Additional data (JSON)
+  metadata         Json?
+  
+  createdAt        DateTime  @default(now())
+  
+  @@map("analytics_events")
+  @@index([type, createdAt])
+  @@index([feedItemId, createdAt])
+}
+
+// System configuration and monitoring
+model SystemConfig {
+  id               String    @id @default(cuid())
+  key              String    @unique
+  value            String
+  description      String?
+  
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  @@map("system_config")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum FeedType {
+  ITK           // In The Know transfer tweet
+  TERRY         // Terry's original commentary
+  PARTNER       // Partner content (The Upshot, FourFourTwo, etc.)
+  BREAKING      // Breaking news
+}
+
+enum TransferType {
+  SIGNING       // Player signed
+  RUMOUR        // Transfer rumour
+  MEDICAL       // Medical scheduled/completed
+  CONFIRMED     // Transfer confirmed
+  BID           // Bid made/rejected
+  PERSONAL_TERMS // Personal terms agreed
+  LOAN          // Loan deal
+  EXTENSION     // Contract extension
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  BREAKING
+}
+
+enum League {
+  PL            // Premier League
+  LALIGA        // La Liga
+  SERIEA        // Serie A
+  BUNDESLIGA    // Bundesliga
+  LIGUE1        // Ligue 1
+  EREDIVISIE    // Eredivisie
+  PRIMEIRA      // Primeira Liga
+  MLS           // Major League Soccer
+  OTHER
+}
+
+enum TagType {
+  CLUB
+  PLAYER
+  SOURCE
+  GENERAL
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  GIF
+}
+
+enum EmailFrequency {
+  DAILY
+  WEEKLY
+  BREAKING_ONLY
+  DISABLED
+}

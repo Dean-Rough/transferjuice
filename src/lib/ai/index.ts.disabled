@@ -1,0 +1,292 @@
+/**
+ * Terry's Continuous Commentary System
+ * Complete AI-powered commentary system with Joel Golby-style voice
+ */
+
+// Core types and interfaces
+export type {
+  TerryCommentaryConfig,
+  TerryCommentaryResult,
+  TerryVoiceMetrics,
+} from './terryCommentarySystem';
+
+export type {
+  TerryIntegrationConfig,
+  TerryProcessingStats,
+} from './terryIntegration';
+
+export type {
+  TerryOrchestrationConfig,
+  TerryOrchestrationStats,
+} from './terryOrchestrator';
+
+// Core commentary system
+export {
+  TerryCommentarySystem,
+  terryCommentarySystem,
+  DEFAULT_TERRY_CONFIG,
+} from './terryCommentarySystem';
+
+// Integration layer
+export {
+  TerryIntegration,
+  terryIntegration,
+  DEFAULT_INTEGRATION_CONFIG,
+  addTerryCommentary,
+  addTerryBreakingNews,
+  getTerryStats,
+  getTerryAnalytics,
+  updateTerryConfig,
+} from './terryIntegration';
+
+// Orchestration system
+export {
+  TerryOrchestrator,
+  terryOrchestrator,
+  DEFAULT_ORCHESTRATION_CONFIG,
+  startTerrySystem,
+  stopTerrySystem,
+  getTerrySystemStatus,
+  triggerTerryBreakingNews,
+  updateTerrySystemConfig,
+} from './terryOrchestrator';
+
+// Convenience functions for common use cases
+
+/**
+ * Quick start Terry's complete system with default config
+ */
+export const quickStartTerry = () => {
+  // TODO: Fix circular dependency issue
+  console.log('Terry system startup placeholder');
+  return null;
+};
+
+/**
+ * Start Terry with custom configuration
+ */
+export const startTerryWithConfig = (config: {
+  maxCommentariesPerHour?: number;
+  voiceConsistencyThreshold?: number;
+  humorIntensity?: 'mild' | 'medium' | 'sharp';
+  enableBreakingNews?: boolean;
+}) => {
+  const terryConfig = {
+    integration: {
+      maxCommentariesPerHour: config.maxCommentariesPerHour || 8,
+      voiceConsistencyThreshold: config.voiceConsistencyThreshold || 0.75,
+      humorIntensity: config.humorIntensity || 'sharp',
+    },
+    scheduling: {
+      enableBreakingNewsAlerts: config.enableBreakingNews ?? true,
+    },
+  };
+
+  // TODO: Fix circular dependency issue
+  console.log('Terry system config startup placeholder', terryConfig);
+  return null;
+};
+
+/**
+ * Get comprehensive Terry analytics dashboard
+ */
+export const getTerryDashboard = () => {
+  const systemStatus = getTerrySystemStatus();
+  const detailedAnalytics = getTerryAnalytics();
+
+  return {
+    overview: {
+      isActive: systemStatus.isRunning,
+      currentHour: systemStatus.currentHour,
+      isActiveHour: systemStatus.isActiveHour,
+      lastActivity: systemStatus.stats.lastActivityTime,
+    },
+    performance: {
+      totalCommentaries: systemStatus.stats.commentariesGenerated,
+      successRate: detailedAnalytics.integration.successRate,
+      averageResponseTime: systemStatus.stats.averageResponseTime,
+      voiceConsistency: systemStatus.stats.voiceConsistencyRate,
+    },
+    breakingNews: {
+      totalBreakingCommentaries: systemStatus.stats.breakingNewsCommentaries,
+      alertsEnabled: systemStatus.config.scheduling.enableBreakingNewsAlerts,
+    },
+    voiceAnalytics: detailedAnalytics.voiceAnalytics,
+    systemHealth: {
+      pendingCommentaries: detailedAnalytics.pendingCommentaries,
+      activeHoursToday: systemStatus.stats.activeHoursToday,
+      rejectionsLowQuality: detailedAnalytics.integration.rejectionsLowQuality,
+      rejectionsQuotaExceeded:
+        detailedAnalytics.integration.rejectionsQuotaExceeded,
+    },
+  };
+};
+
+/**
+ * Test Terry's voice with sample content
+ */
+export const testTerryVoice = async () => {
+  const testFeedItem = {
+    id: 'test-item',
+    type: 'itk' as const,
+    timestamp: new Date(),
+    content:
+      '🚨 BREAKING: Arsenal agree €50M fee for Declan Rice! Medical scheduled for tomorrow. Here we go! ✅',
+    source: {
+      name: 'Fabrizio Romano',
+      handle: '@FabrizioRomano',
+      tier: 1 as const,
+      reliability: 0.95,
+      region: 'GLOBAL' as const,
+    },
+    tags: {
+      clubs: ['Arsenal'],
+      players: ['Declan Rice'],
+      sources: ['Fabrizio Romano'],
+    },
+    metadata: {
+      transferType: 'confirmed' as const,
+      priority: 'high' as const,
+      relevanceScore: 0.92,
+      league: 'PL' as const,
+    },
+    isRead: false,
+    isNew: true,
+  };
+
+  console.log('🧪 Testing Terry voice with sample content...');
+
+  const result = await terryCommentarySystem.generateCommentary(testFeedItem);
+
+  if (result) {
+    console.log('✅ Terry test successful!');
+    console.log(`Commentary: ${result.commentary}`);
+    console.log(
+      `Voice consistency: ${Math.round(result.voiceConsistencyScore * 100)}%`
+    );
+    console.log(`Humor level: ${result.humorLevel}`);
+    console.log(`Topics: ${result.topics.join(', ')}`);
+    return result;
+  } else {
+    console.log('❌ Terry test failed - no commentary generated');
+    return null;
+  }
+};
+
+/**
+ * Configure Terry for different moods/intensities
+ */
+export const setTerryMood = (mood: 'chill' | 'standard' | 'savage') => {
+  const moodConfigs = {
+    chill: {
+      integration: {
+        maxCommentariesPerHour: 4,
+        humorIntensity: 'mild' as const,
+        voiceConsistencyThreshold: 0.7,
+      },
+    },
+    standard: {
+      integration: {
+        maxCommentariesPerHour: 8,
+        humorIntensity: 'medium' as const,
+        voiceConsistencyThreshold: 0.75,
+      },
+    },
+    savage: {
+      integration: {
+        maxCommentariesPerHour: 12,
+        humorIntensity: 'sharp' as const,
+        voiceConsistencyThreshold: 0.8,
+      },
+    },
+  };
+
+  updateTerrySystemConfig(moodConfigs[mood]);
+  console.log(`🎭 Terry mood set to: ${mood}`);
+};
+
+/**
+ * Emergency stop for Terry (if things go wrong)
+ */
+export const emergencyStopTerry = () => {
+  stopTerrySystem();
+  console.log('🛑 Terry emergency stop activated');
+};
+
+/**
+ * Development utilities
+ */
+export const terryDevUtils = {
+  /**
+   * Generate mock Terry commentary for testing
+   */
+  generateMockCommentary: (topic: string) => {
+    const mockCommentaries = {
+      'big-transfer':
+        'Right, spending €100M on a player is either genius or the most expensive way to disappoint your fanbase.',
+      medical:
+        "The medical's tomorrow which means we'll get 47 updates about someone breathing correctly and walking in a straight line.",
+      'personal-terms':
+        "Personal terms agreed, which in football means they've successfully negotiated who pays for the fancy coffee machine.",
+      'breaking-news':
+        'BREAKING: Football Twitter is about to lose its collective mind over this one.',
+      'unreliable-source':
+        'According to this source, the transfer might happen. And according to my horoscope, I might win the lottery.',
+    };
+
+    return (
+      mockCommentaries[topic as keyof typeof mockCommentaries] ||
+      "Terry's having a tea break. Normal service will resume shortly."
+    );
+  },
+
+  /**
+   * Validate Terry voice consistency
+   */
+  validateVoice: (commentary: string) => {
+    return (
+      terryCommentarySystem.validateVoiceConsistency?.(commentary) || {
+        overallConsistency: Math.random() * 0.3 + 0.7, // Mock 70-100%
+        ascerbicScore: Math.random() * 0.4 + 0.6,
+        britishHumourScore: Math.random() * 0.4 + 0.6,
+        footballKnowledgeScore: Math.random() * 0.4 + 0.6,
+        joelGolbyLikenessScore: Math.random() * 0.4 + 0.6,
+      }
+    );
+  },
+
+  /**
+   * Get Terry system diagnostics
+   */
+  getDiagnostics: () => {
+    const status = getTerrySystemStatus();
+    const dashboard = getTerryDashboard();
+
+    return {
+      systemHealth: status.isRunning ? 'healthy' : 'stopped',
+      lastActivity: dashboard.overview.lastActivity,
+      performance: {
+        commentariesGenerated: dashboard.performance.totalCommentaries,
+        successRate: dashboard.performance.successRate,
+        voiceConsistency: dashboard.performance.voiceConsistency,
+      },
+      issues: [
+        ...(dashboard.systemHealth.rejectionsLowQuality > 5
+          ? ['High voice quality rejections']
+          : []),
+        ...(dashboard.systemHealth.rejectionsQuotaExceeded > 10
+          ? ['Quota exceeded frequently']
+          : []),
+        ...(dashboard.performance.successRate < 50 ? ['Low success rate'] : []),
+      ],
+      recommendations: [
+        ...(dashboard.performance.voiceConsistency < 0.7
+          ? ['Consider adjusting voice consistency threshold']
+          : []),
+        ...(dashboard.performance.successRate < 30
+          ? ['Review commentary generation logic']
+          : []),
+      ],
+    };
+  },
+};

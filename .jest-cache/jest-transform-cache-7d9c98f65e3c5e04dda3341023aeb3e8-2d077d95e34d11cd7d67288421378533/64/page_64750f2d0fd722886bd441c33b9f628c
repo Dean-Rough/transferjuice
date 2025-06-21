@@ -1,0 +1,117 @@
+66775aff7d1036c667e101c4a32020fc
+/* istanbul ignore next */
+function cov_b4qiwqun5() {
+  var path = "/Users/deannewton/Documents/TransferJuice/src/app/inline-test/page.tsx";
+  var hash = "c08a6ed632c44792ad5050263f9795a63ae7efa1";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/Users/deannewton/Documents/TransferJuice/src/app/inline-test/page.tsx",
+    statementMap: {
+      "0": {
+        start: {
+          line: 2,
+          column: 2
+        },
+        end: {
+          line: 39,
+          column: 4
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "InlineTestPage",
+        decl: {
+          start: {
+            line: 1,
+            column: 24
+          },
+          end: {
+            line: 1,
+            column: 38
+          }
+        },
+        loc: {
+          start: {
+            line: 1,
+            column: 41
+          },
+          end: {
+            line: 40,
+            column: 1
+          }
+        },
+        line: 1
+      }
+    },
+    branchMap: {},
+    s: {
+      "0": 0
+    },
+    f: {
+      "0": 0
+    },
+    b: {},
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "c08a6ed632c44792ad5050263f9795a63ae7efa1"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_b4qiwqun5 = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_b4qiwqun5();
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+export default function InlineTestPage() {
+  /* istanbul ignore next */
+  cov_b4qiwqun5().f[0]++;
+  cov_b4qiwqun5().s[0]++;
+  return /*#__PURE__*/ /* istanbul ignore next */_jsxs(
+  /* istanbul ignore next */
+  "div",
+  /* istanbul ignore next */
+  {
+    className: "p-8",
+    children: [/*#__PURE__*/
+    /* istanbul ignore next */
+    _jsx(
+    /* istanbul ignore next */
+    "h1",
+    /* istanbul ignore next */
+    {
+      className: "text-2xl font-bold mb-4",
+      children: "Inline JavaScript Test"
+    }), /*#__PURE__*/
+    /* istanbul ignore next */
+    _jsx(
+    /* istanbul ignore next */
+    "div",
+    /* istanbul ignore next */
+    {
+      id: "test-output",
+      children: "JavaScript not loaded"
+    }), /*#__PURE__*/
+    /* istanbul ignore next */
+    _jsx(
+    /* istanbul ignore next */
+    "script",
+    /* istanbul ignore next */
+    {
+      dangerouslySetInnerHTML: {
+        __html:
+        /* istanbul ignore next */
+        "\n            document.addEventListener('DOMContentLoaded', function() {\n              const el = document.getElementById('test-output');\n              if (el) {\n                el.textContent = 'JavaScript is working!';\n                el.style.color = 'green';\n              }\n              \n              // Try to fetch the API\n              fetch('/api/feed?limit=5')\n                .then(res => res.json())\n                .then(data => {\n                  console.log('API Response:', data);\n                  const resultEl = document.createElement('pre');\n                  resultEl.style.marginTop = '20px';\n                  resultEl.style.padding = '10px';\n                  resultEl.style.backgroundColor = '#333';\n                  resultEl.style.borderRadius = '5px';\n                  resultEl.style.overflow = 'auto';\n                  resultEl.textContent = JSON.stringify(data, null, 2);\n                  document.querySelector('.p-8').appendChild(resultEl);\n                })\n                .catch(err => {\n                  console.error('API Error:', err);\n                });\n            });\n          "
+      }
+    })]
+  });
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfYjRxaXdxdW41IiwiYWN0dWFsQ292ZXJhZ2UiLCJqc3giLCJfanN4IiwianN4cyIsIl9qc3hzIiwiSW5saW5lVGVzdFBhZ2UiLCJmIiwicyIsImNsYXNzTmFtZSIsImNoaWxkcmVuIiwiaWQiLCJkYW5nZXJvdXNseVNldElubmVySFRNTCIsIl9faHRtbCJdLCJzb3VyY2VzIjpbInBhZ2UudHN4Il0sInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIElubGluZVRlc3RQYWdlKCkge1xuICByZXR1cm4gKFxuICAgIDxkaXYgY2xhc3NOYW1lPVwicC04XCI+XG4gICAgICA8aDEgY2xhc3NOYW1lPVwidGV4dC0yeGwgZm9udC1ib2xkIG1iLTRcIj5JbmxpbmUgSmF2YVNjcmlwdCBUZXN0PC9oMT5cbiAgICAgIDxkaXYgaWQ9XCJ0ZXN0LW91dHB1dFwiPkphdmFTY3JpcHQgbm90IGxvYWRlZDwvZGl2PlxuICAgICAgXG4gICAgICA8c2NyaXB0IFxuICAgICAgICBkYW5nZXJvdXNseVNldElubmVySFRNTD17e1xuICAgICAgICAgIF9faHRtbDogYFxuICAgICAgICAgICAgZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKCkge1xuICAgICAgICAgICAgICBjb25zdCBlbCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0ZXN0LW91dHB1dCcpO1xuICAgICAgICAgICAgICBpZiAoZWwpIHtcbiAgICAgICAgICAgICAgICBlbC50ZXh0Q29udGVudCA9ICdKYXZhU2NyaXB0IGlzIHdvcmtpbmchJztcbiAgICAgICAgICAgICAgICBlbC5zdHlsZS5jb2xvciA9ICdncmVlbic7XG4gICAgICAgICAgICAgIH1cbiAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgIC8vIFRyeSB0byBmZXRjaCB0aGUgQVBJXG4gICAgICAgICAgICAgIGZldGNoKCcvYXBpL2ZlZWQ/bGltaXQ9NScpXG4gICAgICAgICAgICAgICAgLnRoZW4ocmVzID0+IHJlcy5qc29uKCkpXG4gICAgICAgICAgICAgICAgLnRoZW4oZGF0YSA9PiB7XG4gICAgICAgICAgICAgICAgICBjb25zb2xlLmxvZygnQVBJIFJlc3BvbnNlOicsIGRhdGEpO1xuICAgICAgICAgICAgICAgICAgY29uc3QgcmVzdWx0RWwgPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCdwcmUnKTtcbiAgICAgICAgICAgICAgICAgIHJlc3VsdEVsLnN0eWxlLm1hcmdpblRvcCA9ICcyMHB4JztcbiAgICAgICAgICAgICAgICAgIHJlc3VsdEVsLnN0eWxlLnBhZGRpbmcgPSAnMTBweCc7XG4gICAgICAgICAgICAgICAgICByZXN1bHRFbC5zdHlsZS5iYWNrZ3JvdW5kQ29sb3IgPSAnIzMzMyc7XG4gICAgICAgICAgICAgICAgICByZXN1bHRFbC5zdHlsZS5ib3JkZXJSYWRpdXMgPSAnNXB4JztcbiAgICAgICAgICAgICAgICAgIHJlc3VsdEVsLnN0eWxlLm92ZXJmbG93ID0gJ2F1dG8nO1xuICAgICAgICAgICAgICAgICAgcmVzdWx0RWwudGV4dENvbnRlbnQgPSBKU09OLnN0cmluZ2lmeShkYXRhLCBudWxsLCAyKTtcbiAgICAgICAgICAgICAgICAgIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJy5wLTgnKS5hcHBlbmRDaGlsZChyZXN1bHRFbCk7XG4gICAgICAgICAgICAgICAgfSlcbiAgICAgICAgICAgICAgICAuY2F0Y2goZXJyID0+IHtcbiAgICAgICAgICAgICAgICAgIGNvbnNvbGUuZXJyb3IoJ0FQSSBFcnJvcjonLCBlcnIpO1xuICAgICAgICAgICAgICAgIH0pO1xuICAgICAgICAgICAgfSk7XG4gICAgICAgICAgYFxuICAgICAgICB9fVxuICAgICAgLz5cbiAgICA8L2Rpdj5cbiAgKTtcbn0iXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztJQWVZO0lBQUFBLGFBQUEsWUFBQUEsQ0FBQTtNQUFBLE9BQUFDLGNBQUE7SUFBQTtFQUFBO0VBQUEsT0FBQUEsY0FBQTtBQUFBO0FBQUFELGFBQUE7QUFBQSxTQUFBRSxHQUFBLElBQUFDLElBQUEsRUFBQUMsSUFBQSxJQUFBQyxLQUFBO0FBZlosZUFBZSxTQUFTQyxjQUFjQSxDQUFBLEVBQUc7RUFBQTtFQUFBTixhQUFBLEdBQUFPLENBQUE7RUFBQVAsYUFBQSxHQUFBUSxDQUFBO0VBQ3ZDLG9CQUNFLDJCQUFBSCxLQUFBO0VBQUE7RUFBQTtFQUFBO0VBQUE7SUFBS0ksU0FBUyxFQUFDLEtBQUs7SUFBQUMsUUFBQTtJQUNsQjtJQUFBUCxJQUFBO0lBQUE7SUFBQTtJQUFBO0lBQUE7TUFBSU0sU0FBUyxFQUFDLHlCQUF5QjtNQUFBQyxRQUFBLEVBQUM7SUFBc0IsQ0FBSSxDQUFDO0lBQ25FO0lBQUFQLElBQUE7SUFBQTtJQUFBO0lBQUE7SUFBQTtNQUFLUSxFQUFFLEVBQUMsYUFBYTtNQUFBRCxRQUFBLEVBQUM7SUFBcUIsQ0FBSyxDQUFDO0lBRWpEO0lBQUFQLElBQUE7SUFBQTtJQUFBO0lBQUE7SUFBQTtNQUNFUyx1QkFBdUIsRUFBRTtRQUN2QkMsTUFBTTtRQUFBO1FBQUE7TUEyQlI7SUFBRSxDQUNILENBQUM7RUFBQSxDQUNDLENBQUM7QUFFViIsImlnbm9yZUxpc3QiOltdfQ==

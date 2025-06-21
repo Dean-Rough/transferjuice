@@ -1,0 +1,525 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Fonts */
+@font-face {
+  font-family: 'Bouchers Sans';
+  src: url('/fonts/bouchers-sans.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@layer base {
+  :root {
+    /* ThreadJuice-inspired dark theme */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --radius: 0.5rem;
+    
+    /* Transfer Juice specific colors */
+    --tj-orange: 14 100% 56%;
+    --tj-orange-dark: 14 100% 46%;
+    --tj-orange-light: 14 100% 66%;
+    --tj-green: 142 71% 45%;
+    --tj-green-light: 142 71% 55%;
+    --tj-cream: 30 50% 95%;
+    --tj-black: 0 0% 5%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-light;
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-black; /* Geist 900 */
+  }
+  
+  /* Typography Scale */
+  h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+  h2 {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+  h3 {
+    @apply text-xl md:text-2xl lg:text-3xl;
+  }
+  p, .body-text {
+    @apply font-light text-base md:text-lg;
+  }
+  
+  /* Terry's voice - Bouchers Sans */
+  .terry-voice {
+    font-family: 'Bouchers Sans', system-ui, sans-serif;
+    @apply text-lg md:text-xl;
+  }
+  
+  /* Data/metrics - Geist Mono */
+  .data-mono {
+    font-family: var(--font-geist-mono), monospace;
+    @apply text-sm;
+  }
+}
+
+@layer components {
+  /* Global tag pill style with mono font */
+  .tag-pill {
+    @apply flex flex-shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-black px-4 py-2 font-mono text-sm font-bold text-white transition-colors hover:bg-gray-800;
+  }
+
+  /* Transfer-specific tag variations */
+  .tag-club {
+    @apply bg-orange-600 hover:bg-orange-700;
+  }
+  
+  .tag-player {
+    @apply bg-green-600 hover:bg-green-700;
+  }
+  
+  .tag-source {
+    @apply bg-gray-700 hover:bg-gray-600;
+  }
+
+  /* Terry's quote bubbles - using Bouchers Sans with orange styling */
+  .terry-bubble {
+    font-family: 'Bouchers Sans', system-ui, sans-serif;
+    @apply bg-orange-600 text-white rounded-xl p-6 relative shadow-lg;
+    transform: rotate(-1deg);
+    transition: all 0.3s ease;
+  }
+  
+  .terry-bubble:hover {
+    transform: rotate(0deg) scale(1.02);
+    @apply shadow-xl;
+  }
+  
+  .terry-bubble::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    bottom: 20px;
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-right: 18px solid hsl(var(--tj-orange));
+    z-index: 1;
+  }
+
+  /* Engagement metrics mono style */
+  .engagement-mono {
+    @apply font-mono text-sm;
+  }
+}
+
+/* Mobile-First Touch Optimization */
+@layer utilities {
+  /* Touch target minimum 44px for accessibility */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Enhanced touch areas for small elements */
+  .touch-area {
+    position: relative;
+  }
+
+  .touch-area::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    z-index: 1;
+  }
+
+  /* Mobile-optimized spacing */
+  .mobile-spacing {
+    @apply gap-4 p-4;
+  }
+
+  .mobile-grid {
+    @apply grid grid-cols-1 gap-4 sm:gap-6;
+  }
+
+  /* Touch-friendly scroll areas */
+  .touch-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* Improved focus states for touch navigation */
+  .touch-focus:focus-visible {
+    @apply outline-none ring-2 ring-orange-500 ring-offset-2;
+  }
+
+  /* Mobile typography optimization */
+  .mobile-text {
+    @apply text-base leading-relaxed;
+  }
+
+  .mobile-heading {
+    @apply text-lg font-extrabold leading-tight sm:text-xl md:text-2xl;
+  }
+}
+
+/* Mobile-optimized animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
+/* Jaunty angle animations for feed items and Terry quotes */
+@keyframes jauntyShadow {
+  0% {
+    transform: rotate(-2deg);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    transform: rotate(-1deg);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  100% {
+    transform: rotate(-2deg);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@keyframes mobileSlideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes touchFeedback {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Touch interaction feedback */
+.touch-feedback:active {
+  animation: touchFeedback 0.1s ease-in-out;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInContent {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
+/* Seamless ticker animation for breaking transfer news */
+@keyframes ticker {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+.animate-ticker {
+  animation: ticker 30s linear infinite;
+}
+
+/* Paused state for hover */
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+/* Jaunty cut-out styling for feed items */
+.jaunty-cutout {
+  transform: rotate(-2deg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.jaunty-cutout:hover {
+  transform: rotate(-1deg) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.jaunty-cutout-left {
+  transform: rotate(1.5deg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.jaunty-cutout-left:hover {
+  transform: rotate(0.5deg) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Enhanced content styling for verified transfers */
+.enhanced-content {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(34, 197, 94, 0.02) 100%);
+  border-left: 4px solid #22c55e;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.enhanced-content::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #22c55e, #16a34a);
+  border-radius: 1px;
+}
+
+/* Terry's Commentary Corner animations */
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom {
+  0% {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Subtle bounce animation for Terry character */
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 3s ease-in-out infinite;
+}
+
+/* Speech bubble tail styling for Terry */
+.bubble-tail-right::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  bottom: 20px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 15px solid hsl(var(--tj-orange));
+  z-index: 1;
+}
+
+.bubble-tail-left::before {
+  content: '';
+  position: absolute;
+  left: 100%;
+  bottom: 20px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 15px solid hsl(var(--tj-orange));
+  z-index: 1;
+}
+
+/* Terry's speech bubble hover effects */
+.terrys-corner:hover .speech-bubble {
+  transform: scale(1.02);
+  transition: transform 0.2s ease-out;
+}
+
+.terrys-corner .speech-bubble {
+  transition: transform 0.2s ease-out;
+}
+
+/* Subtle float animation for Terry's icon */
+@keyframes terry-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.animate-terry-float {
+  animation: terry-float 8s ease-in-out infinite;
+}
+
+/* Subtle jiggle animation for speech bubble */
+@keyframes terry-jiggle {
+  0%, 100% {
+    transform: translateX(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateX(0.5px) rotate(0.2deg);
+  }
+  50% {
+    transform: translateX(-0.5px) rotate(-0.1deg);
+  }
+  75% {
+    transform: translateX(0.3px) rotate(0.1deg);
+  }
+}
+
+.animate-terry-jiggle {
+  animation: terry-jiggle 12s ease-in-out infinite;
+}
+
+/* Transfer status indicators */
+.transfer-hot {
+  @apply text-orange-500 font-mono text-xs uppercase tracking-wider font-bold;
+}
+
+.transfer-confirmed {
+  @apply text-green-500 font-mono text-xs uppercase tracking-wider font-bold;
+}
+
+.transfer-rumour {
+  @apply text-gray-400 font-mono text-xs uppercase tracking-wider;
+}
+
+/* Custom scrollbar matching ThreadJuice aesthetic */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground;
+}
+
+/* Selection styling */
+::selection {
+  @apply bg-orange-500 text-white;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-left-color: hsl(var(--tj-orange));
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

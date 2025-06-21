@@ -1,0 +1,89 @@
+03d82349792858b4d71b536d6fab5fdd
+/* istanbul ignore next */
+function cov_2h6gt8cve5() {
+  var path = "/Users/deannewton/Documents/TransferJuice/src/lib/utils.ts";
+  var hash = "2d716e28149a388ea48e45e05cf495bb0d7130da";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/Users/deannewton/Documents/TransferJuice/src/lib/utils.ts",
+    statementMap: {
+      "0": {
+        start: {
+          line: 9,
+          column: 2
+        },
+        end: {
+          line: 9,
+          column: 31
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "cn",
+        decl: {
+          start: {
+            line: 8,
+            column: 16
+          },
+          end: {
+            line: 8,
+            column: 18
+          }
+        },
+        loc: {
+          start: {
+            line: 8,
+            column: 44
+          },
+          end: {
+            line: 10,
+            column: 1
+          }
+        },
+        line: 8
+      }
+    },
+    branchMap: {},
+    s: {
+      "0": 0
+    },
+    f: {
+      "0": 0
+    },
+    b: {},
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "2d716e28149a388ea48e45e05cf495bb0d7130da"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_2h6gt8cve5 = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_2h6gt8cve5();
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+/**
+ * Utility function to merge CSS classes with TailwindCSS conflict resolution
+ * This is the standard shadcn/ui utility function
+ */
+export function cn() {
+  /* istanbul ignore next */
+  cov_2h6gt8cve5().f[0]++;
+  cov_2h6gt8cve5().s[0]++;
+  for (var _len = arguments.length, inputs = new Array(_len), _key = 0; _key < _len; _key++) {
+    inputs[_key] = arguments[_key];
+  }
+  return twMerge(clsx(inputs));
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMmg2Z3Q4Y3ZlNSIsImFjdHVhbENvdmVyYWdlIiwiY2xzeCIsInR3TWVyZ2UiLCJjbiIsImYiLCJzIiwiX2xlbiIsImFyZ3VtZW50cyIsImxlbmd0aCIsImlucHV0cyIsIkFycmF5IiwiX2tleSJdLCJzb3VyY2VzIjpbInV0aWxzLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IHR5cGUgQ2xhc3NWYWx1ZSwgY2xzeCB9IGZyb20gJ2Nsc3gnO1xuaW1wb3J0IHsgdHdNZXJnZSB9IGZyb20gJ3RhaWx3aW5kLW1lcmdlJztcblxuLyoqXG4gKiBVdGlsaXR5IGZ1bmN0aW9uIHRvIG1lcmdlIENTUyBjbGFzc2VzIHdpdGggVGFpbHdpbmRDU1MgY29uZmxpY3QgcmVzb2x1dGlvblxuICogVGhpcyBpcyB0aGUgc3RhbmRhcmQgc2hhZGNuL3VpIHV0aWxpdHkgZnVuY3Rpb25cbiAqL1xuZXhwb3J0IGZ1bmN0aW9uIGNuKC4uLmlucHV0czogQ2xhc3NWYWx1ZVtdKSB7XG4gIHJldHVybiB0d01lcmdlKGNsc3goaW5wdXRzKSk7XG59XG4iXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztJQWVZO0lBQUFBLGNBQUEsWUFBQUEsQ0FBQTtNQUFBLE9BQUFDLGNBQUE7SUFBQTtFQUFBO0VBQUEsT0FBQUEsY0FBQTtBQUFBO0FBQUFELGNBQUE7QUFmWixTQUEwQkUsSUFBSSxRQUFRLE1BQU07QUFDNUMsU0FBU0MsT0FBTyxRQUFRLGdCQUFnQjs7QUFFeEM7QUFDQTtBQUNBO0FBQ0E7QUFDQSxPQUFPLFNBQVNDLEVBQUVBLENBQUEsRUFBMEI7RUFBQTtFQUFBSixjQUFBLEdBQUFLLENBQUE7RUFBQUwsY0FBQSxHQUFBTSxDQUFBO0VBQUEsU0FBQUMsSUFBQSxHQUFBQyxTQUFBLENBQUFDLE1BQUEsRUFBdEJDLE1BQU0sT0FBQUMsS0FBQSxDQUFBSixJQUFBLEdBQUFLLElBQUEsTUFBQUEsSUFBQSxHQUFBTCxJQUFBLEVBQUFLLElBQUE7SUFBTkYsTUFBTSxDQUFBRSxJQUFBLElBQUFKLFNBQUEsQ0FBQUksSUFBQTtFQUFBO0VBQzFCLE9BQU9ULE9BQU8sQ0FBQ0QsSUFBSSxDQUFDUSxNQUFNLENBQUMsQ0FBQztBQUM5QiIsImlnbm9yZUxpc3QiOltdfQ==

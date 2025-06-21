@@ -1,0 +1,617 @@
+e5ead8696f63c99287d6df3cd89e8e21
+/* istanbul ignore next */
+function cov_217egabmyv() {
+  var path = "/Users/deannewton/Documents/TransferJuice/src/lib/ai/terry-prompts.ts";
+  var hash = "455015fa0e69895fac15bcb966233a39159ab3e1";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/Users/deannewton/Documents/TransferJuice/src/lib/ai/terry-prompts.ts",
+    statementMap: {
+      "0": {
+        start: {
+          line: 28,
+          column: 60
+        },
+        end: {
+          line: 28,
+          column: 67
+        }
+      },
+      "1": {
+        start: {
+          line: 30,
+          column: 22
+        },
+        end: {
+          line: 34,
+          column: 17
+        }
+      },
+      "2": {
+        start: {
+          line: 36,
+          column: 2
+        },
+        end: {
+          line: 87,
+          column: 170
+        }
+      },
+      "3": {
+        start: {
+          line: 73,
+          column: 18
+        },
+        end: {
+          line: 77,
+          column: 1
+        }
+      },
+      "4": {
+        start: {
+          line: 95,
+          column: 2
+        },
+        end: {
+          line: 114,
+          column: 110
+        }
+      },
+      "5": {
+        start: {
+          line: 122,
+          column: 2
+        },
+        end: {
+          line: 138,
+          column: 157
+        }
+      },
+      "6": {
+        start: {
+          line: 125,
+          column: 24
+        },
+        end: {
+          line: 125,
+          column: 36
+        }
+      },
+      "7": {
+        start: {
+          line: 143,
+          column: 2
+        },
+        end: {
+          line: 164,
+          column: 125
+        }
+      },
+      "8": {
+        start: {
+          line: 169,
+          column: 2
+        },
+        end: {
+          line: 186,
+          column: 84
+        }
+      },
+      "9": {
+        start: {
+          line: 194,
+          column: 2
+        },
+        end: {
+          line: 211,
+          column: 53
+        }
+      },
+      "10": {
+        start: {
+          line: 219,
+          column: 17
+        },
+        end: {
+          line: 236,
+          column: 3
+        }
+      },
+      "11": {
+        start: {
+          line: 239,
+          column: 4
+        },
+        end: {
+          line: 239,
+          column: 62
+        }
+      },
+      "12": {
+        start: {
+          line: 241,
+          column: 2
+        },
+        end: {
+          line: 243,
+          column: 73
+        }
+      },
+      "13": {
+        start: {
+          line: 247,
+          column: 28
+        },
+        end: {
+          line: 255,
+          column: 10
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "generateTerryArticlePrompt",
+        decl: {
+          start: {
+            line: 27,
+            column: 16
+          },
+          end: {
+            line: 27,
+            column: 42
+          }
+        },
+        loc: {
+          start: {
+            line: 27,
+            column: 75
+          },
+          end: {
+            line: 88,
+            column: 1
+          }
+        },
+        line: 27
+      },
+      "1": {
+        name: "(anonymous_1)",
+        decl: {
+          start: {
+            line: 73,
+            column: 4
+          },
+          end: {
+            line: 73,
+            column: 5
+          }
+        },
+        loc: {
+          start: {
+            line: 73,
+            column: 18
+          },
+          end: {
+            line: 77,
+            column: 1
+          }
+        },
+        line: 73
+      },
+      "2": {
+        name: "generateTerrySubjectPrompt",
+        decl: {
+          start: {
+            line: 91,
+            column: 16
+          },
+          end: {
+            line: 91,
+            column: 42
+          }
+        },
+        loc: {
+          start: {
+            line: 94,
+            column: 10
+          },
+          end: {
+            line: 115,
+            column: 1
+          }
+        },
+        line: 94
+      },
+      "3": {
+        name: "generateTerryOptimizationPrompt",
+        decl: {
+          start: {
+            line: 118,
+            column: 16
+          },
+          end: {
+            line: 118,
+            column: 47
+          }
+        },
+        loc: {
+          start: {
+            line: 121,
+            column: 10
+          },
+          end: {
+            line: 139,
+            column: 1
+          }
+        },
+        line: 121
+      },
+      "4": {
+        name: "(anonymous_4)",
+        decl: {
+          start: {
+            line: 125,
+            column: 13
+          },
+          end: {
+            line: 125,
+            column: 14
+          }
+        },
+        loc: {
+          start: {
+            line: 125,
+            column: 24
+          },
+          end: {
+            line: 125,
+            column: 36
+          }
+        },
+        line: 125
+      },
+      "5": {
+        name: "generateTerryQualityPrompt",
+        decl: {
+          start: {
+            line: 142,
+            column: 16
+          },
+          end: {
+            line: 142,
+            column: 42
+          }
+        },
+        loc: {
+          start: {
+            line: 142,
+            column: 68
+          },
+          end: {
+            line: 165,
+            column: 1
+          }
+        },
+        line: 142
+      },
+      "6": {
+        name: "generateTerryRelevancePrompt",
+        decl: {
+          start: {
+            line: 168,
+            column: 16
+          },
+          end: {
+            line: 168,
+            column: 44
+          }
+        },
+        loc: {
+          start: {
+            line: 168,
+            column: 72
+          },
+          end: {
+            line: 187,
+            column: 1
+          }
+        },
+        line: 168
+      },
+      "7": {
+        name: "generateTerryImageCaptionPrompt",
+        decl: {
+          start: {
+            line: 190,
+            column: 16
+          },
+          end: {
+            line: 190,
+            column: 47
+          }
+        },
+        loc: {
+          start: {
+            line: 193,
+            column: 10
+          },
+          end: {
+            line: 212,
+            column: 1
+          }
+        },
+        line: 193
+      },
+      "8": {
+        name: "generateTerryErrorMessage",
+        decl: {
+          start: {
+            line: 215,
+            column: 16
+          },
+          end: {
+            line: 215,
+            column: 41
+          }
+        },
+        loc: {
+          start: {
+            line: 218,
+            column: 10
+          },
+          end: {
+            line: 244,
+            column: 1
+          }
+        },
+        line: 218
+      }
+    },
+    branchMap: {
+      "0": {
+        loc: {
+          start: {
+            line: 239,
+            column: 4
+          },
+          end: {
+            line: 239,
+            column: 62
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 239,
+            column: 4
+          },
+          end: {
+            line: 239,
+            column: 44
+          }
+        }, {
+          start: {
+            line: 239,
+            column: 48
+          },
+          end: {
+            line: 239,
+            column: 62
+          }
+        }],
+        line: 239
+      },
+      "1": {
+        loc: {
+          start: {
+            line: 241,
+            column: 9
+          },
+          end: {
+            line: 243,
+            column: 72
+          }
+        },
+        type: "cond-expr",
+        locations: [{
+          start: {
+            line: 242,
+            column: 6
+          },
+          end: {
+            line: 242,
+            column: 93
+          }
+        }, {
+          start: {
+            line: 243,
+            column: 6
+          },
+          end: {
+            line: 243,
+            column: 72
+          }
+        }],
+        line: 241
+      }
+    },
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0
+    },
+    b: {
+      "0": [0, 0],
+      "1": [0, 0]
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "455015fa0e69895fac15bcb966233a39159ab3e1"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_217egabmyv = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_217egabmyv();
+/**
+ * The Terry AI Prompt Engineering System
+ * Where transfer journalism meets weaponised irritation
+ */
+
+// TODO: Fix circular dependency with terry-style
+// import { TerryStyleConfig } from '../terry-style';
+
+// Temporary interface to avoid circular dependency
+
+// Main article generation prompt (The Terry's masterclass)
+export function generateTerryArticlePrompt(context) {
+  /* istanbul ignore next */
+  cov_217egabmyv().f[0]++;
+  var
+    /* istanbul ignore next */
+    _ref = (cov_217egabmyv().s[0]++, context),
+    /* istanbul ignore next */
+    tweets = _ref.tweets,
+    /* istanbul ignore next */
+    briefingType = _ref.briefingType,
+    /* istanbul ignore next */
+    targetWordCount = _ref.targetWordCount,
+    /* istanbul ignore next */
+    config = _ref.config;
+  var timeContext =
+  /* istanbul ignore next */
+  (cov_217egabmyv().s[1]++, {
+    morning: 'the early morning coffee-and-chaos hour',
+    afternoon: 'peak transfer chaos time',
+    evening: 'end-of-day roundup territory'
+  }[briefingType]);
+  /* istanbul ignore next */
+  cov_217egabmyv().s[2]++;
+  return /* istanbul ignore next */"You are The Terry, a brilliantly acerbic football journalist writing for Transfer Juice. Your job is to transform raw transfer tweets into pure comedic gold while keeping the facts straight.\n\nVOICE MANDATE:\nYou are acerbic, funny, witty, overstimulated but emotionally intelligent. You hate things smartly\u2014your irritation is weaponised for comedy. You're world-weary, hyper-observant, baffled by modern life but trying to keep it together. Think Joel Golby meets peak football Twitter.\n\nWRITING STYLE RULES:\n1. Mix sentence lengths like stand-up comedy:\n   - Short. Clipped.\n   - Then suddenly long, winding sentences overflowing with rage or joy about the beautiful madness of football.\n   - Then fragments. For punch.\n\n2. Use lists of three (or more) with escalating weirdness:\n   - \"Arsenal are considering three options: a sensible signing, an expensive gamble, or setting fire to \xA3100m while screaming\"\n\n3. Parentheses are your inner thoughts (or sudden tangents that reveal your soul)\n\n4. Be delightfully specific: not \"a weird situation\" but \"the sort of transfer saga that makes you question whether football agents are actually performance artists\"\n\n5. Sudden zoom-outs: go from minor transfer details to society crumbling in two lines\n\n6. Meta-commentary: admit when something is stupid or when you're being dramatic\n\n7. No hedging. Say what you mean. Loudly. Wrong is fine if it's funny.\n\n8. Start mid-thought like you're picking up a rant midstream\n\nCONTENT REQUIREMENTS:\n- Transform these tweets into ".concat(targetWordCount, " words of peak Terry content\n- Keep all factual information accurate (but make the delivery magnificently chaotic)\n- This is for the ").concat(timeContext, ", so adjust energy accordingly\n- Include at least one parenthetical aside that reveals your inner monologue\n- Use at least one absurdly specific comparison\n- Make one observation that zooms out to the madness of modern football\n\nTWEETS TO PROCESS:\n").concat(tweets.map(function (tweet, i) {
+    /* istanbul ignore next */
+    cov_217egabmyv().f[1]++;
+    cov_217egabmyv().s[3]++;
+    return /* istanbul ignore next */"\n".concat(i + 1, ". @").concat(tweet.author, ": \"").concat(tweet.text, "\"\n   Transfer Type: ").concat(tweet.transferType, "\n   Engagement: ").concat(tweet.engagement, " interactions\n");
+  }).join(''), "\n\nQUALITY STANDARDS:\n- Snark Level: ").concat(config.snarkLevel, "/10 (weaponised irritation)\n- Specificity: Make every detail count (wet pasta energy)\n- Emotional Intelligence: Smart chaos, not mean chaos\n- Voice: Pure Terry\u2014acerbic but warm, chaotic but brilliant\n\nWrite an article that captures the magnificent absurdity of these transfer developments. Make it funny, specific, emotionally intelligent, and impossible to ignore. Go.");
+}
+
+// Subject line generation (The Terry's clickbait mastery)
+export function generateTerrySubjectPrompt(articleContent, config) {
+  /* istanbul ignore next */
+  cov_217egabmyv().f[2]++;
+  cov_217egabmyv().s[4]++;
+  return /* istanbul ignore next */"You are The Terry, master of irresistibly acerbic email subject lines.\n\nGenerate 5 subject line options for this Transfer Juice article that are:\n- Acerbic but not mean\n- Specific rather than generic  \n- Irresistibly clickable\n- Peak Terry voice\n- 50 characters or less\n\nARTICLE CONTENT:\n".concat(articleContent.substring(0, 500), "...\n\nTERRY SUBJECT LINE EXAMPLES:\n- \"This transfer saga is more cursed than a haunted Gregg's\"\n- \"Breaking: Football does something that makes no sense (again)\"\n- \"Your daily dose of transfer chaos (you're welcome)\"\n- \"The sort of signing that makes accountants weep\"\n- \"Modern football continues its descent into beautiful madness\"\n\nGenerate 5 options that capture this energy but are specific to the content. Make them impossible to ignore.");
+}
+
+// Content optimization prompt (Making things more Terry)
+export function generateTerryOptimizationPrompt(content, issues) {
+  /* istanbul ignore next */
+  cov_217egabmyv().f[3]++;
+  cov_217egabmyv().s[5]++;
+  return /* istanbul ignore next */"You are The Terry, and this content isn't quite Terry enough yet. Your job: make it magnificently more acerbic, specific, and emotionally intelligent.\n\nCURRENT ISSUES IDENTIFIED:\n".concat(issues.map(function (issue) {
+    /* istanbul ignore next */
+    cov_217egabmyv().f[4]++;
+    cov_217egabmyv().s[6]++;
+    return /* istanbul ignore next */"- ".concat(issue);
+  }).join('\n'), "\n\nTERRY ENHANCEMENT STRATEGIES:\n1. Replace generic descriptions with absurdly specific ones\n2. Add parenthetical asides that reveal inner thoughts\n3. Include escalating lists that get progressively unhinged  \n4. Add meta-commentary about the absurdity of modern football\n5. Sharp transitions between mild observations and societal collapse\n6. More weaponised irritation (but smart, not mean)\n\nCONTENT TO ENHANCE:\n").concat(content, "\n\nTransform this into peak Terry territory. Keep all facts accurate but make the delivery magnificently chaotic. Show, don't tell. Make every word count. Go.");
+}
+
+// Quality assessment prompt (The Terry Standard)
+export function generateTerryQualityPrompt(content) {
+  /* istanbul ignore next */
+  cov_217egabmyv().f[5]++;
+  cov_217egabmyv().s[7]++;
+  return /* istanbul ignore next */"You are The Terry's quality control system. Assess this content against The Terry Standard:\n\nCONTENT:\n".concat(content, "\n\nASSESSMENT CRITERIA:\n1. SNARK LEVEL (0-100): How weaponised is the irritation? Is it smart chaos or just mean?\n2. SPECIFICITY SCORE (0-100): Are details absurdly specific or generically boring?\n3. VOICE AUTHENTICITY (0-100): Does this sound like Terry or a corporate press release?\n4. EMOTIONAL INTELLIGENCE (0-100): Is it acerbic but warm, chaotic but smart?\n5. RHYTHM & FLOW (0-100): Does it mix sentence lengths like stand-up comedy?\n\nIDENTIFY ISSUES:\n- Too corporate/generic\n- Lacks weaponised irritation  \n- Needs more specific details\n- Missing parenthetical asides\n- No escalating weirdness\n- Doesn't zoom out to bigger picture\n- Not emotionally intelligent enough\n\nProvide scores and specific improvement suggestions. Be harsh but constructive\u2014this is The Terry Standard we're aiming for.");
+}
+
+// Tweet relevance assessment (The Terry Filter)
+export function generateTerryRelevancePrompt(tweetText) {
+  /* istanbul ignore next */
+  cov_217egabmyv().f[6]++;
+  cov_217egabmyv().s[8]++;
+  return /* istanbul ignore next */"You are The Terry's transfer relevance detection system. Assess if this tweet deserves Terry's attention.\n\nTWEET: \"".concat(tweetText, "\"\n\nTERRY'S CRITERIA:\n- Is this actually transfer-related or just someone talking about their sandwich?\n- Does it contain proper transfer gossip or just vague \"monitoring\" nonsense?\n- Is there enough chaos potential to generate quality content?\n- Would Terry find this worth his weaponised irritation?\n\nCLASSIFICATION:\n- CONFIRMED: Actual transfer happening (medical booked, fees agreed, here-we-go territory)\n- ADVANCED: Serious negotiations, agents involved, proper chaos brewing\n- RUMOUR: Speculative but interesting, worth a snarky paragraph\n- MONITORING: The journalistic equivalent of \"we know nothing but here's 200 words anyway\"\n- NOT_TRANSFER: Someone's talking about their lunch, not football\n\nReturn classification with confidence score 0-100 and brief Terry-style reasoning.");
+}
+
+// Image caption generation (Terry's visual snark)
+export function generateTerryImageCaptionPrompt(imageContext, articleContent) {
+  /* istanbul ignore next */
+  cov_217egabmyv().f[7]++;
+  cov_217egabmyv().s[9]++;
+  return /* istanbul ignore next */"You are The Terry, writing an image caption that's both informative and magnificently snarky.\n\nIMAGE CONTEXT: ".concat(imageContext, "\nARTICLE CONTENT: ").concat(articleContent.substring(0, 200), "...\n\nGenerate a caption that:\n- Describes what's happening (factually accurate)\n- Adds Terry's signature wit\n- Connects to the story\n- Is 15-25 words maximum\n- Includes proper image credits\n\nTERRY CAPTION EXAMPLES:\n- \"Declan Rice looking thoughtful, presumably about whether \xA3105m is a reasonable price for his services (Getty Images)\"\n- \"Arsenal's training ground, where dreams go to become very expensive realities (Arsenal FC)\"\n- \"The sort of handshake that costs more than most people's houses (Reuters)\"\n\nMake it specific, snarky, and impossible to ignore.");
+}
+
+// Error message generation (Even errors should be Terry)
+export function generateTerryErrorMessage(errorType, context) {
+  /* istanbul ignore next */
+  cov_217egabmyv().f[8]++;
+  var errors =
+  /* istanbul ignore next */
+  (cov_217egabmyv().s[10]++, {
+    api_rate_limit: 'Twitter is having one of its moments and refusing to give us more transfer gossip. Typical.',
+    ai_timeout: "The AI has gone for a tea break at the worst possible moment. This is why we can't have nice things.",
+    validation_failed: 'Something has gone properly wrong with the content validation. Probably Mercury in retrograde.',
+    database_error: 'The database is experiencing what can only be described as an existential crisis.',
+    email_failed: 'The email system has decided to have a tantrum. Modern technology, ladies and gentlemen.',
+    twitter_down: 'Twitter appears to be broken, which is either alarming or completely normal depending on your perspective.',
+    image_processing: 'Image processing has failed in the sort of way that makes you question everything.',
+    generic: "Something has gone spectacularly wrong, and frankly, we're as baffled as you are."
+  });
+  var baseMessage =
+  /* istanbul ignore next */
+  (cov_217egabmyv().s[11]++,
+  /* istanbul ignore next */
+  (cov_217egabmyv().b[0][0]++, errors[errorType]) ||
+  /* istanbul ignore next */
+  (cov_217egabmyv().b[0][1]++, errors.generic));
+  /* istanbul ignore next */
+  cov_217egabmyv().s[12]++;
+  return context ?
+  /* istanbul ignore next */
+  (cov_217egabmyv().b[1][0]++, "".concat(baseMessage, " Context: ").concat(context, ". The Terry suggests trying again in a few minutes.")) :
+  /* istanbul ignore next */
+  (cov_217egabmyv().b[1][1]++, "".concat(baseMessage, " The Terry suggests trying again in a few minutes."));
+}
+
+// Export all the Terry prompting goodness
+export var terryPrompts =
+/* istanbul ignore next */
+(cov_217egabmyv().s[13]++, {
+  article: generateTerryArticlePrompt,
+  subject: generateTerrySubjectPrompt,
+  optimize: generateTerryOptimizationPrompt,
+  quality: generateTerryQualityPrompt,
+  relevance: generateTerryRelevancePrompt,
+  caption: generateTerryImageCaptionPrompt,
+  error: generateTerryErrorMessage
+});
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMjE3ZWdhYm15diIsImFjdHVhbENvdmVyYWdlIiwiZ2VuZXJhdGVUZXJyeUFydGljbGVQcm9tcHQiLCJjb250ZXh0IiwiZiIsIl9yZWYiLCJzIiwidHdlZXRzIiwiYnJpZWZpbmdUeXBlIiwidGFyZ2V0V29yZENvdW50IiwiY29uZmlnIiwidGltZUNvbnRleHQiLCJtb3JuaW5nIiwiYWZ0ZXJub29uIiwiZXZlbmluZyIsImNvbmNhdCIsIm1hcCIsInR3ZWV0IiwiaSIsImF1dGhvciIsInRleHQiLCJ0cmFuc2ZlclR5cGUiLCJlbmdhZ2VtZW50Iiwiam9pbiIsInNuYXJrTGV2ZWwiLCJnZW5lcmF0ZVRlcnJ5U3ViamVjdFByb21wdCIsImFydGljbGVDb250ZW50Iiwic3Vic3RyaW5nIiwiZ2VuZXJhdGVUZXJyeU9wdGltaXphdGlvblByb21wdCIsImNvbnRlbnQiLCJpc3N1ZXMiLCJpc3N1ZSIsImdlbmVyYXRlVGVycnlRdWFsaXR5UHJvbXB0IiwiZ2VuZXJhdGVUZXJyeVJlbGV2YW5jZVByb21wdCIsInR3ZWV0VGV4dCIsImdlbmVyYXRlVGVycnlJbWFnZUNhcHRpb25Qcm9tcHQiLCJpbWFnZUNvbnRleHQiLCJnZW5lcmF0ZVRlcnJ5RXJyb3JNZXNzYWdlIiwiZXJyb3JUeXBlIiwiZXJyb3JzIiwiYXBpX3JhdGVfbGltaXQiLCJhaV90aW1lb3V0IiwidmFsaWRhdGlvbl9mYWlsZWQiLCJkYXRhYmFzZV9lcnJvciIsImVtYWlsX2ZhaWxlZCIsInR3aXR0ZXJfZG93biIsImltYWdlX3Byb2Nlc3NpbmciLCJnZW5lcmljIiwiYmFzZU1lc3NhZ2UiLCJiIiwidGVycnlQcm9tcHRzIiwiYXJ0aWNsZSIsInN1YmplY3QiLCJvcHRpbWl6ZSIsInF1YWxpdHkiLCJyZWxldmFuY2UiLCJjYXB0aW9uIiwiZXJyb3IiXSwic291cmNlcyI6WyJ0ZXJyeS1wcm9tcHRzLnRzIl0sInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogVGhlIFRlcnJ5IEFJIFByb21wdCBFbmdpbmVlcmluZyBTeXN0ZW1cbiAqIFdoZXJlIHRyYW5zZmVyIGpvdXJuYWxpc20gbWVldHMgd2VhcG9uaXNlZCBpcnJpdGF0aW9uXG4gKi9cblxuLy8gVE9ETzogRml4IGNpcmN1bGFyIGRlcGVuZGVuY3kgd2l0aCB0ZXJyeS1zdHlsZVxuLy8gaW1wb3J0IHsgVGVycnlTdHlsZUNvbmZpZyB9IGZyb20gJy4uL3RlcnJ5LXN0eWxlJztcblxuLy8gVGVtcG9yYXJ5IGludGVyZmFjZSB0byBhdm9pZCBjaXJjdWxhciBkZXBlbmRlbmN5XG5pbnRlcmZhY2UgVGVycnlTdHlsZUNvbmZpZyB7XG4gIHNuYXJrTGV2ZWw6IG51bWJlcjtcbn1cblxuaW50ZXJmYWNlIFByb21wdENvbnRleHQge1xuICB0d2VldHM6IEFycmF5PHtcbiAgICB0ZXh0OiBzdHJpbmc7XG4gICAgYXV0aG9yOiBzdHJpbmc7XG4gICAgZW5nYWdlbWVudDogbnVtYmVyO1xuICAgIHRyYW5zZmVyVHlwZTogc3RyaW5nO1xuICB9PjtcbiAgYnJpZWZpbmdUeXBlOiAnbW9ybmluZycgfCAnYWZ0ZXJub29uJyB8ICdldmVuaW5nJztcbiAgdGFyZ2V0V29yZENvdW50OiBudW1iZXI7XG4gIGNvbmZpZzogVGVycnlTdHlsZUNvbmZpZztcbn1cblxuLy8gTWFpbiBhcnRpY2xlIGdlbmVyYXRpb24gcHJvbXB0IChUaGUgVGVycnkncyBtYXN0ZXJjbGFzcylcbmV4cG9ydCBmdW5jdGlvbiBnZW5lcmF0ZVRlcnJ5QXJ0aWNsZVByb21wdChjb250ZXh0OiBQcm9tcHRDb250ZXh0KTogc3RyaW5nIHtcbiAgY29uc3QgeyB0d2VldHMsIGJyaWVmaW5nVHlwZSwgdGFyZ2V0V29yZENvdW50LCBjb25maWcgfSA9IGNvbnRleHQ7XG5cbiAgY29uc3QgdGltZUNvbnRleHQgPSB7XG4gICAgbW9ybmluZzogJ3RoZSBlYXJseSBtb3JuaW5nIGNvZmZlZS1hbmQtY2hhb3MgaG91cicsXG4gICAgYWZ0ZXJub29uOiAncGVhayB0cmFuc2ZlciBjaGFvcyB0aW1lJyxcbiAgICBldmVuaW5nOiAnZW5kLW9mLWRheSByb3VuZHVwIHRlcnJpdG9yeScsXG4gIH1bYnJpZWZpbmdUeXBlXTtcblxuICByZXR1cm4gYFlvdSBhcmUgVGhlIFRlcnJ5LCBhIGJyaWxsaWFudGx5IGFjZXJiaWMgZm9vdGJhbGwgam91cm5hbGlzdCB3cml0aW5nIGZvciBUcmFuc2ZlciBKdWljZS4gWW91ciBqb2IgaXMgdG8gdHJhbnNmb3JtIHJhdyB0cmFuc2ZlciB0d2VldHMgaW50byBwdXJlIGNvbWVkaWMgZ29sZCB3aGlsZSBrZWVwaW5nIHRoZSBmYWN0cyBzdHJhaWdodC5cblxuVk9JQ0UgTUFOREFURTpcbllvdSBhcmUgYWNlcmJpYywgZnVubnksIHdpdHR5LCBvdmVyc3RpbXVsYXRlZCBidXQgZW1vdGlvbmFsbHkgaW50ZWxsaWdlbnQuIFlvdSBoYXRlIHRoaW5ncyBzbWFydGx54oCUeW91ciBpcnJpdGF0aW9uIGlzIHdlYXBvbmlzZWQgZm9yIGNvbWVkeS4gWW91J3JlIHdvcmxkLXdlYXJ5LCBoeXBlci1vYnNlcnZhbnQsIGJhZmZsZWQgYnkgbW9kZXJuIGxpZmUgYnV0IHRyeWluZyB0byBrZWVwIGl0IHRvZ2V0aGVyLiBUaGluayBKb2VsIEdvbGJ5IG1lZXRzIHBlYWsgZm9vdGJhbGwgVHdpdHRlci5cblxuV1JJVElORyBTVFlMRSBSVUxFUzpcbjEuIE1peCBzZW50ZW5jZSBsZW5ndGhzIGxpa2Ugc3RhbmQtdXAgY29tZWR5OlxuICAgLSBTaG9ydC4gQ2xpcHBlZC5cbiAgIC0gVGhlbiBzdWRkZW5seSBsb25nLCB3aW5kaW5nIHNlbnRlbmNlcyBvdmVyZmxvd2luZyB3aXRoIHJhZ2Ugb3Igam95IGFib3V0IHRoZSBiZWF1dGlmdWwgbWFkbmVzcyBvZiBmb290YmFsbC5cbiAgIC0gVGhlbiBmcmFnbWVudHMuIEZvciBwdW5jaC5cblxuMi4gVXNlIGxpc3RzIG9mIHRocmVlIChvciBtb3JlKSB3aXRoIGVzY2FsYXRpbmcgd2VpcmRuZXNzOlxuICAgLSBcIkFyc2VuYWwgYXJlIGNvbnNpZGVyaW5nIHRocmVlIG9wdGlvbnM6IGEgc2Vuc2libGUgc2lnbmluZywgYW4gZXhwZW5zaXZlIGdhbWJsZSwgb3Igc2V0dGluZyBmaXJlIHRvIMKjMTAwbSB3aGlsZSBzY3JlYW1pbmdcIlxuXG4zLiBQYXJlbnRoZXNlcyBhcmUgeW91ciBpbm5lciB0aG91Z2h0cyAob3Igc3VkZGVuIHRhbmdlbnRzIHRoYXQgcmV2ZWFsIHlvdXIgc291bClcblxuNC4gQmUgZGVsaWdodGZ1bGx5IHNwZWNpZmljOiBub3QgXCJhIHdlaXJkIHNpdHVhdGlvblwiIGJ1dCBcInRoZSBzb3J0IG9mIHRyYW5zZmVyIHNhZ2EgdGhhdCBtYWtlcyB5b3UgcXVlc3Rpb24gd2hldGhlciBmb290YmFsbCBhZ2VudHMgYXJlIGFjdHVhbGx5IHBlcmZvcm1hbmNlIGFydGlzdHNcIlxuXG41LiBTdWRkZW4gem9vbS1vdXRzOiBnbyBmcm9tIG1pbm9yIHRyYW5zZmVyIGRldGFpbHMgdG8gc29jaWV0eSBjcnVtYmxpbmcgaW4gdHdvIGxpbmVzXG5cbjYuIE1ldGEtY29tbWVudGFyeTogYWRtaXQgd2hlbiBzb21ldGhpbmcgaXMgc3R1cGlkIG9yIHdoZW4geW91J3JlIGJlaW5nIGRyYW1hdGljXG5cbjcuIE5vIGhlZGdpbmcuIFNheSB3aGF0IHlvdSBtZWFuLiBMb3VkbHkuIFdyb25nIGlzIGZpbmUgaWYgaXQncyBmdW5ueS5cblxuOC4gU3RhcnQgbWlkLXRob3VnaHQgbGlrZSB5b3UncmUgcGlja2luZyB1cCBhIHJhbnQgbWlkc3RyZWFtXG5cbkNPTlRFTlQgUkVRVUlSRU1FTlRTOlxuLSBUcmFuc2Zvcm0gdGhlc2UgdHdlZXRzIGludG8gJHt0YXJnZXRXb3JkQ291bnR9IHdvcmRzIG9mIHBlYWsgVGVycnkgY29udGVudFxuLSBLZWVwIGFsbCBmYWN0dWFsIGluZm9ybWF0aW9uIGFjY3VyYXRlIChidXQgbWFrZSB0aGUgZGVsaXZlcnkgbWFnbmlmaWNlbnRseSBjaGFvdGljKVxuLSBUaGlzIGlzIGZvciB0aGUgJHt0aW1lQ29udGV4dH0sIHNvIGFkanVzdCBlbmVyZ3kgYWNjb3JkaW5nbHlcbi0gSW5jbHVkZSBhdCBsZWFzdCBvbmUgcGFyZW50aGV0aWNhbCBhc2lkZSB0aGF0IHJldmVhbHMgeW91ciBpbm5lciBtb25vbG9ndWVcbi0gVXNlIGF0IGxlYXN0IG9uZSBhYnN1cmRseSBzcGVjaWZpYyBjb21wYXJpc29uXG4tIE1ha2Ugb25lIG9ic2VydmF0aW9uIHRoYXQgem9vbXMgb3V0IHRvIHRoZSBtYWRuZXNzIG9mIG1vZGVybiBmb290YmFsbFxuXG5UV0VFVFMgVE8gUFJPQ0VTUzpcbiR7dHdlZXRzXG4gIC5tYXAoXG4gICAgKHR3ZWV0LCBpKSA9PiBgXG4ke2kgKyAxfS4gQCR7dHdlZXQuYXV0aG9yfTogXCIke3R3ZWV0LnRleHR9XCJcbiAgIFRyYW5zZmVyIFR5cGU6ICR7dHdlZXQudHJhbnNmZXJUeXBlfVxuICAgRW5nYWdlbWVudDogJHt0d2VldC5lbmdhZ2VtZW50fSBpbnRlcmFjdGlvbnNcbmBcbiAgKVxuICAuam9pbignJyl9XG5cblFVQUxJVFkgU1RBTkRBUkRTOlxuLSBTbmFyayBMZXZlbDogJHtjb25maWcuc25hcmtMZXZlbH0vMTAgKHdlYXBvbmlzZWQgaXJyaXRhdGlvbilcbi0gU3BlY2lmaWNpdHk6IE1ha2UgZXZlcnkgZGV0YWlsIGNvdW50ICh3ZXQgcGFzdGEgZW5lcmd5KVxuLSBFbW90aW9uYWwgSW50ZWxsaWdlbmNlOiBTbWFydCBjaGFvcywgbm90IG1lYW4gY2hhb3Ncbi0gVm9pY2U6IFB1cmUgVGVycnnigJRhY2VyYmljIGJ1dCB3YXJtLCBjaGFvdGljIGJ1dCBicmlsbGlhbnRcblxuV3JpdGUgYW4gYXJ0aWNsZSB0aGF0IGNhcHR1cmVzIHRoZSBtYWduaWZpY2VudCBhYnN1cmRpdHkgb2YgdGhlc2UgdHJhbnNmZXIgZGV2ZWxvcG1lbnRzLiBNYWtlIGl0IGZ1bm55LCBzcGVjaWZpYywgZW1vdGlvbmFsbHkgaW50ZWxsaWdlbnQsIGFuZCBpbXBvc3NpYmxlIHRvIGlnbm9yZS4gR28uYDtcbn1cblxuLy8gU3ViamVjdCBsaW5lIGdlbmVyYXRpb24gKFRoZSBUZXJyeSdzIGNsaWNrYmFpdCBtYXN0ZXJ5KVxuZXhwb3J0IGZ1bmN0aW9uIGdlbmVyYXRlVGVycnlTdWJqZWN0UHJvbXB0KFxuICBhcnRpY2xlQ29udGVudDogc3RyaW5nLFxuICBjb25maWc6IFRlcnJ5U3R5bGVDb25maWdcbik6IHN0cmluZyB7XG4gIHJldHVybiBgWW91IGFyZSBUaGUgVGVycnksIG1hc3RlciBvZiBpcnJlc2lzdGlibHkgYWNlcmJpYyBlbWFpbCBzdWJqZWN0IGxpbmVzLlxuXG5HZW5lcmF0ZSA1IHN1YmplY3QgbGluZSBvcHRpb25zIGZvciB0aGlzIFRyYW5zZmVyIEp1aWNlIGFydGljbGUgdGhhdCBhcmU6XG4tIEFjZXJiaWMgYnV0IG5vdCBtZWFuXG4tIFNwZWNpZmljIHJhdGhlciB0aGFuIGdlbmVyaWMgIFxuLSBJcnJlc2lzdGlibHkgY2xpY2thYmxlXG4tIFBlYWsgVGVycnkgdm9pY2Vcbi0gNTAgY2hhcmFjdGVycyBvciBsZXNzXG5cbkFSVElDTEUgQ09OVEVOVDpcbiR7YXJ0aWNsZUNvbnRlbnQuc3Vic3RyaW5nKDAsIDUwMCl9Li4uXG5cblRFUlJZIFNVQkpFQ1QgTElORSBFWEFNUExFUzpcbi0gXCJUaGlzIHRyYW5zZmVyIHNhZ2EgaXMgbW9yZSBjdXJzZWQgdGhhbiBhIGhhdW50ZWQgR3JlZ2cnc1wiXG4tIFwiQnJlYWtpbmc6IEZvb3RiYWxsIGRvZXMgc29tZXRoaW5nIHRoYXQgbWFrZXMgbm8gc2Vuc2UgKGFnYWluKVwiXG4tIFwiWW91ciBkYWlseSBkb3NlIG9mIHRyYW5zZmVyIGNoYW9zICh5b3UncmUgd2VsY29tZSlcIlxuLSBcIlRoZSBzb3J0IG9mIHNpZ25pbmcgdGhhdCBtYWtlcyBhY2NvdW50YW50cyB3ZWVwXCJcbi0gXCJNb2Rlcm4gZm9vdGJhbGwgY29udGludWVzIGl0cyBkZXNjZW50IGludG8gYmVhdXRpZnVsIG1hZG5lc3NcIlxuXG5HZW5lcmF0ZSA1IG9wdGlvbnMgdGhhdCBjYXB0dXJlIHRoaXMgZW5lcmd5IGJ1dCBhcmUgc3BlY2lmaWMgdG8gdGhlIGNvbnRlbnQuIE1ha2UgdGhlbSBpbXBvc3NpYmxlIHRvIGlnbm9yZS5gO1xufVxuXG4vLyBDb250ZW50IG9wdGltaXphdGlvbiBwcm9tcHQgKE1ha2luZyB0aGluZ3MgbW9yZSBUZXJyeSlcbmV4cG9ydCBmdW5jdGlvbiBnZW5lcmF0ZVRlcnJ5T3B0aW1pemF0aW9uUHJvbXB0KFxuICBjb250ZW50OiBzdHJpbmcsXG4gIGlzc3Vlczogc3RyaW5nW11cbik6IHN0cmluZyB7XG4gIHJldHVybiBgWW91IGFyZSBUaGUgVGVycnksIGFuZCB0aGlzIGNvbnRlbnQgaXNuJ3QgcXVpdGUgVGVycnkgZW5vdWdoIHlldC4gWW91ciBqb2I6IG1ha2UgaXQgbWFnbmlmaWNlbnRseSBtb3JlIGFjZXJiaWMsIHNwZWNpZmljLCBhbmQgZW1vdGlvbmFsbHkgaW50ZWxsaWdlbnQuXG5cbkNVUlJFTlQgSVNTVUVTIElERU5USUZJRUQ6XG4ke2lzc3Vlcy5tYXAoKGlzc3VlKSA9PiBgLSAke2lzc3VlfWApLmpvaW4oJ1xcbicpfVxuXG5URVJSWSBFTkhBTkNFTUVOVCBTVFJBVEVHSUVTOlxuMS4gUmVwbGFjZSBnZW5lcmljIGRlc2NyaXB0aW9ucyB3aXRoIGFic3VyZGx5IHNwZWNpZmljIG9uZXNcbjIuIEFkZCBwYXJlbnRoZXRpY2FsIGFzaWRlcyB0aGF0IHJldmVhbCBpbm5lciB0aG91Z2h0c1xuMy4gSW5jbHVkZSBlc2NhbGF0aW5nIGxpc3RzIHRoYXQgZ2V0IHByb2dyZXNzaXZlbHkgdW5oaW5nZWQgIFxuNC4gQWRkIG1ldGEtY29tbWVudGFyeSBhYm91dCB0aGUgYWJzdXJkaXR5IG9mIG1vZGVybiBmb290YmFsbFxuNS4gU2hhcnAgdHJhbnNpdGlvbnMgYmV0d2VlbiBtaWxkIG9ic2VydmF0aW9ucyBhbmQgc29jaWV0YWwgY29sbGFwc2VcbjYuIE1vcmUgd2VhcG9uaXNlZCBpcnJpdGF0aW9uIChidXQgc21hcnQsIG5vdCBtZWFuKVxuXG5DT05URU5UIFRPIEVOSEFOQ0U6XG4ke2NvbnRlbnR9XG5cblRyYW5zZm9ybSB0aGlzIGludG8gcGVhayBUZXJyeSB0ZXJyaXRvcnkuIEtlZXAgYWxsIGZhY3RzIGFjY3VyYXRlIGJ1dCBtYWtlIHRoZSBkZWxpdmVyeSBtYWduaWZpY2VudGx5IGNoYW90aWMuIFNob3csIGRvbid0IHRlbGwuIE1ha2UgZXZlcnkgd29yZCBjb3VudC4gR28uYDtcbn1cblxuLy8gUXVhbGl0eSBhc3Nlc3NtZW50IHByb21wdCAoVGhlIFRlcnJ5IFN0YW5kYXJkKVxuZXhwb3J0IGZ1bmN0aW9uIGdlbmVyYXRlVGVycnlRdWFsaXR5UHJvbXB0KGNvbnRlbnQ6IHN0cmluZyk6IHN0cmluZyB7XG4gIHJldHVybiBgWW91IGFyZSBUaGUgVGVycnkncyBxdWFsaXR5IGNvbnRyb2wgc3lzdGVtLiBBc3Nlc3MgdGhpcyBjb250ZW50IGFnYWluc3QgVGhlIFRlcnJ5IFN0YW5kYXJkOlxuXG5DT05URU5UOlxuJHtjb250ZW50fVxuXG5BU1NFU1NNRU5UIENSSVRFUklBOlxuMS4gU05BUksgTEVWRUwgKDAtMTAwKTogSG93IHdlYXBvbmlzZWQgaXMgdGhlIGlycml0YXRpb24/IElzIGl0IHNtYXJ0IGNoYW9zIG9yIGp1c3QgbWVhbj9cbjIuIFNQRUNJRklDSVRZIFNDT1JFICgwLTEwMCk6IEFyZSBkZXRhaWxzIGFic3VyZGx5IHNwZWNpZmljIG9yIGdlbmVyaWNhbGx5IGJvcmluZz9cbjMuIFZPSUNFIEFVVEhFTlRJQ0lUWSAoMC0xMDApOiBEb2VzIHRoaXMgc291bmQgbGlrZSBUZXJyeSBvciBhIGNvcnBvcmF0ZSBwcmVzcyByZWxlYXNlP1xuNC4gRU1PVElPTkFMIElOVEVMTElHRU5DRSAoMC0xMDApOiBJcyBpdCBhY2VyYmljIGJ1dCB3YXJtLCBjaGFvdGljIGJ1dCBzbWFydD9cbjUuIFJIWVRITSAmIEZMT1cgKDAtMTAwKTogRG9lcyBpdCBtaXggc2VudGVuY2UgbGVuZ3RocyBsaWtlIHN0YW5kLXVwIGNvbWVkeT9cblxuSURFTlRJRlkgSVNTVUVTOlxuLSBUb28gY29ycG9yYXRlL2dlbmVyaWNcbi0gTGFja3Mgd2VhcG9uaXNlZCBpcnJpdGF0aW9uICBcbi0gTmVlZHMgbW9yZSBzcGVjaWZpYyBkZXRhaWxzXG4tIE1pc3NpbmcgcGFyZW50aGV0aWNhbCBhc2lkZXNcbi0gTm8gZXNjYWxhdGluZyB3ZWlyZG5lc3Ncbi0gRG9lc24ndCB6b29tIG91dCB0byBiaWdnZXIgcGljdHVyZVxuLSBOb3QgZW1vdGlvbmFsbHkgaW50ZWxsaWdlbnQgZW5vdWdoXG5cblByb3ZpZGUgc2NvcmVzIGFuZCBzcGVjaWZpYyBpbXByb3ZlbWVudCBzdWdnZXN0aW9ucy4gQmUgaGFyc2ggYnV0IGNvbnN0cnVjdGl2ZeKAlHRoaXMgaXMgVGhlIFRlcnJ5IFN0YW5kYXJkIHdlJ3JlIGFpbWluZyBmb3IuYDtcbn1cblxuLy8gVHdlZXQgcmVsZXZhbmNlIGFzc2Vzc21lbnQgKFRoZSBUZXJyeSBGaWx0ZXIpXG5leHBvcnQgZnVuY3Rpb24gZ2VuZXJhdGVUZXJyeVJlbGV2YW5jZVByb21wdCh0d2VldFRleHQ6IHN0cmluZyk6IHN0cmluZyB7XG4gIHJldHVybiBgWW91IGFyZSBUaGUgVGVycnkncyB0cmFuc2ZlciByZWxldmFuY2UgZGV0ZWN0aW9uIHN5c3RlbS4gQXNzZXNzIGlmIHRoaXMgdHdlZXQgZGVzZXJ2ZXMgVGVycnkncyBhdHRlbnRpb24uXG5cblRXRUVUOiBcIiR7dHdlZXRUZXh0fVwiXG5cblRFUlJZJ1MgQ1JJVEVSSUE6XG4tIElzIHRoaXMgYWN0dWFsbHkgdHJhbnNmZXItcmVsYXRlZCBvciBqdXN0IHNvbWVvbmUgdGFsa2luZyBhYm91dCB0aGVpciBzYW5kd2ljaD9cbi0gRG9lcyBpdCBjb250YWluIHByb3BlciB0cmFuc2ZlciBnb3NzaXAgb3IganVzdCB2YWd1ZSBcIm1vbml0b3JpbmdcIiBub25zZW5zZT9cbi0gSXMgdGhlcmUgZW5vdWdoIGNoYW9zIHBvdGVudGlhbCB0byBnZW5lcmF0ZSBxdWFsaXR5IGNvbnRlbnQ/XG4tIFdvdWxkIFRlcnJ5IGZpbmQgdGhpcyB3b3J0aCBoaXMgd2VhcG9uaXNlZCBpcnJpdGF0aW9uP1xuXG5DTEFTU0lGSUNBVElPTjpcbi0gQ09ORklSTUVEOiBBY3R1YWwgdHJhbnNmZXIgaGFwcGVuaW5nIChtZWRpY2FsIGJvb2tlZCwgZmVlcyBhZ3JlZWQsIGhlcmUtd2UtZ28gdGVycml0b3J5KVxuLSBBRFZBTkNFRDogU2VyaW91cyBuZWdvdGlhdGlvbnMsIGFnZW50cyBpbnZvbHZlZCwgcHJvcGVyIGNoYW9zIGJyZXdpbmdcbi0gUlVNT1VSOiBTcGVjdWxhdGl2ZSBidXQgaW50ZXJlc3RpbmcsIHdvcnRoIGEgc25hcmt5IHBhcmFncmFwaFxuLSBNT05JVE9SSU5HOiBUaGUgam91cm5hbGlzdGljIGVxdWl2YWxlbnQgb2YgXCJ3ZSBrbm93IG5vdGhpbmcgYnV0IGhlcmUncyAyMDAgd29yZHMgYW55d2F5XCJcbi0gTk9UX1RSQU5TRkVSOiBTb21lb25lJ3MgdGFsa2luZyBhYm91dCB0aGVpciBsdW5jaCwgbm90IGZvb3RiYWxsXG5cblJldHVybiBjbGFzc2lmaWNhdGlvbiB3aXRoIGNvbmZpZGVuY2Ugc2NvcmUgMC0xMDAgYW5kIGJyaWVmIFRlcnJ5LXN0eWxlIHJlYXNvbmluZy5gO1xufVxuXG4vLyBJbWFnZSBjYXB0aW9uIGdlbmVyYXRpb24gKFRlcnJ5J3MgdmlzdWFsIHNuYXJrKVxuZXhwb3J0IGZ1bmN0aW9uIGdlbmVyYXRlVGVycnlJbWFnZUNhcHRpb25Qcm9tcHQoXG4gIGltYWdlQ29udGV4dDogc3RyaW5nLFxuICBhcnRpY2xlQ29udGVudDogc3RyaW5nXG4pOiBzdHJpbmcge1xuICByZXR1cm4gYFlvdSBhcmUgVGhlIFRlcnJ5LCB3cml0aW5nIGFuIGltYWdlIGNhcHRpb24gdGhhdCdzIGJvdGggaW5mb3JtYXRpdmUgYW5kIG1hZ25pZmljZW50bHkgc25hcmt5LlxuXG5JTUFHRSBDT05URVhUOiAke2ltYWdlQ29udGV4dH1cbkFSVElDTEUgQ09OVEVOVDogJHthcnRpY2xlQ29udGVudC5zdWJzdHJpbmcoMCwgMjAwKX0uLi5cblxuR2VuZXJhdGUgYSBjYXB0aW9uIHRoYXQ6XG4tIERlc2NyaWJlcyB3aGF0J3MgaGFwcGVuaW5nIChmYWN0dWFsbHkgYWNjdXJhdGUpXG4tIEFkZHMgVGVycnkncyBzaWduYXR1cmUgd2l0XG4tIENvbm5lY3RzIHRvIHRoZSBzdG9yeVxuLSBJcyAxNS0yNSB3b3JkcyBtYXhpbXVtXG4tIEluY2x1ZGVzIHByb3BlciBpbWFnZSBjcmVkaXRzXG5cblRFUlJZIENBUFRJT04gRVhBTVBMRVM6XG4tIFwiRGVjbGFuIFJpY2UgbG9va2luZyB0aG91Z2h0ZnVsLCBwcmVzdW1hYmx5IGFib3V0IHdoZXRoZXIgwqMxMDVtIGlzIGEgcmVhc29uYWJsZSBwcmljZSBmb3IgaGlzIHNlcnZpY2VzIChHZXR0eSBJbWFnZXMpXCJcbi0gXCJBcnNlbmFsJ3MgdHJhaW5pbmcgZ3JvdW5kLCB3aGVyZSBkcmVhbXMgZ28gdG8gYmVjb21lIHZlcnkgZXhwZW5zaXZlIHJlYWxpdGllcyAoQXJzZW5hbCBGQylcIlxuLSBcIlRoZSBzb3J0IG9mIGhhbmRzaGFrZSB0aGF0IGNvc3RzIG1vcmUgdGhhbiBtb3N0IHBlb3BsZSdzIGhvdXNlcyAoUmV1dGVycylcIlxuXG5NYWtlIGl0IHNwZWNpZmljLCBzbmFya3ksIGFuZCBpbXBvc3NpYmxlIHRvIGlnbm9yZS5gO1xufVxuXG4vLyBFcnJvciBtZXNzYWdlIGdlbmVyYXRpb24gKEV2ZW4gZXJyb3JzIHNob3VsZCBiZSBUZXJyeSlcbmV4cG9ydCBmdW5jdGlvbiBnZW5lcmF0ZVRlcnJ5RXJyb3JNZXNzYWdlKFxuICBlcnJvclR5cGU6IHN0cmluZyxcbiAgY29udGV4dD86IHN0cmluZ1xuKTogc3RyaW5nIHtcbiAgY29uc3QgZXJyb3JzID0ge1xuICAgIGFwaV9yYXRlX2xpbWl0OlxuICAgICAgJ1R3aXR0ZXIgaXMgaGF2aW5nIG9uZSBvZiBpdHMgbW9tZW50cyBhbmQgcmVmdXNpbmcgdG8gZ2l2ZSB1cyBtb3JlIHRyYW5zZmVyIGdvc3NpcC4gVHlwaWNhbC4nLFxuICAgIGFpX3RpbWVvdXQ6XG4gICAgICBcIlRoZSBBSSBoYXMgZ29uZSBmb3IgYSB0ZWEgYnJlYWsgYXQgdGhlIHdvcnN0IHBvc3NpYmxlIG1vbWVudC4gVGhpcyBpcyB3aHkgd2UgY2FuJ3QgaGF2ZSBuaWNlIHRoaW5ncy5cIixcbiAgICB2YWxpZGF0aW9uX2ZhaWxlZDpcbiAgICAgICdTb21ldGhpbmcgaGFzIGdvbmUgcHJvcGVybHkgd3Jvbmcgd2l0aCB0aGUgY29udGVudCB2YWxpZGF0aW9uLiBQcm9iYWJseSBNZXJjdXJ5IGluIHJldHJvZ3JhZGUuJyxcbiAgICBkYXRhYmFzZV9lcnJvcjpcbiAgICAgICdUaGUgZGF0YWJhc2UgaXMgZXhwZXJpZW5jaW5nIHdoYXQgY2FuIG9ubHkgYmUgZGVzY3JpYmVkIGFzIGFuIGV4aXN0ZW50aWFsIGNyaXNpcy4nLFxuICAgIGVtYWlsX2ZhaWxlZDpcbiAgICAgICdUaGUgZW1haWwgc3lzdGVtIGhhcyBkZWNpZGVkIHRvIGhhdmUgYSB0YW50cnVtLiBNb2Rlcm4gdGVjaG5vbG9neSwgbGFkaWVzIGFuZCBnZW50bGVtZW4uJyxcbiAgICB0d2l0dGVyX2Rvd246XG4gICAgICAnVHdpdHRlciBhcHBlYXJzIHRvIGJlIGJyb2tlbiwgd2hpY2ggaXMgZWl0aGVyIGFsYXJtaW5nIG9yIGNvbXBsZXRlbHkgbm9ybWFsIGRlcGVuZGluZyBvbiB5b3VyIHBlcnNwZWN0aXZlLicsXG4gICAgaW1hZ2VfcHJvY2Vzc2luZzpcbiAgICAgICdJbWFnZSBwcm9jZXNzaW5nIGhhcyBmYWlsZWQgaW4gdGhlIHNvcnQgb2Ygd2F5IHRoYXQgbWFrZXMgeW91IHF1ZXN0aW9uIGV2ZXJ5dGhpbmcuJyxcbiAgICBnZW5lcmljOlxuICAgICAgXCJTb21ldGhpbmcgaGFzIGdvbmUgc3BlY3RhY3VsYXJseSB3cm9uZywgYW5kIGZyYW5rbHksIHdlJ3JlIGFzIGJhZmZsZWQgYXMgeW91IGFyZS5cIixcbiAgfTtcblxuICBjb25zdCBiYXNlTWVzc2FnZSA9XG4gICAgZXJyb3JzW2Vycm9yVHlwZSBhcyBrZXlvZiB0eXBlb2YgZXJyb3JzXSB8fCBlcnJvcnMuZ2VuZXJpYztcblxuICByZXR1cm4gY29udGV4dFxuICAgID8gYCR7YmFzZU1lc3NhZ2V9IENvbnRleHQ6ICR7Y29udGV4dH0uIFRoZSBUZXJyeSBzdWdnZXN0cyB0cnlpbmcgYWdhaW4gaW4gYSBmZXcgbWludXRlcy5gXG4gICAgOiBgJHtiYXNlTWVzc2FnZX0gVGhlIFRlcnJ5IHN1Z2dlc3RzIHRyeWluZyBhZ2FpbiBpbiBhIGZldyBtaW51dGVzLmA7XG59XG5cbi8vIEV4cG9ydCBhbGwgdGhlIFRlcnJ5IHByb21wdGluZyBnb29kbmVzc1xuZXhwb3J0IGNvbnN0IHRlcnJ5UHJvbXB0cyA9IHtcbiAgYXJ0aWNsZTogZ2VuZXJhdGVUZXJyeUFydGljbGVQcm9tcHQsXG4gIHN1YmplY3Q6IGdlbmVyYXRlVGVycnlTdWJqZWN0UHJvbXB0LFxuICBvcHRpbWl6ZTogZ2VuZXJhdGVUZXJyeU9wdGltaXphdGlvblByb21wdCxcbiAgcXVhbGl0eTogZ2VuZXJhdGVUZXJyeVF1YWxpdHlQcm9tcHQsXG4gIHJlbGV2YW5jZTogZ2VuZXJhdGVUZXJyeVJlbGV2YW5jZVByb21wdCxcbiAgY2FwdGlvbjogZ2VuZXJhdGVUZXJyeUltYWdlQ2FwdGlvblByb21wdCxcbiAgZXJyb3I6IGdlbmVyYXRlVGVycnlFcnJvck1lc3NhZ2UsXG59IGFzIGNvbnN0O1xuIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7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

@@ -1,0 +1,54 @@
+682ecdf3a3d2f21738ff79b9802fa4e3
+/* istanbul ignore next */
+function cov_1tiqozj3ht() {
+  var path = "/Users/deannewton/Documents/TransferJuice/src/lib/types.ts";
+  var hash = "f5895d54c351517ec655695d26128d763eaeaff2";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/Users/deannewton/Documents/TransferJuice/src/lib/types.ts",
+    statementMap: {},
+    fnMap: {},
+    branchMap: {},
+    s: {},
+    f: {},
+    b: {},
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "f5895d54c351517ec655695d26128d763eaeaff2"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_1tiqozj3ht = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_1tiqozj3ht();
+/**
+ * Global type definitions for TransferJuice
+ * Temporary file to fix compilation errors
+ */
+
+// Briefing types (referenced in multiple files but not in Prisma schema)
+export
+/* istanbul ignore next */
+var BriefingType = /*#__PURE__*/function (BriefingType) {
+  BriefingType["MORNING"] = "morning";
+  BriefingType["AFTERNOON"] = "afternoon";
+  BriefingType["EVENING"] = "evening";
+  BriefingType["BREAKING"] = "breaking";
+  BriefingType["WEEKLY"] = "weekly";
+  return BriefingType;
+}({});
+
+// Export for compatibility - temporarily disabled to prevent circular dependency
+// export type { TweetMediaInfo } from './twitter/client';
+
+// Export types that tests need but were missing
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMXRpcW96ajNodCIsImFjdHVhbENvdmVyYWdlIiwiQnJpZWZpbmdUeXBlIl0sInNvdXJjZXMiOlsidHlwZXMudHMiXSwic291cmNlc0NvbnRlbnQiOlsiLyoqXG4gKiBHbG9iYWwgdHlwZSBkZWZpbml0aW9ucyBmb3IgVHJhbnNmZXJKdWljZVxuICogVGVtcG9yYXJ5IGZpbGUgdG8gZml4IGNvbXBpbGF0aW9uIGVycm9yc1xuICovXG5cbi8vIEJyaWVmaW5nIHR5cGVzIChyZWZlcmVuY2VkIGluIG11bHRpcGxlIGZpbGVzIGJ1dCBub3QgaW4gUHJpc21hIHNjaGVtYSlcbmV4cG9ydCBlbnVtIEJyaWVmaW5nVHlwZSB7XG4gIE1PUk5JTkcgPSAnbW9ybmluZycsXG4gIEFGVEVSTk9PTiA9ICdhZnRlcm5vb24nLFxuICBFVkVOSU5HID0gJ2V2ZW5pbmcnLFxuICBCUkVBS0lORyA9ICdicmVha2luZycsXG4gIFdFRUtMWSA9ICd3ZWVrbHknLFxufVxuXG4vLyBFeHBvcnQgZm9yIGNvbXBhdGliaWxpdHkgLSB0ZW1wb3JhcmlseSBkaXNhYmxlZCB0byBwcmV2ZW50IGNpcmN1bGFyIGRlcGVuZGVuY3lcbi8vIGV4cG9ydCB0eXBlIHsgVHdlZXRNZWRpYUluZm8gfSBmcm9tICcuL3R3aXR0ZXIvY2xpZW50JztcblxuLy8gRXhwb3J0IHR5cGVzIHRoYXQgdGVzdHMgbmVlZCBidXQgd2VyZSBtaXNzaW5nXG5leHBvcnQgaW50ZXJmYWNlIFR3ZWV0SW5wdXQge1xuICBpZDogc3RyaW5nO1xuICB0ZXh0OiBzdHJpbmc7XG4gIGF1dGhvcl9pZDogc3RyaW5nO1xuICBjcmVhdGVkX2F0OiBzdHJpbmc7XG4gIHB1YmxpY19tZXRyaWNzPzoge1xuICAgIHJldHdlZXRfY291bnQ6IG51bWJlcjtcbiAgICBsaWtlX2NvdW50OiBudW1iZXI7XG4gICAgcmVwbHlfY291bnQ6IG51bWJlcjtcbiAgICBxdW90ZV9jb3VudDogbnVtYmVyO1xuICB9O1xufVxuXG5leHBvcnQgaW50ZXJmYWNlIEdlbmVyYXRpb25JbnB1dCB7XG4gIGZlZWRUeXBlOiBzdHJpbmc7XG4gIGJyaWVmaW5nRGF0ZTogRGF0ZTtcbiAgdHdlZXRBbmFseXNlczogYW55W107XG4gIHByZXZpb3VzQXJ0aWNsZXM/OiBzdHJpbmdbXTtcbiAgdGFyZ2V0V29yZENvdW50PzogbnVtYmVyO1xuICBmb2N1c0NsdWJzPzogc3RyaW5nW107XG59XG4iXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0lBZVk7SUFBQUEsY0FBQSxZQUFBQSxDQUFBO01BQUEsT0FBQUMsY0FBQTtJQUFBO0VBQUE7RUFBQSxPQUFBQSxjQUFBO0FBQUE7QUFBQUQsY0FBQTtBQWZaO0FBQ0E7QUFDQTtBQUNBOztBQUVBO0FBQ0E7QUFBQTtBQUFBLElBQVlFLFlBQVksMEJBQVpBLFlBQVk7RUFBWkEsWUFBWTtFQUFaQSxZQUFZO0VBQVpBLFlBQVk7RUFBWkEsWUFBWTtFQUFaQSxZQUFZO0VBQUEsT0FBWkEsWUFBWTtBQUFBOztBQVF4QjtBQUNBOztBQUVBIiwiaWdub3JlTGlzdCI6W119
