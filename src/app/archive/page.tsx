@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Briefing, BriefingArchive } from "@/lib/types/briefing";
 import { NewsletterSignup } from "@/components/features/NewsletterSignup";
+import { SEOGenerator } from "@/lib/seo/seoGenerator";
+import { generateMetadata as generateSEOMetadata } from "@/components/seo/SEOHead";
 
 interface ArchivePageProps {
   searchParams: {
@@ -81,18 +83,9 @@ async function getArchiveStats(): Promise<{
   }
 }
 
-export const metadata: Metadata = {
-  title: "Briefing Archive - Transfer Juice",
-  description:
-    "Browse the complete archive of Terry's unhinged briefings. Months of magnificent chaos, organized for your browsing pleasure.",
-  openGraph: {
-    title: "Briefing Archive - Transfer Juice",
-    description:
-      "Browse the complete archive of Terry's unhinged briefings. Months of magnificent chaos, organized for your browsing pleasure.",
-    type: "website",
-    url: "https://transferjuice.com/archive",
-  },
-};
+// Generate optimized SEO metadata for archive page
+const archiveSEO = SEOGenerator.generateArchiveSEO();
+export const metadata: Metadata = generateSEOMetadata(archiveSEO);
 
 export default async function ArchivePage({ searchParams }: ArchivePageProps) {
   const [archive, stats] = await Promise.all([

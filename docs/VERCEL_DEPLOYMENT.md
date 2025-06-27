@@ -10,6 +10,12 @@ This guide documents the process of deploying Transfer Juice to Vercel, includin
 
 **Latest Deployment**: Successfully deployed on June 27, 2025
 
+**Deployment ID**: dpl_GH1eZeo4RjVj2dMMNZrxNDx7YxmV
+
+**Aliases**:
+- https://transferjuice.vercel.app
+- https://transferjuice-dean-roughs-projects.vercel.app
+
 ## Prerequisites
 
 1. Vercel CLI installed: `npm install -g vercel`

@@ -12,6 +12,8 @@ import {
 } from "@/lib/database/briefings";
 import type { BriefingWithRelations } from "@/types/briefing";
 import dynamic from "next/dynamic";
+import { SEOGenerator } from "@/lib/seo/seoGenerator";
+import { generateMetadata as generateSEOMetadata } from "@/components/seo/SEOHead";
 
 // Temporarily disabled for deployment
 const RichMediaBriefingPage = null;
@@ -37,36 +39,9 @@ export async function generateMetadata({
     };
   }
 
-  const title = (briefing.title as any).main;
-  const subtitle = (briefing.title as any).subtitle;
-  const description = subtitle || `${title} - Transfer Juice hourly briefing`;
-
-  return {
-    title: `${title} | Transfer Juice`,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      publishedTime: briefing.publishedAt?.toISOString(),
-      authors: ["The Terry"],
-      siteName: "Transfer Juice",
-      images: [
-        {
-          url: `/api/og/briefing/${briefing.slug}`,
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [`/api/og/briefing/${briefing.slug}`],
-    },
-  };
+  // Generate optimized SEO metadata using automated system
+  const seoMetadata = SEOGenerator.generateBriefingSEO(briefing);
+  return generateSEOMetadata(seoMetadata);
 }
 
 export default async function BriefingPage({

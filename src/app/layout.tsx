@@ -4,6 +4,8 @@ import { GeistMono } from "geist/font/mono";
 import Script from "next/script";
 import { Header } from "@/components/layout/Header";
 import { BreakingNewsTicker } from "@/components/ui/BreakingNewsTicker";
+import { SEOGenerator } from "@/lib/seo/seoGenerator";
+import { generateMetadata as generateSEOMetadata } from "@/components/seo/SEOHead";
 import "./globals.css";
 
 // Initialize why-did-you-render in development
@@ -11,24 +13,10 @@ if (process.env.NODE_ENV === "development") {
   import("@/lib/wdyr");
 }
 
+// Generate optimized SEO metadata
+const homeSEO = SEOGenerator.generateHomeSEO();
 export const metadata: Metadata = {
-  title: "Transfer Juice - Live Global Football Transfer Feed",
-  description:
-    "Live global football transfer feed with Terry's ascerbic commentary - transforming ITK chaos into addictive entertainment",
-  keywords: [
-    "football transfers",
-    "transfer news",
-    "ITK",
-    "Fabrizio Romano",
-    "live feed",
-    "global football",
-    "transfer rumours",
-    "Premier League",
-    "La Liga",
-    "Serie A",
-    "Bundesliga",
-  ],
-  authors: [{ name: "Transfer Juice" }],
+  ...generateSEOMetadata(homeSEO),
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -46,24 +34,7 @@ export const metadata: Metadata = {
     ],
   },
   manifest: "/site.webmanifest",
-  openGraph: {
-    title: "Transfer Juice",
-    description: "Premier League ITK Transfer Digest",
-    type: "website",
-    images: [
-      {
-        url: "/android-chrome-512x512.png",
-        width: 512,
-        height: 512,
-        alt: "Transfer Juice Logo",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Transfer Juice",
-    description: "Premier League ITK Transfer Digest",
-  },
+  metadataBase: new URL("https://transferjuice.com"),
 };
 
 export const viewport: Viewport = {
@@ -98,6 +69,63 @@ export default function RootLayout({
 
         {/* Load TikTok embed script */}
         <Script src="https://www.tiktok.com/embed.js" strategy="lazyOnload" />
+
+        {/* Performance Optimization */}
+        <Script
+          id="performance-optimizer"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Initialize performance monitoring
+              if (typeof window !== 'undefined') {
+                // Simple performance monitoring
+                if ('PerformanceObserver' in window) {
+                  // Monitor LCP
+                  const lcpObserver = new PerformanceObserver((list) => {
+                    const entries = list.getEntries();
+                    if (entries.length > 0) {
+                      const lcp = entries[entries.length - 1];
+                      if (typeof gtag !== 'undefined') {
+                        gtag('event', 'LCP', {
+                          event_category: 'Web Vitals',
+                          value: Math.round(lcp.startTime),
+                          non_interaction: true
+                        });
+                      }
+                    }
+                  });
+                  lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+                }
+                
+                // Register service worker
+                if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
+                  navigator.serviceWorker.register('/sw.js').catch(() => {});
+                }
+              }
+            `,
+          }}
+        />
+
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'GA_MEASUREMENT_ID', {
+                page_title: document.title,
+                page_location: window.location.href,
+              });
+            `,
+          }}
+        />
       </body>
     </html>
   );
