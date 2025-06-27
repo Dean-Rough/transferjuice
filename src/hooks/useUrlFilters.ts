@@ -1,6 +1,6 @@
-import { useEffect, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useFeedStore } from '@/lib/stores/feedStore';
+import { useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useFeedStore } from "@/lib/stores/feedStore";
 
 interface UseUrlFiltersReturn {
   updateUrlFilters: (filters: string[]) => void;
@@ -14,10 +14,10 @@ export function useUrlFilters(): UseUrlFiltersReturn {
 
   // Sync filters from URL to store on mount
   const syncFiltersFromUrl = useCallback(() => {
-    const urlFilters = searchParams.get('filters');
+    const urlFilters = searchParams.get("filters");
 
     if (urlFilters) {
-      const filters = urlFilters.split(',').filter(Boolean);
+      const filters = urlFilters.split(",").filter(Boolean);
 
       // Only proceed if there are valid filters
       if (filters.length > 0) {
@@ -43,11 +43,11 @@ export function useUrlFilters(): UseUrlFiltersReturn {
         // Encode filters and join with commas
         const encodedFilters = filters
           .map((filter) => encodeURIComponent(filter))
-          .join(',');
-        params.set('filters', encodedFilters);
+          .join(",");
+        params.set("filters", encodedFilters);
       } else {
         // Remove filters parameter if no filters
-        params.delete('filters');
+        params.delete("filters");
       }
 
       // Build new URL
@@ -58,7 +58,7 @@ export function useUrlFilters(): UseUrlFiltersReturn {
       // Update URL without triggering a page reload
       router.replace(newUrl, { scroll: false });
     },
-    [router, searchParams]
+    [router, searchParams],
   );
 
   // Sync filters to URL when activeFilters change

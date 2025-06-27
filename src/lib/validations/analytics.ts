@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Analytics and Metrics Schemas
@@ -7,35 +7,35 @@ import { z } from 'zod';
 
 // Time period schema for analytics queries
 export const TimePeriodSchema = z.enum([
-  'hour',
-  'day',
-  'week',
-  'month',
-  'quarter',
-  'year',
+  "hour",
+  "day",
+  "week",
+  "month",
+  "quarter",
+  "year",
 ]);
 
 // Metric categories
 export const MetricCategorySchema = z.enum([
-  'content',
-  'audience',
-  'engagement',
-  'technical',
-  'business',
+  "content",
+  "audience",
+  "engagement",
+  "technical",
+  "business",
 ]);
 
 // Website analytics event schema
 export const WebAnalyticsEventSchema = z.object({
   id: z.string(),
   type: z.enum([
-    'page_view',
-    'article_view',
-    'newsletter_signup',
-    'email_click',
-    'search',
-    'share',
-    'download',
-    'error',
+    "page_view",
+    "article_view",
+    "newsletter_signup",
+    "email_click",
+    "search",
+    "share",
+    "download",
+    "error",
   ]),
 
   // Event data
@@ -48,7 +48,7 @@ export const WebAnalyticsEventSchema = z.object({
   title: z.string().optional(),
   referrer: z.string().url().optional(),
   articleId: z.string().optional(),
-  briefingType: z.enum(['morning', 'afternoon', 'evening']).optional(),
+  briefingType: z.enum(["morning", "afternoon", "evening"]).optional(),
 
   // User context
   userAgent: z.string().optional(),
@@ -65,7 +65,7 @@ export const WebAnalyticsEventSchema = z.object({
   // Device info
   device: z
     .object({
-      type: z.enum(['mobile', 'tablet', 'desktop', 'unknown']),
+      type: z.enum(["mobile", "tablet", "desktop", "unknown"]),
       os: z.string().optional(),
       browser: z.string().optional(),
       screenSize: z
@@ -234,7 +234,7 @@ export const TechnicalMetricsSchema = z.object({
         avgResponseTime: z.number().min(0),
         errorRate: z.number().min(0).max(1),
         requestCount: z.number().min(0),
-      })
+      }),
     ),
   }),
 
@@ -269,7 +269,7 @@ export const TechnicalMetricsSchema = z.object({
           message: z.string(),
           count: z.number().min(0),
           lastSeen: z.date(),
-        })
+        }),
       )
       .max(10),
   }),
@@ -322,17 +322,17 @@ export const AnalyticsQuerySchema = z.object({
   metrics: z.array(MetricCategorySchema),
   dateFrom: z.date(),
   dateTo: z.date(),
-  granularity: TimePeriodSchema.default('day'),
+  granularity: TimePeriodSchema.default("day"),
 
   // Filters
   filters: z
     .object({
       articleIds: z.array(z.string()).optional(),
       briefingTypes: z
-        .array(z.enum(['morning', 'afternoon', 'evening']))
+        .array(z.enum(["morning", "afternoon", "evening"]))
         .optional(),
       countries: z.array(z.string().length(2)).optional(),
-      devices: z.array(z.enum(['mobile', 'tablet', 'desktop'])).optional(),
+      devices: z.array(z.enum(["mobile", "tablet", "desktop"])).optional(),
       sources: z.array(z.string()).optional(),
     })
     .optional(),
@@ -340,29 +340,29 @@ export const AnalyticsQuerySchema = z.object({
   // Comparison options
   compareWith: z
     .object({
-      period: z.enum(['previous_period', 'same_period_last_year']).optional(),
+      period: z.enum(["previous_period", "same_period_last_year"]).optional(),
       baseline: z.date().optional(),
     })
     .optional(),
 
   // Output options
-  format: z.enum(['json', 'csv', 'chart']).default('json'),
+  format: z.enum(["json", "csv", "chart"]).default("json"),
   aggregation: z
-    .enum(['sum', 'average', 'median', 'min', 'max'])
-    .default('sum'),
+    .enum(["sum", "average", "median", "min", "max"])
+    .default("sum"),
 });
 
 // Dashboard widget schema
 export const DashboardWidgetSchema = z.object({
   id: z.string(),
   type: z.enum([
-    'metric_card',
-    'line_chart',
-    'bar_chart',
-    'pie_chart',
-    'table',
-    'map',
-    'funnel',
+    "metric_card",
+    "line_chart",
+    "bar_chart",
+    "pie_chart",
+    "table",
+    "map",
+    "funnel",
   ]),
   title: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
@@ -371,7 +371,7 @@ export const DashboardWidgetSchema = z.object({
   dataSource: z.object({
     metric: MetricCategorySchema,
     field: z.string(),
-    aggregation: z.enum(['sum', 'average', 'count', 'unique']),
+    aggregation: z.enum(["sum", "average", "count", "unique"]),
     timeRange: z.object({
       start: z.date(),
       end: z.date(),
@@ -398,16 +398,16 @@ export const DashboardWidgetSchema = z.object({
   alerts: z
     .array(
       z.object({
-        condition: z.enum(['above', 'below', 'equals']),
+        condition: z.enum(["above", "below", "equals"]),
         threshold: z.number(),
         enabled: z.boolean(),
         recipients: z.array(z.string().email()),
-      })
+      }),
     )
     .optional(),
 
   // Access control
-  visibility: z.enum(['public', 'internal', 'restricted']).default('internal'),
+  visibility: z.enum(["public", "internal", "restricted"]).default("internal"),
   allowedUsers: z.array(z.string()).optional(),
 
   // System fields
@@ -422,7 +422,7 @@ export const ReportSchema = z.object({
   id: z.string(),
   name: z.string().min(1).max(255),
   description: z.string().max(1000).optional(),
-  type: z.enum(['automated', 'manual', 'scheduled']),
+  type: z.enum(["automated", "manual", "scheduled"]),
 
   // Report configuration
   config: z.object({
@@ -433,7 +433,7 @@ export const ReportSchema = z.object({
       granularity: TimePeriodSchema,
     }),
     comparisons: z
-      .array(z.enum(['previous_period', 'same_period_last_year']))
+      .array(z.enum(["previous_period", "same_period_last_year"]))
       .optional(),
     segments: z.array(z.string()).optional(),
   }),
@@ -441,26 +441,26 @@ export const ReportSchema = z.object({
   // Scheduling (for automated reports)
   schedule: z
     .object({
-      frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly']),
+      frequency: z.enum(["daily", "weekly", "monthly", "quarterly"]),
       dayOfWeek: z.number().min(0).max(6).optional(), // For weekly
       dayOfMonth: z.number().min(1).max(31).optional(), // For monthly
       time: z
         .string()
         .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
         .optional(), // HH:MM
-      timezone: z.string().default('Europe/London'),
+      timezone: z.string().default("Europe/London"),
     })
     .optional(),
 
   // Distribution
   recipients: z.array(z.string().email()),
-  format: z.enum(['pdf', 'html', 'csv', 'json']).default('pdf'),
+  format: z.enum(["pdf", "html", "csv", "json"]).default("pdf"),
 
   // System fields
   createdAt: z.date(),
   lastGenerated: z.date().optional(),
   nextRun: z.date().optional(),
-  status: z.enum(['active', 'paused', 'error']).default('active'),
+  status: z.enum(["active", "paused", "error"]).default("active"),
 });
 
 // Export types

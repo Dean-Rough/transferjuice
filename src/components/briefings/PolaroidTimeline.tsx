@@ -1,10 +1,45 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useRef } from 'react';
-import Image from 'next/image';
-import { PolaroidImage } from '@/lib/types/briefing';
-import { generatePlayerFrame, type GeneratedFrame } from '@/lib/images/frameGenerator';
-import { findPlayer } from '@/lib/players/playerDatabase';
+import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
+import { PolaroidImage } from "@/lib/types/briefing";
+// import {
+//   generatePlayerFrame,
+//   type GeneratedFrame,
+// } from "@/lib/images/frameGenerator"; // TODO: Fix canvas types
+
+// Temporary type until canvas types are fixed
+type GeneratedFrame = {
+  playerName: string;
+  frameUrl: string;
+  playerImageUrl: string;
+  clubName?: string;
+  frameStyle: string;
+  metadata: any;
+  url: string;
+  width: number;
+  height: number;
+};
+
+// Temporary mock function
+const generatePlayerFrame = async (
+  playerName: string,
+  options: any,
+): Promise<GeneratedFrame> => {
+  const frameUrl = `/api/polaroids/default?player=${encodeURIComponent(playerName)}`;
+  return {
+    playerName,
+    frameUrl,
+    playerImageUrl: "",
+    clubName: options.clubName,
+    frameStyle: "vintage",
+    metadata: {},
+    url: frameUrl,
+    width: 300,
+    height: 400,
+  };
+};
+import { findPlayer } from "@/lib/players/playerDatabase";
 
 interface PolaroidTimelineProps {
   playerNames: string[]; // Changed from polaroids to player names
@@ -21,14 +56,16 @@ interface VisiblePolaroid extends GeneratedFrame {
   rotation: number;
 }
 
-export function PolaroidTimeline({ 
-  playerNames, 
-  scrollPosition, 
-  contentHeight, 
-  className = '' 
+export function PolaroidTimeline({
+  playerNames,
+  scrollPosition,
+  contentHeight,
+  className = "",
 }: PolaroidTimelineProps) {
   const [generatedFrames, setGeneratedFrames] = useState<GeneratedFrame[]>([]);
-  const [visiblePolaroids, setVisiblePolaroids] = useState<VisiblePolaroid[]>([]);
+  const [visiblePolaroids, setVisiblePolaroids] = useState<VisiblePolaroid[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(true);
   const timelineRef = useRef<HTMLDivElement>(null);
 
@@ -37,18 +74,18 @@ export function PolaroidTimeline({
     const generateFrames = async () => {
       setIsLoading(true);
       const frames: GeneratedFrame[] = [];
-      
+
       for (const playerName of playerNames) {
         try {
           // Generate random rotation for each frame (±8 degrees)
           const rotation = (Math.random() - 0.5) * 16;
-          
+
           const frame = await generatePlayerFrame(playerName, {
             rotation,
             maxWidth: 200,
             maxHeight: 250,
           });
-          
+
           if (frame) {
             frames.push(frame);
           }
@@ -56,7 +93,7 @@ export function PolaroidTimeline({
           console.error(`Error generating frame for ${playerName}:`, error);
         }
       }
-      
+
       setGeneratedFrames(frames);
       setIsLoading(false);
     };
@@ -73,7 +110,7 @@ export function PolaroidTimeline({
         // Each polaroid appears at different scroll positions
         const appearAt = (index + 1) / (generatedFrames.length + 1);
         const disappearAt = Math.min(appearAt + 0.3, 1); // Visible for 30% of scroll
-        
+
         let isVisible = false;
         let opacity = 0;
         let scale = 0.8;
@@ -81,20 +118,21 @@ export function PolaroidTimeline({
 
         if (scrollPosition >= appearAt && scrollPosition <= disappearAt) {
           isVisible = true;
-          
+
           // Calculate fade in/out based on position within visibility window
-          const visibilityProgress = (scrollPosition - appearAt) / (disappearAt - appearAt);
-          
+          const visibilityProgress =
+            (scrollPosition - appearAt) / (disappearAt - appearAt);
+
           if (visibilityProgress <= 0.2) {
             // Fade in
             opacity = visibilityProgress / 0.2;
-            scale = 0.8 + (0.2 * opacity);
+            scale = 0.8 + 0.2 * opacity;
             translateY = 20 * (1 - opacity);
           } else if (visibilityProgress >= 0.8) {
             // Fade out
             const fadeOut = (1 - visibilityProgress) / 0.2;
             opacity = fadeOut;
-            scale = 0.8 + (0.2 * fadeOut);
+            scale = 0.8 + 0.2 * fadeOut;
             translateY = 20 * (1 - fadeOut);
           } else {
             // Fully visible
@@ -125,18 +163,18 @@ export function PolaroidTimeline({
   // Handle polaroid interaction
   const handlePolaroidClick = (frame: GeneratedFrame) => {
     // Could implement lightbox or player detail modal
-    console.log('Clicked polaroid:', frame.playerName);
+    console.log("Clicked polaroid:", frame.playerName);
   };
 
   const handlePolaroidHover = (frame: GeneratedFrame, isHovering: boolean) => {
     // Could implement hover effects or preview
     if (isHovering) {
-      console.log('Hovering:', frame.playerName);
+      console.log("Hovering:", frame.playerName);
     }
   };
 
   return (
-    <div 
+    <div
       ref={timelineRef}
       className={`polaroid-timeline relative w-full h-full overflow-hidden ${className}`}
       data-testid="polaroid-timeline"
@@ -144,7 +182,7 @@ export function PolaroidTimeline({
       {/* Timeline Background */}
       <div className="timeline-background absolute inset-0">
         <div className="timeline-line absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-border to-transparent transform -translate-x-0.5" />
-        
+
         {/* Timeline dots for visual interest */}
         {Array.from({ length: 5 }).map((_, index) => (
           <div
@@ -172,49 +210,50 @@ export function PolaroidTimeline({
 
       {/* Polaroid Images */}
       <div className="polaroids-container relative z-10">
-        {!isLoading && visiblePolaroids.map((frame, index) => (
-          <div
-            key={`${frame.playerName}-${index}`}
-            className="polaroid-wrapper absolute cursor-pointer transform transition-all duration-500 ease-out"
-            style={{
-              left: index % 2 === 0 ? '10%' : '60%', // Alternate sides
-              top: `${20 + (index * 15)}%`, // Stagger vertically
-              opacity: frame.opacity,
-              transform: `
+        {!isLoading &&
+          visiblePolaroids.map((frame, index) => (
+            <div
+              key={`${frame.playerName}-${index}`}
+              className="polaroid-wrapper absolute cursor-pointer transform transition-all duration-500 ease-out"
+              style={{
+                left: index % 2 === 0 ? "10%" : "60%", // Alternate sides
+                top: `${20 + index * 15}%`, // Stagger vertically
+                opacity: frame.opacity,
+                transform: `
                 rotate(${frame.rotation}deg) 
                 scale(${frame.scale})
                 translateY(${frame.translateY}px)
               `,
-              visibility: frame.isVisible ? 'visible' : 'hidden',
-            }}
-            onClick={() => handlePolaroidClick(frame)}
-            onMouseEnter={() => handlePolaroidHover(frame, true)}
-            onMouseLeave={() => handlePolaroidHover(frame, false)}
-            data-testid={`polaroid-${frame.playerName}`}
-            aria-label={`Player photo: ${frame.playerName}`}
-          >
-            {/* Use the generated frame directly - it already includes borders and text */}
-            <div className="generated-frame-wrapper hover:shadow-xl transition-shadow duration-300">
-              <Image
-                src={frame.url}
-                alt={`Polaroid-style photo of ${frame.playerName}`}
-                width={frame.width}
-                height={frame.height}
-                className="generated-frame"
-                sizes="(max-width: 768px) 150px, 200px"
-                loading="lazy"
-                onError={(e) => {
-                  // Fallback to placeholder on error
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/images/player-placeholder.jpg';
-                }}
-              />
+                visibility: frame.isVisible ? "visible" : "hidden",
+              }}
+              onClick={() => handlePolaroidClick(frame)}
+              onMouseEnter={() => handlePolaroidHover(frame, true)}
+              onMouseLeave={() => handlePolaroidHover(frame, false)}
+              data-testid={`polaroid-${frame.playerName}`}
+              aria-label={`Player photo: ${frame.playerName}`}
+            >
+              {/* Use the generated frame directly - it already includes borders and text */}
+              <div className="generated-frame-wrapper hover:shadow-xl transition-shadow duration-300">
+                <Image
+                  src={frame.url}
+                  alt={`Polaroid-style photo of ${frame.playerName}`}
+                  width={frame.width}
+                  height={frame.height}
+                  className="generated-frame"
+                  sizes="(max-width: 768px) 150px, 200px"
+                  loading="lazy"
+                  onError={(e) => {
+                    // Fallback to placeholder on error
+                    const target = e.target as HTMLImageElement;
+                    target.src = "/images/player-placeholder.jpg";
+                  }}
+                />
+              </div>
+
+              {/* Hover effect overlay */}
+              <div className="polaroid-overlay absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-5 transition-all duration-300 rounded pointer-events-none" />
             </div>
-            
-            {/* Hover effect overlay */}
-            <div className="polaroid-overlay absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-5 transition-all duration-300 rounded pointer-events-none" />
-          </div>
-        ))}
+          ))}
       </div>
 
       {/* Floating particles for visual enhancement */}
@@ -247,13 +286,13 @@ export function PolaroidTimeline({
           transition: all 0.3s ease;
           border-radius: 4px;
           overflow: hidden;
-          box-shadow: 
+          box-shadow:
             0 4px 8px rgba(0, 0, 0, 0.1),
             0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .generated-frame-wrapper:hover {
-          box-shadow: 
+          box-shadow:
             0 8px 16px rgba(0, 0, 0, 0.2),
             0 4px 8px rgba(0, 0, 0, 0.15);
         }
@@ -271,7 +310,8 @@ export function PolaroidTimeline({
 
         /* Particle animation */
         @keyframes float {
-          0%, 100% {
+          0%,
+          100% {
             transform: translateY(0px) translateX(0px) scale(1);
             opacity: 0.3;
           }
@@ -347,7 +387,12 @@ export function PolaroidTimeline({
 
         /* Loading states */
         .polaroid-image img[src=""] {
-          background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+          background: linear-gradient(
+            90deg,
+            #f0f0f0 25%,
+            #e0e0e0 50%,
+            #f0f0f0 75%
+          );
           background-size: 200% 100%;
           animation: loading 1.5s infinite;
         }

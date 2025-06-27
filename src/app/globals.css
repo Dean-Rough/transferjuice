@@ -4,8 +4,8 @@
 
 /* Custom Fonts */
 @font-face {
-  font-family: 'Bouchers Sans';
-  src: url('/fonts/bouchers-sans.otf') format('opentype');
+  font-family: "Bouchers Sans";
+  src: url("/fonts/bouchers-sans.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
 }
@@ -33,7 +33,7 @@
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
     --radius: 0.5rem;
-    
+
     /* Transfer Juice specific colors */
     --tj-orange: 14 100% 56%;
     --tj-orange-dark: 14 100% 46%;
@@ -83,27 +83,31 @@
   h6 {
     @apply font-black; /* Geist 900 */
   }
-  
-  /* Typography Scale */
+
+  /* Typography Scale - Consistent line heights and spacing */
   h1 {
-    @apply text-3xl md:text-4xl lg:text-5xl;
+    @apply text-3xl md:text-4xl lg:text-5xl leading-[1.1] tracking-tight;
   }
   h2 {
-    @apply text-2xl md:text-3xl lg:text-4xl;
+    @apply text-2xl md:text-3xl lg:text-4xl leading-[1.2] tracking-tight;
   }
   h3 {
-    @apply text-xl md:text-2xl lg:text-3xl;
+    @apply text-xl md:text-2xl lg:text-3xl leading-[1.3] tracking-tight;
   }
-  p, .body-text {
-    @apply font-light text-base md:text-lg;
+  h4 {
+    @apply text-lg md:text-xl lg:text-2xl leading-[1.4];
   }
-  
+  p,
+  .body-text {
+    @apply font-light text-base md:text-lg leading-relaxed;
+  }
+
   /* Terry's voice - Bouchers Sans */
   .terry-voice {
-    font-family: 'Bouchers Sans', system-ui, sans-serif;
+    font-family: "Bouchers Sans", system-ui, sans-serif;
     @apply text-lg md:text-xl;
   }
-  
+
   /* Data/metrics - Geist Mono */
   .data-mono {
     font-family: var(--font-geist-mono), monospace;
@@ -112,39 +116,39 @@
 }
 
 @layer components {
-  /* Global tag pill style with mono font */
+  /* Global tag pill style with mono font - consistent sizing */
   .tag-pill {
-    @apply flex flex-shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-black px-4 py-2 font-mono text-sm font-bold text-white transition-colors hover:bg-gray-800;
+    @apply inline-flex flex-shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-zinc-900 border border-zinc-800 px-3 py-1.5 font-mono text-xs font-medium text-zinc-300 transition-all hover:bg-zinc-800 hover:border-zinc-700 hover:text-white;
   }
 
-  /* Transfer-specific tag variations */
+  /* Transfer-specific tag variations - consistent with dark theme */
   .tag-club {
-    @apply bg-orange-600 hover:bg-orange-700;
+    @apply bg-orange-500/10 border-orange-500/30 text-orange-400 hover:bg-orange-500/20 hover:border-orange-500/50;
   }
-  
+
   .tag-player {
-    @apply bg-green-600 hover:bg-green-700;
+    @apply bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20 hover:border-green-500/50;
   }
-  
+
   .tag-source {
-    @apply bg-gray-700 hover:bg-gray-600;
+    @apply bg-zinc-800 border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:border-zinc-600;
   }
 
   /* Terry's quote bubbles - using Bouchers Sans with orange styling */
   .terry-bubble {
-    font-family: 'Bouchers Sans', system-ui, sans-serif;
+    font-family: "Bouchers Sans", system-ui, sans-serif;
     @apply bg-orange-600 text-white rounded-xl p-6 relative shadow-lg;
     transform: rotate(-1deg);
     transition: all 0.3s ease;
   }
-  
+
   .terry-bubble:hover {
     transform: rotate(0deg) scale(1.02);
     @apply shadow-xl;
   }
-  
+
   .terry-bubble::before {
-    content: '';
+    content: "";
     position: absolute;
     left: -12px;
     bottom: 20px;
@@ -179,7 +183,7 @@
   }
 
   .touch-area::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -8px;
     left: -8px;
@@ -296,6 +300,176 @@
   }
 }
 
+/* Briefing Content Styles */
+.briefing-content {
+  /* Embedded tweet styles - consistent spacing */
+  .twitter-tweet {
+    @apply my-8 mx-auto;
+    max-width: 550px !important;
+  }
+
+  /* Embedded images */
+  img {
+    @apply rounded-lg my-6 mx-auto;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Figure captions - consistent styling */
+  figure {
+    @apply my-8;
+
+    figcaption {
+      @apply text-sm text-zinc-500 mt-3 font-mono;
+    }
+  }
+
+  /* Briefing image figures - floated right at 50% width */
+  figure.briefing-image {
+    @apply float-right ml-6 mb-4 w-1/2;
+    max-width: 400px;
+
+    img {
+      @apply w-full h-auto rounded-lg shadow-lg;
+      margin: 0;
+    }
+
+    figcaption {
+      @apply text-sm text-zinc-400 mt-2 italic;
+      text-align: left;
+    }
+  }
+
+  /* Hero images - full width */
+  figure.briefing-image.hero-image {
+    @apply float-none w-full max-w-none mx-0 my-8;
+
+    img {
+      @apply w-full;
+      max-height: 500px;
+      object-fit: cover;
+    }
+
+    figcaption {
+      @apply text-center;
+    }
+  }
+
+  /* Mobile responsive - stack images on small screens */
+  @media (max-width: 768px) {
+    figure.briefing-image {
+      @apply float-none w-full max-w-none mx-0;
+    }
+  }
+
+  /* Clear floats after content sections */
+  .transfer-section-content::after,
+  .partner-content::after,
+  .analysis-content::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  /* Inline tweet references */
+  .tweet-embed-inline {
+    @apply bg-zinc-900 border border-zinc-700 rounded-lg p-4 my-6;
+  }
+
+  /* Blockquotes styled as Terry commentary */
+  blockquote {
+    @apply border-l-4 border-orange-500 pl-4 my-6 italic text-zinc-300;
+  }
+
+  /* Twitter/X embedded tweet blockquotes - override Terry commentary styles */
+  blockquote.twitter-tweet {
+    @apply bg-white text-black border-0 rounded-2xl p-4 my-6 mx-auto not-italic font-normal;
+    max-width: 550px !important;
+    border-left: none !important;
+    box-shadow:
+      0 1px 3px 0 rgba(0, 0, 0, 0.12),
+      0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+    transition: box-shadow 0.15s ease-in-out;
+  }
+
+  blockquote.twitter-tweet:hover {
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* Twitter/X tweet content styling */
+  blockquote.twitter-tweet p {
+    @apply text-black mb-3 text-base leading-normal not-italic;
+  }
+
+  blockquote.twitter-tweet a {
+    @apply text-blue-500 hover:text-blue-600 no-underline;
+  }
+
+  /* Twitter/X tweet metadata */
+  blockquote.twitter-tweet > a:last-child {
+    @apply text-gray-500 text-sm hover:text-gray-600;
+  }
+}
+
+/* Enhanced content specific styles */
+.enhanced-content {
+  /* Ensure proper text wrapping around floated images */
+  overflow: auto;
+  text-align: left;
+
+  /* Briefing image figures - same as above but scoped to enhanced content */
+  figure.briefing-image {
+    @apply float-right ml-6 mb-4 w-1/2;
+    max-width: 400px;
+
+    img {
+      @apply w-full h-auto rounded-lg shadow-lg;
+      margin: 0;
+    }
+
+    figcaption {
+      @apply text-sm text-zinc-400 mt-2 italic;
+      text-align: left;
+    }
+  }
+
+  /* Hero images in enhanced content */
+  figure.briefing-image.hero-image {
+    @apply float-none w-full max-w-none mx-0 my-8;
+
+    img {
+      @apply w-full;
+      max-height: 500px;
+      object-fit: cover;
+    }
+
+    figcaption {
+      @apply text-left;
+    }
+  }
+
+  /* Paragraphs should wrap around floated images */
+  p {
+    @apply text-zinc-200 leading-relaxed;
+    text-align: left;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    figure.briefing-image {
+      @apply float-none w-full max-w-none mx-0;
+    }
+  }
+}
+
+/* TikTok Embed Styles */
+.tiktok-embed {
+  @apply mx-auto my-6;
+  max-width: 605px !important;
+}
+
 /* Seamless ticker animation for breaking transfer news */
 @keyframes ticker {
   0% {
@@ -318,38 +492,51 @@
 /* Jaunty cut-out styling for feed items */
 .jaunty-cutout {
   transform: rotate(-2deg);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   position: relative;
 }
 
 .jaunty-cutout:hover {
   transform: rotate(-1deg) scale(1.02);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .jaunty-cutout-left {
   transform: rotate(1.5deg);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   position: relative;
 }
 
 .jaunty-cutout-left:hover {
   transform: rotate(0.5deg) scale(1.02);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Enhanced content styling for verified transfers */
-.enhanced-content {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(34, 197, 94, 0.02) 100%);
+.enhanced-content.verified-transfer {
+  background: linear-gradient(
+    135deg,
+    rgba(34, 197, 94, 0.05) 0%,
+    rgba(34, 197, 94, 0.02) 100%
+  );
   border-left: 4px solid #22c55e;
   padding-left: 1.5rem;
   position: relative;
+  text-align: left;
 }
 
-.enhanced-content::before {
-  content: '';
+.enhanced-content.verified-transfer::before {
+  content: "";
   position: absolute;
   left: -2px;
   top: 0;
@@ -390,7 +577,8 @@
 
 /* Subtle bounce animation for Terry character */
 @keyframes bounce-subtle {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -404,7 +592,7 @@
 
 /* Speech bubble tail styling for Terry */
 .bubble-tail-right::before {
-  content: '';
+  content: "";
   position: absolute;
   right: 100%;
   bottom: 20px;
@@ -417,7 +605,7 @@
 }
 
 .bubble-tail-left::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 100%;
   bottom: 20px;
@@ -441,7 +629,8 @@
 
 /* Subtle float animation for Terry's icon */
 @keyframes terry-float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -455,7 +644,8 @@
 
 /* Subtle jiggle animation for speech bubble */
 @keyframes terry-jiggle {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0px) rotate(0deg);
   }
   25% {
@@ -508,9 +698,9 @@
   @apply bg-orange-500 text-white;
 }
 
-/* Loading spinner */
+/* Loading spinner - consistent with theme */
 .loading-spinner {
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid hsl(var(--tj-orange) / 0.2);
   border-left-color: hsl(var(--tj-orange));
   border-radius: 50%;
   width: 1.5rem;
@@ -518,8 +708,97 @@
   animation: spin 0.8s linear infinite;
 }
 
+/* Consistent shadow styles */
+.shadow-subtle {
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.shadow-medium {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-large {
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Consistent hover states */
+.hover-lift {
+  @apply transition-transform duration-200 hover:-translate-y-0.5;
+}
+
+.hover-glow {
+  @apply transition-shadow duration-200 hover:shadow-orange-500/20;
+}
+
+/* Consistent border radius */
+.rounded-standard {
+  @apply rounded-lg;
+}
+
+.rounded-small {
+  @apply rounded-md;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Briefing Content Styles */
+.briefing-content {
+  @apply text-zinc-200 leading-relaxed;
+  text-align: left;
+}
+
+.briefing-content p {
+  @apply mb-4;
+  text-align: left;
+}
+
+.briefing-content h1,
+.briefing-content h2,
+.briefing-content h3,
+.briefing-content h4,
+.briefing-content h5,
+.briefing-content h6 {
+  text-align: left;
+}
+
+.briefing-content a {
+  @apply text-orange-500 hover:text-orange-400 transition-colors;
+}
+
+.briefing-content strong {
+  @apply font-semibold;
+}
+
+.briefing-content blockquote {
+  @apply border-l-4 border-orange-500 pl-4 my-4 italic text-zinc-300;
+}
+
+.briefing-content figure {
+  @apply my-8 text-center;
+}
+
+.briefing-content figcaption {
+  @apply text-sm text-zinc-500 mt-2;
+}
+
+.briefing-content img {
+  @apply max-w-full h-auto rounded-lg shadow-lg mx-auto;
+}
+
+.briefing-content .tweet-embed {
+  @apply border border-zinc-700 rounded-lg p-6 bg-zinc-900/50 my-6;
+}
+
+.briefing-content .inline-media-break {
+  @apply my-12;
 }

@@ -3,8 +3,8 @@
  * Database operations for tag management
  */
 
-import { prisma } from '@/lib/prisma';
-import type { Tag, TagType, League } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import type { Tag, TagType, League } from "@prisma/client";
 
 /**
  * Find or create tag
@@ -17,8 +17,8 @@ export async function findOrCreateTag(data: {
   position?: string;
   transferValue?: bigint;
 }): Promise<Tag> {
-  const normalizedName = data.name.toLowerCase().replace(/\s+/g, '-');
-  
+  const normalizedName = data.name.toLowerCase().replace(/\s+/g, "-");
+
   // Try to find existing tag
   const existing = await prisma.tag.findFirst({
     where: {
@@ -26,7 +26,7 @@ export async function findOrCreateTag(data: {
       type: data.type,
     },
   });
-  
+
   if (existing) {
     // Update usage count
     await prisma.tag.update({
@@ -38,7 +38,7 @@ export async function findOrCreateTag(data: {
     });
     return existing;
   }
-  
+
   // Create new tag
   return await prisma.tag.create({
     data: {
@@ -65,26 +65,22 @@ export async function findOrCreateTags(
     league?: League;
     country?: string;
     position?: string;
-  }>
+  }>,
 ): Promise<Tag[]> {
-  return await Promise.all(
-    tags.map(tag => findOrCreateTag(tag))
-  );
+  return await Promise.all(tags.map((tag) => findOrCreateTag(tag)));
 }
 
 /**
  * Get popular tags
  */
-export async function getPopularTags(
-  options?: {
-    type?: TagType;
-    league?: League;
-    limit?: number;
-    since?: Date;
-  }
-): Promise<Tag[]> {
+export async function getPopularTags(options?: {
+  type?: TagType;
+  league?: League;
+  limit?: number;
+  since?: Date;
+}): Promise<Tag[]> {
   const { type, league, limit = 20, since } = options || {};
-  
+
   return await prisma.tag.findMany({
     where: {
       ...(type && { type }),
@@ -92,7 +88,7 @@ export async function getPopularTags(
       ...(since && { lastUsedAt: { gte: since } }),
       isPopular: true,
     },
-    orderBy: { usageCount: 'desc' },
+    orderBy: { usageCount: "desc" },
     take: limit,
   });
 }
@@ -102,36 +98,38 @@ export async function getPopularTags(
  */
 export async function getTrendingTags(
   since: Date,
-  limit = 10
+  limit = 10,
 ): Promise<(Tag & { recentUsage: number })[]> {
   // Get recent tag usage
   const recentUsage = await prisma.feedItemTag.groupBy({
-    by: ['tagId'],
+    by: ["tagId"],
     where: {
       createdAt: { gte: since },
     },
     _count: true,
     orderBy: {
       _count: {
-        tagId: 'desc',
+        tagId: "desc",
       },
     },
     take: limit,
   });
-  
+
   // Get tag details
-  const tagIds = recentUsage.map(u => u.tagId);
+  const tagIds = recentUsage.map((u) => u.tagId);
   const tags = await prisma.tag.findMany({
     where: { id: { in: tagIds } },
   });
-  
+
   // Combine with usage counts
-  const tagMap = Object.fromEntries(tags.map(t => [t.id, t]));
-  
-  return recentUsage.map(usage => ({
-    ...tagMap[usage.tagId],
-    recentUsage: usage._count,
-  })).filter(t => t.id); // Filter out any missing tags
+  const tagMap = Object.fromEntries(tags.map((t) => [t.id, t]));
+
+  return recentUsage
+    .map((usage) => ({
+      ...tagMap[usage.tagId],
+      recentUsage: usage._count,
+    }))
+    .filter((t) => t.id); // Filter out any missing tags
 }
 
 /**
@@ -142,11 +140,11 @@ export async function searchTags(
   options?: {
     type?: TagType;
     limit?: number;
-  }
+  },
 ): Promise<Tag[]> {
   const { type, limit = 10 } = options || {};
-  const normalizedQuery = query.toLowerCase().replace(/\s+/g, '-');
-  
+  const normalizedQuery = query.toLowerCase().replace(/\s+/g, "-");
+
   return await prisma.tag.findMany({
     where: {
       normalizedName: {
@@ -154,7 +152,7 @@ export async function searchTags(
       },
       ...(type && { type }),
     },
-    orderBy: { usageCount: 'desc' },
+    orderBy: { usageCount: "desc" },
     take: limit,
   });
 }
@@ -162,9 +160,7 @@ export async function searchTags(
 /**
  * Update tag popularity
  */
-export async function updateTagPopularity(
-  threshold = 100
-): Promise<number> {
+export async function updateTagPopularity(threshold = 100): Promise<number> {
   // Mark tags as popular if they exceed usage threshold
   const result = await prisma.tag.updateMany({
     where: {
@@ -175,7 +171,7 @@ export async function updateTagPopularity(
       isPopular: true,
     },
   });
-  
+
   // Unmark tags that fell below threshold
   await prisma.tag.updateMany({
     where: {
@@ -186,29 +182,26 @@ export async function updateTagPopularity(
       isPopular: false,
     },
   });
-  
+
   return result.count;
 }
 
 /**
  * Get related tags
  */
-export async function getRelatedTags(
-  tagId: string,
-  limit = 5
-): Promise<Tag[]> {
+export async function getRelatedTags(tagId: string, limit = 5): Promise<Tag[]> {
   // Find feed items that have this tag
   const feedItemsWithTag = await prisma.feedItemTag.findMany({
     where: { tagId },
     select: { feedItemId: true },
     take: 100, // Sample recent items
   });
-  
-  const feedItemIds = feedItemsWithTag.map(fit => fit.feedItemId);
-  
+
+  const feedItemIds = feedItemsWithTag.map((fit) => fit.feedItemId);
+
   // Find other tags on these feed items
   const relatedTagUsage = await prisma.feedItemTag.groupBy({
-    by: ['tagId'],
+    by: ["tagId"],
     where: {
       feedItemId: { in: feedItemIds },
       tagId: { not: tagId }, // Exclude the original tag
@@ -216,14 +209,14 @@ export async function getRelatedTags(
     _count: true,
     orderBy: {
       _count: {
-        tagId: 'desc',
+        tagId: "desc",
       },
     },
     take: limit,
   });
-  
+
   // Get tag details
-  const relatedTagIds = relatedTagUsage.map(u => u.tagId);
+  const relatedTagIds = relatedTagUsage.map((u) => u.tagId);
   return await prisma.tag.findMany({
     where: { id: { in: relatedTagIds } },
   });
@@ -234,7 +227,7 @@ export async function getRelatedTags(
  */
 export async function mergeTags(
   sourceTagId: string,
-  targetTagId: string
+  targetTagId: string,
 ): Promise<void> {
   await prisma.$transaction(async (tx) => {
     // Get both tags
@@ -242,23 +235,23 @@ export async function mergeTags(
       tx.tag.findUnique({ where: { id: sourceTagId } }),
       tx.tag.findUnique({ where: { id: targetTagId } }),
     ]);
-    
+
     if (!sourceTag || !targetTag) {
-      throw new Error('One or both tags not found');
+      throw new Error("One or both tags not found");
     }
-    
+
     // Update all feed item tags
     await tx.feedItemTag.updateMany({
       where: { tagId: sourceTagId },
       data: { tagId: targetTagId },
     });
-    
+
     // Update all briefing tags
     await tx.briefingTag.updateMany({
       where: { tagId: sourceTagId },
       data: { tagId: targetTagId },
     });
-    
+
     // Update target tag usage count
     await tx.tag.update({
       where: { id: targetTagId },
@@ -266,7 +259,7 @@ export async function mergeTags(
         usageCount: { increment: sourceTag.usageCount },
       },
     });
-    
+
     // Delete source tag
     await tx.tag.delete({
       where: { id: sourceTagId },
@@ -289,15 +282,15 @@ export async function cleanupUnusedTags(): Promise<number> {
     },
     select: { id: true },
   });
-  
+
   if (unusedTags.length === 0) return 0;
-  
+
   // Delete unused tags
   const result = await prisma.tag.deleteMany({
     where: {
-      id: { in: unusedTags.map(t => t.id) },
+      id: { in: unusedTags.map((t) => t.id) },
     },
   });
-  
+
   return result.count;
 }

@@ -9,7 +9,7 @@
 // Temporary type to avoid circular dependency
 interface FeedItem {
   id: string;
-  type: 'itk' | 'terry' | 'partner' | 'breaking';
+  type: "itk" | "terry" | "partner" | "breaking";
   content: string;
   timestamp: Date;
   terryCommentary?: string;
@@ -18,7 +18,7 @@ interface FeedItem {
     handle?: string;
     tier: 1 | 2 | 3;
     reliability: number;
-    region?: 'UK' | 'ES' | 'IT' | 'FR' | 'DE' | 'BR' | 'GLOBAL';
+    region?: "UK" | "ES" | "IT" | "FR" | "DE" | "BR" | "GLOBAL";
   };
   tags: {
     clubs: string[];
@@ -26,10 +26,16 @@ interface FeedItem {
     sources: string[];
   };
   metadata: {
-    transferType?: 'signing' | 'rumour' | 'medical' | 'confirmed' | 'bid' | 'personal_terms';
-    priority: 'low' | 'medium' | 'high' | 'breaking';
+    transferType?:
+      | "signing"
+      | "rumour"
+      | "medical"
+      | "confirmed"
+      | "bid"
+      | "personal_terms";
+    priority: "low" | "medium" | "high" | "breaking";
     relevanceScore: number;
-    league?: 'PL' | 'LaLiga' | 'SerieA' | 'Bundesliga' | 'Ligue1' | 'Other';
+    league?: "PL" | "LaLiga" | "SerieA" | "Bundesliga" | "Ligue1" | "Other";
     originalUrl?: string;
     attribution?: string;
   };
@@ -39,12 +45,12 @@ import {
   type TerryCommentaryResult,
   type TerryCommentaryConfig,
   DEFAULT_TERRY_CONFIG,
-} from './terryCommentarySystem';
+} from "./terryCommentarySystem";
 import {
   type TweetData,
   type ClassificationResult,
-} from '@/lib/twitter/transferClassifier';
-import { type ITKSource } from '@/lib/twitter/globalSources';
+} from "@/lib/twitter/transferClassifier";
+import { type ITKSource } from "@/lib/twitter/globalSources";
 
 export interface TerryIntegrationConfig extends TerryCommentaryConfig {
   enableRealTimeCommentary: boolean;
@@ -96,7 +102,7 @@ export class TerryIntegration {
     feedItem: FeedItem,
     originalTweet?: TweetData,
     classification?: ClassificationResult,
-    source?: ITKSource
+    source?: ITKSource,
   ): Promise<boolean> {
     if (!this.config.enableRealTimeCommentary) {
       return false;
@@ -112,11 +118,11 @@ export class TerryIntegration {
             await this.generateAndAddCommentary(
               feedItem,
               originalTweet,
-              classification
+              classification,
             );
             this.pendingCommentary.delete(feedItem.id);
           },
-          this.config.commentaryDelay * 60 * 1000
+          this.config.commentaryDelay * 60 * 1000,
         );
 
         this.pendingCommentary.set(feedItem.id, timeoutId);
@@ -126,13 +132,13 @@ export class TerryIntegration {
         return await this.generateAndAddCommentary(
           feedItem,
           originalTweet,
-          classification
+          classification,
         );
       }
     } catch (error) {
       console.error(
         `Failed to process feed item ${feedItem.id} for Terry commentary:`,
-        error
+        error,
       );
       return false;
     }
@@ -145,13 +151,13 @@ export class TerryIntegration {
     feedItem: FeedItem,
     originalTweet?: TweetData,
     classification?: ClassificationResult,
-    retryCount: number = 0
+    retryCount: number = 0,
   ): Promise<boolean> {
     try {
       const commentaryResult = await this.terrySystem.generateCommentary(
         feedItem,
         originalTweet,
-        classification
+        classification,
       );
 
       if (!commentaryResult) {
@@ -175,13 +181,13 @@ export class TerryIntegration {
           retryCount < this.config.maxRetries
         ) {
           console.log(
-            `Retrying Terry commentary for ${feedItem.id} (attempt ${retryCount + 1})`
+            `Retrying Terry commentary for ${feedItem.id} (attempt ${retryCount + 1})`,
           );
           return await this.generateAndAddCommentary(
             feedItem,
             originalTweet,
             classification,
-            retryCount + 1
+            retryCount + 1,
           );
         }
 
@@ -205,13 +211,13 @@ export class TerryIntegration {
         this.processingStats.commentariesGenerated;
 
       console.log(
-        `✅ Terry commentary added to ${feedItem.id}: ${commentaryResult.commentary.substring(0, 50)}...`
+        `✅ Terry commentary added to ${feedItem.id}: ${commentaryResult.commentary.substring(0, 50)}...`,
       );
       return true;
     } catch (error) {
       console.error(
         `Failed to generate Terry commentary for ${feedItem.id}:`,
-        error
+        error,
       );
 
       // Retry if enabled
@@ -220,13 +226,13 @@ export class TerryIntegration {
         retryCount < this.config.maxRetries
       ) {
         console.log(
-          `Retrying Terry commentary for ${feedItem.id} (attempt ${retryCount + 1})`
+          `Retrying Terry commentary for ${feedItem.id} (attempt ${retryCount + 1})`,
         );
         return await this.generateAndAddCommentary(
           feedItem,
           originalTweet,
           classification,
-          retryCount + 1
+          retryCount + 1,
         );
       }
 
@@ -239,11 +245,11 @@ export class TerryIntegration {
    */
   private async addCommentaryToFeedItem(
     feedItemId: string,
-    commentaryResult: TerryCommentaryResult
+    commentaryResult: TerryCommentaryResult,
   ): Promise<void> {
     // TODO: Re-enable feed store updates once circular dependency is fixed
     console.log(
-      `Terry commentary would be added to ${feedItemId}: ${commentaryResult.commentary}`
+      `Terry commentary would be added to ${feedItemId}: ${commentaryResult.commentary}`,
     );
     // // Get the current feed store state
     // const feedStore = useFeedStore.getState();
@@ -284,7 +290,7 @@ export class TerryIntegration {
       originalTweet?: TweetData;
       classification?: ClassificationResult;
       source?: ITKSource;
-    }>
+    }>,
   ): Promise<number> {
     if (!this.config.enableBatchCommentary) {
       return 0;
@@ -297,7 +303,7 @@ export class TerryIntegration {
         item.feedItem,
         item.originalTweet,
         item.classification,
-        item.source
+        item.source,
       );
 
       if (success) {
@@ -309,7 +315,7 @@ export class TerryIntegration {
     }
 
     console.log(
-      `📊 Terry batch processing complete: ${successCount}/${feedItems.length} commentaries generated`
+      `📊 Terry batch processing complete: ${successCount}/${feedItems.length} commentaries generated`,
     );
     return successCount;
   }
@@ -319,9 +325,9 @@ export class TerryIntegration {
    */
   public async processBreakingNews(
     feedItem: FeedItem,
-    isGenuineDrama: boolean = true
+    isGenuineDrama: boolean = true,
   ): Promise<boolean> {
-    if (feedItem.type !== 'breaking') {
+    if (feedItem.type !== "breaking") {
       return false;
     }
 
@@ -329,7 +335,7 @@ export class TerryIntegration {
       const breakingCommentary =
         await this.terrySystem.generateBreakingNewsCommentary(
           feedItem,
-          isGenuineDrama
+          isGenuineDrama,
         );
 
       if (!breakingCommentary) {
@@ -340,13 +346,13 @@ export class TerryIntegration {
       await this.addCommentaryToFeedItem(feedItem.id, breakingCommentary);
 
       console.log(
-        `🚨 Terry breaking news commentary added: ${breakingCommentary.commentary}`
+        `🚨 Terry breaking news commentary added: ${breakingCommentary.commentary}`,
       );
       return true;
     } catch (error) {
       console.error(
         `Failed to process breaking news commentary for ${feedItem.id}:`,
-        error
+        error,
       );
       return false;
     }
@@ -404,7 +410,7 @@ export class TerryIntegration {
   public updateConfig(newConfig: Partial<TerryIntegrationConfig>): void {
     this.config = { ...this.config, ...newConfig };
     this.terrySystem.updateConfig(newConfig);
-    console.log('🔧 Updated Terry integration config:', this.config);
+    console.log("🔧 Updated Terry integration config:", this.config);
   }
 
   /**
@@ -412,7 +418,7 @@ export class TerryIntegration {
    */
   public resetStats(): void {
     this.processingStats = this.initializeStats();
-    console.log('📊 Terry integration stats reset');
+    console.log("📊 Terry integration stats reset");
   }
 
   /**
@@ -463,12 +469,12 @@ export const terryIntegration = new TerryIntegration();
 export const addTerryCommentary = async (
   feedItem: FeedItem,
   originalTweet?: TweetData,
-  classification?: ClassificationResult
+  classification?: ClassificationResult,
 ): Promise<boolean> => {
   return await terryIntegration.processFeedItem(
     feedItem,
     originalTweet,
-    classification
+    classification,
   );
 };
 
@@ -477,7 +483,7 @@ export const addTerryCommentary = async (
  */
 export const addTerryBreakingNews = async (
   feedItem: FeedItem,
-  isGenuineDrama: boolean = true
+  isGenuineDrama: boolean = true,
 ): Promise<boolean> => {
   return await terryIntegration.processBreakingNews(feedItem, isGenuineDrama);
 };

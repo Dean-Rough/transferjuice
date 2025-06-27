@@ -3,12 +3,12 @@
  * Converts classified tweets into feed items and integrates with the feed store
  */
 
-import { type FeedItem } from '@/lib/stores/feedStore';
+import { type FeedItem } from "@/lib/stores/feedStore";
 import {
   type TweetData,
   type ClassificationResult,
-} from './transferClassifier';
-import { type ITKSource } from './globalSources';
+} from "./transferClassifier";
+import { type ITKSource } from "./globalSources";
 
 /**
  * Convert a classified tweet into a feed item
@@ -16,17 +16,17 @@ import { type ITKSource } from './globalSources';
 export const convertTweetToFeedItem = (
   tweet: TweetData,
   classification: ClassificationResult,
-  source: ITKSource
+  source: ITKSource,
 ): FeedItem => {
   const isBreaking =
     classification.confidence >= 0.9 &&
-    (classification.transferType === 'confirmed' ||
-      classification.transferType === 'signing');
+    (classification.transferType === "confirmed" ||
+      classification.transferType === "signing");
 
   // Extract clubs and players from content
   const { clubs, players } = extractEntitiesFromContent(
     tweet.text,
-    classification.language
+    classification.language,
   );
 
   // Determine priority based on confidence and transfer type
@@ -37,7 +37,7 @@ export const convertTweetToFeedItem = (
 
   return {
     id: `tweet-${tweet.id}`,
-    type: isBreaking ? 'breaking' : 'itk',
+    type: isBreaking ? "breaking" : "itk",
     timestamp: new Date(tweet.createdAt),
     content: cleanTweetContent(tweet.text),
     source: {
@@ -54,7 +54,7 @@ export const convertTweetToFeedItem = (
     },
     media: tweet.media
       ? {
-          type: tweet.media[0].type === 'photo' ? 'image' : 'video',
+          type: tweet.media[0].type === "photo" ? "image" : "video",
           url: tweet.media[0].url,
           altText: `Transfer update from ${source.name}`,
         }
@@ -89,109 +89,109 @@ const extractEntitiesFromContent = (content: string, language?: string) => {
   // Common club names patterns (could be enhanced with ML/NER)
   const clubPatterns = [
     // Premier League
-    'Arsenal',
-    'Chelsea',
-    'Manchester United',
-    'Man United',
-    'United',
-    'Liverpool',
-    'Manchester City',
-    'Man City',
-    'City',
-    'Tottenham',
-    'Spurs',
-    'Newcastle',
-    'Brighton',
-    'West Ham',
-    'Aston Villa',
-    'Crystal Palace',
+    "Arsenal",
+    "Chelsea",
+    "Manchester United",
+    "Man United",
+    "United",
+    "Liverpool",
+    "Manchester City",
+    "Man City",
+    "City",
+    "Tottenham",
+    "Spurs",
+    "Newcastle",
+    "Brighton",
+    "West Ham",
+    "Aston Villa",
+    "Crystal Palace",
 
     // La Liga
-    'Real Madrid',
-    'Madrid',
-    'Barcelona',
-    'Barca',
-    'Atletico Madrid',
-    'Atletico',
-    'Sevilla',
-    'Valencia',
-    'Villarreal',
-    'Real Sociedad',
-    'Athletic Bilbao',
+    "Real Madrid",
+    "Madrid",
+    "Barcelona",
+    "Barca",
+    "Atletico Madrid",
+    "Atletico",
+    "Sevilla",
+    "Valencia",
+    "Villarreal",
+    "Real Sociedad",
+    "Athletic Bilbao",
 
     // Serie A
-    'Juventus',
-    'Juve',
-    'AC Milan',
-    'Milan',
-    'Inter Milan',
-    'Inter',
-    'Napoli',
-    'AS Roma',
-    'Roma',
-    'Lazio',
-    'Fiorentina',
-    'Atalanta',
+    "Juventus",
+    "Juve",
+    "AC Milan",
+    "Milan",
+    "Inter Milan",
+    "Inter",
+    "Napoli",
+    "AS Roma",
+    "Roma",
+    "Lazio",
+    "Fiorentina",
+    "Atalanta",
 
     // Bundesliga
-    'Bayern Munich',
-    'Bayern',
-    'Borussia Dortmund',
-    'Dortmund',
-    'BVB',
-    'RB Leipzig',
-    'Leipzig',
-    'Bayer Leverkusen',
-    'Leverkusen',
-    'Eintracht Frankfurt',
+    "Bayern Munich",
+    "Bayern",
+    "Borussia Dortmund",
+    "Dortmund",
+    "BVB",
+    "RB Leipzig",
+    "Leipzig",
+    "Bayer Leverkusen",
+    "Leverkusen",
+    "Eintracht Frankfurt",
 
     // Ligue 1
-    'PSG',
-    'Paris Saint-Germain',
-    'Lyon',
-    'Marseille',
-    'Monaco',
-    'Lille',
+    "PSG",
+    "Paris Saint-Germain",
+    "Lyon",
+    "Marseille",
+    "Monaco",
+    "Lille",
 
     // Other major clubs
-    'Ajax',
-    'PSV',
-    'Feyenoord',
-    'Benfica',
-    'Porto',
-    'Sporting',
+    "Ajax",
+    "PSV",
+    "Feyenoord",
+    "Benfica",
+    "Porto",
+    "Sporting",
   ];
 
   // Extract clubs mentioned in the content
   const clubs = clubPatterns.filter((club) =>
-    content.toLowerCase().includes(club.toLowerCase())
+    content.toLowerCase().includes(club.toLowerCase()),
   );
 
   // Common player name patterns (simplified - could use NER)
   const playerPatterns = [
-    'Haaland',
-    'Mbappe',
-    'Bellingham',
-    'Kane',
-    'Salah',
-    'Vinicius',
-    'Pedri',
-    'Gavi',
-    'Musiala',
-    'Camavinga',
-    'Osimhen',
-    'Leao',
-    'Kvaratskhelia',
-    'Vlahovic',
-    'Saka',
-    'Foden',
-    'Wirtz',
-    'Moukoko',
+    "Haaland",
+    "Mbappe",
+    "Bellingham",
+    "Kane",
+    "Salah",
+    "Vinicius",
+    "Pedri",
+    "Gavi",
+    "Musiala",
+    "Camavinga",
+    "Osimhen",
+    "Leao",
+    "Kvaratskhelia",
+    "Vlahovic",
+    "Saka",
+    "Foden",
+    "Wirtz",
+    "Moukoko",
   ];
 
   // Extract players mentioned in the content
   const players = playerPatterns.filter((player) =>
-    content.toLowerCase().includes(player.toLowerCase())
+    content.toLowerCase().includes(player.toLowerCase()),
   );
 
   return { clubs, players };
@@ -202,16 +202,16 @@ const extractEntitiesFromContent = (content: string, language?: string) => {
  */
 const determinePriority = (
   classification: ClassificationResult,
-  source: ITKSource
-): FeedItem['metadata']['priority'] => {
+  source: ITKSource,
+): FeedItem["metadata"]["priority"] => {
   // Breaking news: high confidence + tier 1 source + confirmed/signing
   if (
     classification.confidence >= 0.9 &&
     source.tier === 1 &&
-    (classification.transferType === 'confirmed' ||
-      classification.transferType === 'signing')
+    (classification.transferType === "confirmed" ||
+      classification.transferType === "signing")
   ) {
-    return 'breaking';
+    return "breaking";
   }
 
   // High priority: good confidence + good source OR tier 1 source
@@ -219,82 +219,82 @@ const determinePriority = (
     (classification.confidence >= 0.7 && source.tier <= 2) ||
     source.tier === 1
   ) {
-    return 'high';
+    return "high";
   }
 
   // Medium priority: decent confidence OR tier 2 source
   if (classification.confidence >= 0.5 || source.tier === 2) {
-    return 'medium';
+    return "medium";
   }
 
-  return 'low';
+  return "low";
 };
 
 /**
  * Map classification transfer type to feed item transfer type
  */
 const mapTransferType = (
-  transferType?: ClassificationResult['transferType']
-): FeedItem['metadata']['transferType'] => {
+  transferType?: ClassificationResult["transferType"],
+): FeedItem["metadata"]["transferType"] => {
   switch (transferType) {
-    case 'confirmed':
-    case 'signing':
-      return 'confirmed';
-    case 'medical':
-      return 'medical';
-    case 'bid':
-      return 'bid';
-    case 'personal_terms':
-      return 'personal_terms';
-    case 'rumour':
+    case "confirmed":
+    case "signing":
+      return "confirmed";
+    case "medical":
+      return "medical";
+    case "bid":
+      return "bid";
+    case "personal_terms":
+      return "personal_terms";
+    case "rumour":
     default:
-      return 'rumour';
+      return "rumour";
   }
 };
 
 /**
  * Determine league based on clubs mentioned
  */
-const determineLeague = (clubs: string[]): FeedItem['metadata']['league'] => {
+const determineLeague = (clubs: string[]): FeedItem["metadata"]["league"] => {
   const leagueClubs = {
     PL: [
-      'Arsenal',
-      'Chelsea',
-      'Manchester United',
-      'Liverpool',
-      'Manchester City',
-      'Tottenham',
+      "Arsenal",
+      "Chelsea",
+      "Manchester United",
+      "Liverpool",
+      "Manchester City",
+      "Tottenham",
     ],
     LaLiga: [
-      'Real Madrid',
-      'Barcelona',
-      'Atletico Madrid',
-      'Sevilla',
-      'Valencia',
+      "Real Madrid",
+      "Barcelona",
+      "Atletico Madrid",
+      "Sevilla",
+      "Valencia",
     ],
-    SerieA: ['Juventus', 'AC Milan', 'Inter Milan', 'Napoli', 'AS Roma'],
+    SerieA: ["Juventus", "AC Milan", "Inter Milan", "Napoli", "AS Roma"],
     Bundesliga: [
-      'Bayern Munich',
-      'Borussia Dortmund',
-      'RB Leipzig',
-      'Bayer Leverkusen',
+      "Bayern Munich",
+      "Borussia Dortmund",
+      "RB Leipzig",
+      "Bayer Leverkusen",
     ],
-    Ligue1: ['PSG', 'Lyon', 'Marseille', 'Monaco'],
+    Ligue1: ["PSG", "Lyon", "Marseille", "Monaco"],
   };
 
   for (const [league, leagueClubList] of Object.entries(leagueClubs)) {
     if (
       clubs.some((club) =>
         leagueClubList.some((leagueClub) =>
-          club.toLowerCase().includes(leagueClub.toLowerCase())
-        )
+          club.toLowerCase().includes(leagueClub.toLowerCase()),
+        ),
       )
     ) {
-      return league as FeedItem['metadata']['league'];
+      return league as FeedItem["metadata"]["league"];
     }
   }
 
-  return 'Other';
+  return "Other";
 };
 
 /**
@@ -304,9 +304,9 @@ const cleanTweetContent = (content: string): string => {
   return (
     content
       // Remove URLs
-      .replace(/https?:\/\/[^\s]+/g, '')
+      .replace(/https?:\/\/[^\s]+/g, "")
       // Remove extra whitespace
-      .replace(/\s+/g, ' ')
+      .replace(/\s+/g, " ")
       // Trim
       .trim()
   );
@@ -320,12 +320,12 @@ export const convertTweetsToFeedItems = (
     tweet: TweetData;
     classification: ClassificationResult;
     source: ITKSource;
-  }>
+  }>,
 ): FeedItem[] => {
   return tweetClassifications
     .filter(({ classification }) => classification.isTransferRelated)
     .map(({ tweet, classification, source }) =>
-      convertTweetToFeedItem(tweet, classification, source)
+      convertTweetToFeedItem(tweet, classification, source),
     );
 };
 
@@ -338,17 +338,17 @@ export const integrateClassifiedTweets = async (
     classification: ClassificationResult;
     source: ITKSource;
   }>,
-  minConfidence: number = 0.4
+  minConfidence: number = 0.4,
 ) => {
   // Filter by confidence threshold
   const highConfidenceTweets = tweetClassifications.filter(
     ({ classification }) =>
       classification.isTransferRelated &&
-      classification.confidence >= minConfidence
+      classification.confidence >= minConfidence,
   );
 
   if (highConfidenceTweets.length === 0) {
-    console.log('No high-confidence transfer tweets to process');
+    console.log("No high-confidence transfer tweets to process");
     return;
   }
 
@@ -370,12 +370,12 @@ export const integrateClassifiedTweets = async (
 
   // Add to feed store (would integrate with actual store in production)
   console.log(`📊 Processing ${feedItems.length} transfer tweets into feed:`, {
-    breaking: feedItems.filter((item) => item.metadata.priority === 'breaking')
+    breaking: feedItems.filter((item) => item.metadata.priority === "breaking")
       .length,
-    high: feedItems.filter((item) => item.metadata.priority === 'high').length,
-    medium: feedItems.filter((item) => item.metadata.priority === 'medium')
+    high: feedItems.filter((item) => item.metadata.priority === "high").length,
+    medium: feedItems.filter((item) => item.metadata.priority === "medium")
       .length,
-    low: feedItems.filter((item) => item.metadata.priority === 'low').length,
+    low: feedItems.filter((item) => item.metadata.priority === "low").length,
   });
 
   // In production, this would call:
@@ -394,8 +394,8 @@ export const filterDuplicateTweets = (tweets: TweetData[]): TweetData[] => {
     // Create a normalized content signature
     const signature = tweet.text
       .toLowerCase()
-      .replace(/[^\w\s]/g, '') // Remove punctuation
-      .replace(/\s+/g, ' ') // Normalize whitespace
+      .replace(/[^\w\s]/g, "") // Remove punctuation
+      .replace(/\s+/g, " ") // Normalize whitespace
       .trim();
 
     if (seen.has(signature)) {
@@ -415,7 +415,7 @@ export const mergeSimilarTweets = (
     tweet: TweetData;
     classification: ClassificationResult;
     source: ITKSource;
-  }>
+  }>,
 ): Array<{
   tweet: TweetData;
   classification: ClassificationResult;
@@ -442,8 +442,8 @@ export const mergeSimilarTweets = (
         !processed.has(other.tweet.id) &&
         haveSimilarKeywords(
           item.classification.keywords,
-          other.classification.keywords
-        )
+          other.classification.keywords,
+        ),
     );
 
     // Mark similar tweets as processed
@@ -466,7 +466,7 @@ export const mergeSimilarTweets = (
  */
 const haveSimilarKeywords = (
   keywords1: string[],
-  keywords2: string[]
+  keywords2: string[],
 ): boolean => {
   const set1 = new Set(keywords1.map((k) => k.toLowerCase()));
   const set2 = new Set(keywords2.map((k) => k.toLowerCase()));

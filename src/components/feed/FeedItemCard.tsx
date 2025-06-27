@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { useState } from 'react';
+import Image from "next/image";
+import { useState } from "react";
 
 interface FeedItemCardProps {
   id: string;
-  priority: 'breaking' | 'high' | 'medium' | 'low';
+  priority: "breaking" | "high" | "medium" | "low";
   headline: string;
   content: string;
   terryCommentary?: string;
@@ -46,17 +46,17 @@ export function FeedItemCard({
   const [imageError, setImageError] = useState(false);
 
   const priorityColors = {
-    breaking: 'bg-red-600 text-white',
-    high: 'bg-orange-600 text-white',
-    medium: 'bg-gray-600 text-white',
-    low: 'bg-gray-500 text-white',
+    breaking: "bg-red-600 text-white",
+    high: "bg-orange-600 text-white",
+    medium: "bg-gray-600 text-white",
+    low: "bg-gray-500 text-white",
   };
 
   const priorityLabels = {
-    breaking: 'BREAKING',
-    high: 'HIGH',
-    medium: 'MEDIUM',
-    low: 'LOW',
+    breaking: "BREAKING",
+    high: "HIGH",
+    medium: "MEDIUM",
+    low: "LOW",
   };
 
   return (
@@ -70,7 +70,7 @@ export function FeedItemCard({
             fill
             className="object-cover"
             onError={() => setImageError(true)}
-            priority={priority === 'breaking'}
+            priority={priority === "breaking"}
           />
           {heroImage.caption && (
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
@@ -113,9 +113,9 @@ export function FeedItemCard({
 
           {/* Timestamp */}
           <time className="text-xs text-muted-foreground data-mono">
-            {timestamp.toLocaleTimeString('en-GB', {
-              hour: '2-digit',
-              minute: '2-digit',
+            {timestamp.toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
             })}
           </time>
         </div>
@@ -136,7 +136,9 @@ export function FeedItemCard({
             <p className="terry-voice text-orange-100">
               &quot;{terryCommentary}&quot;
             </p>
-            <span className="text-xs text-orange-400 mt-1 block">- The Terry</span>
+            <span className="text-xs text-orange-400 mt-1 block">
+              - The Terry
+            </span>
           </div>
         )}
 

@@ -1,26 +1,26 @@
-import { FeedItem } from './FeedItem';
+import { FeedItem } from "./FeedItem";
 
 async function getFeedData() {
   try {
-    const res = await fetch('http://localhost:4433/api/feed?limit=20', {
-      next: { revalidate: 60 } // Revalidate every minute
+    const res = await fetch("http://localhost:4433/api/feed?limit=20", {
+      next: { revalidate: 60 }, // Revalidate every minute
     });
-    
+
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}`);
     }
-    
+
     const data = await res.json();
     return data;
   } catch (error) {
-    console.error('Failed to fetch feed:', error);
+    console.error("Failed to fetch feed:", error);
     return null;
   }
 }
 
 export async function ServerFeedContainer() {
   const feedData = await getFeedData();
-  
+
   if (!feedData || !feedData.success) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -28,9 +28,9 @@ export async function ServerFeedContainer() {
       </div>
     );
   }
-  
+
   const items = feedData.data || [];
-  
+
   if (items.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -38,7 +38,7 @@ export async function ServerFeedContainer() {
       </div>
     );
   }
-  
+
   return (
     <div className="feed-container">
       <div className="border-b border-border p-4">
@@ -47,12 +47,12 @@ export async function ServerFeedContainer() {
       </div>
       <div className="divide-y divide-border">
         {items.map((item: any) => (
-          <FeedItem 
-            key={item.id} 
+          <FeedItem
+            key={item.id}
             item={{
               ...item,
-              timestamp: new Date(item.timestamp)
-            }} 
+              timestamp: new Date(item.timestamp),
+            }}
           />
         ))}
       </div>

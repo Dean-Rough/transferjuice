@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 interface WebSocketMessage {
   data: string;
@@ -7,15 +7,15 @@ interface WebSocketMessage {
 
 interface UseWebSocketReturn {
   lastMessage: WebSocketMessage | null;
-  connectionStatus: 'connecting' | 'connected' | 'disconnected';
+  connectionStatus: "connecting" | "connected" | "disconnected";
   sendMessage: (message: string) => void;
 }
 
 export function useWebSocket(url: string): UseWebSocketReturn {
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<
-    'connecting' | 'connected' | 'disconnected'
-  >('disconnected');
+    "connecting" | "connected" | "disconnected"
+  >("disconnected");
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttempts = useRef(0);
@@ -25,7 +25,7 @@ export function useWebSocket(url: string): UseWebSocketReturn {
       return;
     }
 
-    setConnectionStatus('connecting');
+    setConnectionStatus("connecting");
 
     try {
       // For demo purposes, we'll simulate a WebSocket connection
@@ -34,7 +34,7 @@ export function useWebSocket(url: string): UseWebSocketReturn {
 
       // Simulate connection success after delay
       setTimeout(() => {
-        setConnectionStatus('connected');
+        setConnectionStatus("connected");
         reconnectAttempts.current = 0;
 
         // Simulate incoming messages for demo
@@ -44,13 +44,13 @@ export function useWebSocket(url: string): UseWebSocketReturn {
             const mockMessage = {
               data: JSON.stringify({
                 id: `live-${Date.now()}`,
-                content: `🚨 LIVE UPDATE: ${['Transfer agreed!', 'Medical confirmed!', 'Deal announced!'][Math.floor(Math.random() * 3)]}`,
-                author: ['FabrizioRomano', 'David_Ornstein', 'DiMarzio'][
+                content: `🚨 LIVE UPDATE: ${["Transfer agreed!", "Medical confirmed!", "Deal announced!"][Math.floor(Math.random() * 3)]}`,
+                author: ["FabrizioRomano", "David_Ornstein", "DiMarzio"][
                   Math.floor(Math.random() * 3)
                 ],
                 timestamp: new Date(),
-                tags: ['#Arsenal', '@Haaland', 'FabrizioRomano'],
-                type: 'itk',
+                tags: ["#Arsenal", "@Haaland", "FabrizioRomano"],
+                type: "itk",
               }),
               timestamp: new Date(),
             };
@@ -62,8 +62,8 @@ export function useWebSocket(url: string): UseWebSocketReturn {
         wsRef.current = { close: () => clearInterval(interval) } as any;
       }, 1000);
     } catch (error) {
-      console.error('WebSocket connection error:', error);
-      setConnectionStatus('disconnected');
+      console.error("WebSocket connection error:", error);
+      setConnectionStatus("disconnected");
       scheduleReconnect();
     }
   };
@@ -82,13 +82,13 @@ export function useWebSocket(url: string): UseWebSocketReturn {
       reconnectTimeoutRef.current = setTimeout(() => {
         reconnectAttempts.current++;
         console.log(
-          `Reconnect attempt ${reconnectAttempts.current}/${maxAttempts}`
+          `Reconnect attempt ${reconnectAttempts.current}/${maxAttempts}`,
         );
         connect();
       }, delay);
     } else {
-      console.log('Max reconnection attempts reached');
-      setConnectionStatus('disconnected');
+      console.log("Max reconnection attempts reached");
+      setConnectionStatus("disconnected");
     }
   };
 
@@ -96,7 +96,7 @@ export function useWebSocket(url: string): UseWebSocketReturn {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(message);
     } else {
-      console.warn('WebSocket is not connected');
+      console.warn("WebSocket is not connected");
     }
   };
 
@@ -110,7 +110,7 @@ export function useWebSocket(url: string): UseWebSocketReturn {
       wsRef.current = null;
     }
 
-    setConnectionStatus('disconnected');
+    setConnectionStatus("disconnected");
   };
 
   useEffect(() => {
@@ -126,18 +126,18 @@ export function useWebSocket(url: string): UseWebSocketReturn {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // Page is hidden, can reduce connection frequency
-        console.log('Page hidden, maintaining connection');
+        console.log("Page hidden, maintaining connection");
       } else {
         // Page is visible, ensure connection
-        if (connectionStatus === 'disconnected') {
+        if (connectionStatus === "disconnected") {
           connect();
         }
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     return () =>
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [connectionStatus]);
 
   return {

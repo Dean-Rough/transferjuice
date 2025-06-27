@@ -1,5 +1,5 @@
-import { useCallback, useState, useRef, useEffect } from 'react';
-import { useFeedStore } from '@/lib/stores/feedStore';
+import { useCallback, useState, useRef, useEffect } from "react";
+import { useFeedStore } from "@/lib/stores/feedStore";
 
 interface UseFeedScrollOptions {
   hasMore?: boolean;
@@ -30,7 +30,7 @@ export function useFeedScroll({
   hasMore: propHasMore,
   loadItems: propLoadItems,
   threshold = 1000,
-  rootMargin = '200px',
+  rootMargin = "200px",
   enabled = true,
   onScrollPositionChange,
 }: UseFeedScrollOptions = {}): UseFeedScrollReturn {
@@ -83,7 +83,7 @@ export function useFeedScroll({
     };
 
     // Start monitoring on mobile devices
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    if ("ontouchstart" in window || navigator.maxTouchPoints > 0) {
       rafId = requestAnimationFrame(monitorPerformance);
     }
 
@@ -108,7 +108,7 @@ export function useFeedScroll({
       {
         rootMargin,
         threshold: 0.1,
-      }
+      },
     );
 
     observer.observe(sentinelRef.current);
@@ -143,7 +143,7 @@ export function useFeedScroll({
     const now = performance.now();
     const timeDelta = now - scrollMetricsRef.current.lastScrollTime;
     const positionDelta = Math.abs(
-      scrollTop - scrollMetricsRef.current.lastScrollPosition
+      scrollTop - scrollMetricsRef.current.lastScrollPosition,
     );
     const velocity = timeDelta > 0 ? positionDelta / timeDelta : 0;
 
@@ -164,7 +164,7 @@ export function useFeedScroll({
     }
 
     // On mobile, add slight delay to prevent janky loading during fast scrolls
-    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     const delay =
       isMobile && scrollMetricsRef.current.scrollVelocity > 100 ? 100 : 0;
 
@@ -187,15 +187,15 @@ export function useFeedScroll({
         const isLoadingSlow = loadTime > (isMobile ? 500 : 1000);
         if (isLoadingSlow) {
           console.warn(
-            `Mobile scroll loading slower than optimal: ${loadTime.toFixed(2)}ms`
+            `Mobile scroll loading slower than optimal: ${loadTime.toFixed(2)}ms`,
           );
         }
 
         console.log(
-          `Infinite scroll loaded ${batchSize} items in ${loadTime.toFixed(2)}ms (mobile: ${isMobile})`
+          `Infinite scroll loaded ${batchSize} items in ${loadTime.toFixed(2)}ms (mobile: ${isMobile})`,
         );
       } catch (error) {
-        console.error('Failed to load more items:', error);
+        console.error("Failed to load more items:", error);
       }
     }, delay);
   }, [
@@ -212,9 +212,9 @@ export function useFeedScroll({
     const container = containerRef.current;
     if (!container || !enabled) return;
 
-    container.addEventListener('scroll', handleScroll, { passive: true });
+    container.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
-      container.removeEventListener('scroll', handleScroll);
+      container.removeEventListener("scroll", handleScroll);
     };
   }, [handleScroll, enabled]);
 
@@ -238,7 +238,7 @@ export function useFeedScroll({
 
     container.scrollTo({
       top: 0,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
 
     setScrollPosition(0);
@@ -251,12 +251,12 @@ export function useFeedScroll({
 
       container.scrollTo({
         top: position,
-        behavior: 'smooth',
+        behavior: "smooth",
       });
 
       setScrollPosition(position);
     },
-    [setScrollPosition]
+    [setScrollPosition],
   );
 
   // Update scroll metrics for performance tracking
@@ -270,7 +270,7 @@ export function useFeedScroll({
         lastScrollPosition: position,
       };
     },
-    []
+    [],
   );
 
   return {
@@ -292,7 +292,7 @@ export function useFeedScroll({
 
 // Hook for managing feed scroll behavior with memory optimization
 export const useMemoryOptimizedScroll = (
-  options: UseFeedScrollOptions = {}
+  options: UseFeedScrollOptions = {},
 ) => {
   const { getMemoryStats, optimizeMemory } = useFeedStore();
   const scroll = useFeedScroll(options);
@@ -304,7 +304,7 @@ export const useMemoryOptimizedScroll = (
 
       // If memory usage is high or we have too many items, optimize
       if (stats.usageMB > 150 || stats.itemCount > 800) {
-        console.log('Memory threshold reached, optimizing...', stats);
+        console.log("Memory threshold reached, optimizing...", stats);
         optimizeMemory();
       }
     };
@@ -323,14 +323,14 @@ export const useScrollRestoration = () => {
   const { scrollPosition, setScrollPosition } = useFeedStore();
 
   const saveScrollPosition = useCallback(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     const scrollY = window.scrollY || document.documentElement.scrollTop;
     setScrollPosition(scrollY);
   }, [setScrollPosition]);
 
   const restoreScrollPosition = useCallback(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     if (scrollPosition > 0) {
       window.scrollTo(0, scrollPosition);
@@ -339,8 +339,8 @@ export const useScrollRestoration = () => {
 
   // Save scroll position before page unload
   useEffect(() => {
-    window.addEventListener('beforeunload', saveScrollPosition);
-    return () => window.removeEventListener('beforeunload', saveScrollPosition);
+    window.addEventListener("beforeunload", saveScrollPosition);
+    return () => window.removeEventListener("beforeunload", saveScrollPosition);
   }, [saveScrollPosition]);
 
   return {

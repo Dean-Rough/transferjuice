@@ -5,11 +5,11 @@
 
 // Briefing types (referenced in multiple files but not in Prisma schema)
 export enum BriefingType {
-  MORNING = 'morning',
-  AFTERNOON = 'afternoon',
-  EVENING = 'evening',
-  BREAKING = 'breaking',
-  WEEKLY = 'weekly',
+  MORNING = "morning",
+  AFTERNOON = "afternoon",
+  EVENING = "evening",
+  BREAKING = "breaking",
+  WEEKLY = "weekly",
 }
 
 // Export for compatibility - temporarily disabled to prevent circular dependency

@@ -3,33 +3,33 @@
  * Comprehensive test suite for tweet analysis and content classification
  */
 
-import OpenAI from 'openai';
-import type { TweetInput } from '../content-analyzer';
-import { AIContentAnalyzer } from '../content-analyzer';
+import OpenAI from "openai";
+import type { TweetInput } from "../content-analyzer";
+import { AIContentAnalyzer } from "../content-analyzer";
 
 // Mock OpenAI
-jest.mock('openai');
+jest.mock("openai");
 const MockedOpenAI = OpenAI as jest.MockedClass<typeof OpenAI>;
 
 // Mock terry-style module
-jest.mock('@/lib/terry-style', () => ({
+jest.mock("@/lib/terry-style", () => ({
   applyTerryStyle: {
     enhanceError: jest.fn((msg: string) => `Terry-enhanced: ${msg}`),
   },
 }));
 
-describe('AIContentAnalyzer', () => {
+describe("AIContentAnalyzer", () => {
   let analyzer: AIContentAnalyzer;
   let mockOpenAI: jest.Mocked<OpenAI>;
 
   const mockTweetInput: TweetInput = {
-    id: 'tweet_123',
-    text: 'Manchester United are close to signing Declan Rice for £100m after successful medical tests. Agent confirms deal should be completed by Friday.',
-    authorHandle: 'FabrizioRomano',
-    authorName: 'Fabrizio Romano',
+    id: "tweet_123",
+    text: "Manchester United are close to signing Declan Rice for £100m after successful medical tests. Agent confirms deal should be completed by Friday.",
+    authorHandle: "FabrizioRomano",
+    authorName: "Fabrizio Romano",
     authorVerified: true,
-    authorTier: 'tier1',
-    createdAt: new Date('2024-01-15T10:00:00Z'),
+    authorTier: "tier1",
+    createdAt: new Date("2024-01-15T10:00:00Z"),
     metrics: {
       retweets: 5420,
       likes: 18760,
@@ -37,22 +37,22 @@ describe('AIContentAnalyzer', () => {
       quotes: 234,
     },
     context: {
-      recentTweets: ['Previous transfer update about Rice'],
-      authorSpecialties: ['Transfer news', 'Premier League'],
+      recentTweets: ["Previous transfer update about Rice"],
+      authorSpecialties: ["Transfer news", "Premier League"],
     },
   };
 
   const mockClassificationResponse = {
     isTransferRelated: true,
-    transferType: 'ADVANCED',
-    priority: 'HIGH',
+    transferType: "ADVANCED",
+    priority: "HIGH",
     confidence: 0.95,
-    categories: ['signing', 'medical', 'fee_discussion'],
+    categories: ["signing", "medical", "fee_discussion"],
     keyPoints: [
-      'Manchester United',
-      'Declan Rice',
-      '£100m fee',
-      'Medical completed',
+      "Manchester United",
+      "Declan Rice",
+      "£100m fee",
+      "Medical completed",
     ],
     duplicateOf: undefined,
   };
@@ -60,30 +60,30 @@ describe('AIContentAnalyzer', () => {
   const mockEntityResponse = {
     players: [
       {
-        name: 'Declan Rice',
+        name: "Declan Rice",
         confidence: 0.98,
-        position: 'Defensive Midfielder',
-        currentClub: 'West Ham United',
-        nationality: 'England',
+        position: "Defensive Midfielder",
+        currentClub: "West Ham United",
+        nationality: "England",
       },
     ],
     clubs: [
       {
-        name: 'Manchester United',
+        name: "Manchester United",
         confidence: 0.99,
-        league: 'Premier League',
-        country: 'England',
+        league: "Premier League",
+        country: "England",
       },
     ],
     transferDetails: [
       {
-        type: 'fee',
-        value: '£100m',
+        type: "fee",
+        value: "£100m",
         confidence: 0.9,
       },
       {
-        type: 'medical_date',
-        value: 'completed',
+        type: "medical_date",
+        value: "completed",
         confidence: 0.85,
       },
     ],
@@ -97,9 +97,9 @@ describe('AIContentAnalyzer', () => {
   };
 
   const mockSentimentResponse = {
-    sentiment: 'positive',
+    sentiment: "positive",
     confidence: 0.85,
-    emotions: ['excitement', 'optimism'],
+    emotions: ["excitement", "optimism"],
     reliability: 0.95,
     urgency: 0.8,
   };
@@ -119,24 +119,24 @@ describe('AIContentAnalyzer', () => {
     MockedOpenAI.mockImplementation(() => mockOpenAI);
 
     analyzer = new AIContentAnalyzer({
-      openaiApiKey: 'test-key',
-      model: 'gpt-4.1',
+      openaiApiKey: "test-key",
+      model: "gpt-4.1",
       enableCaching: true,
     });
   });
 
-  describe('constructor', () => {
-    it('should initialize with default configuration', () => {
+  describe("constructor", () => {
+    it("should initialize with default configuration", () => {
       const defaultAnalyzer = new AIContentAnalyzer({
-        openaiApiKey: 'test-key',
+        openaiApiKey: "test-key",
       });
       expect(defaultAnalyzer).toBeInstanceOf(AIContentAnalyzer);
     });
 
-    it('should initialize with custom configuration', () => {
+    it("should initialize with custom configuration", () => {
       const customAnalyzer = new AIContentAnalyzer({
-        openaiApiKey: 'test-key',
-        model: 'gpt-4o',
+        openaiApiKey: "test-key",
+        model: "gpt-4o",
         maxTokens: 2000,
         temperature: 0.5,
         enableCaching: false,
@@ -145,7 +145,7 @@ describe('AIContentAnalyzer', () => {
     });
   });
 
-  describe('analyzeTweet', () => {
+  describe("analyzeTweet", () => {
     beforeEach(() => {
       // Mock successful API responses
       mockOpenAI.chat.completions.create
@@ -168,7 +168,7 @@ describe('AIContentAnalyzer', () => {
         } as any);
     });
 
-    it('should analyze tweet successfully with all components', async () => {
+    it("should analyze tweet successfully with all components", async () => {
       const result = await analyzer.analyzeTweet(mockTweetInput);
 
       expect(result).toMatchObject({
@@ -178,14 +178,14 @@ describe('AIContentAnalyzer', () => {
         qualityScore: expect.any(Number),
         terryCompatibility: expect.any(Number),
         processingTime: expect.any(Number),
-        aiModel: 'gpt-4.1',
+        aiModel: "gpt-4.1",
       });
 
       // Verify API was called three times (classification, entities, sentiment)
       expect(mockOpenAI.chat.completions.create).toHaveBeenCalledTimes(3);
     });
 
-    it('should return cached result on subsequent calls', async () => {
+    it("should return cached result on subsequent calls", async () => {
       // First call
       await analyzer.analyzeTweet(mockTweetInput);
 
@@ -197,17 +197,17 @@ describe('AIContentAnalyzer', () => {
       expect(mockOpenAI.chat.completions.create).toHaveBeenCalledTimes(3);
     });
 
-    it('should calculate quality score correctly for tier1 author', async () => {
+    it("should calculate quality score correctly for tier1 author", async () => {
       const result = await analyzer.analyzeTweet(mockTweetInput);
 
       // Tier1 + verified + high confidence should give high quality score
       expect(result.qualityScore).toBeGreaterThan(80);
     });
 
-    it('should calculate Terry compatibility score for chaotic content', async () => {
+    it("should calculate Terry compatibility score for chaotic content", async () => {
       const chaoticInput = {
         ...mockTweetInput,
-        text: 'This mental transfer saga involves £200m and proper chaos at the club!',
+        text: "This mental transfer saga involves £200m and proper chaos at the club!",
       };
 
       const result = await analyzer.analyzeTweet(chaoticInput);
@@ -216,37 +216,37 @@ describe('AIContentAnalyzer', () => {
       expect(result.terryCompatibility).toBeGreaterThan(20);
     });
 
-    it('should handle API errors gracefully', async () => {
+    it("should handle API errors gracefully", async () => {
       mockOpenAI.chat.completions.create.mockRejectedValue(
-        new Error('API Error')
+        new Error("API Error"),
       );
 
       await expect(analyzer.analyzeTweet(mockTweetInput)).rejects.toThrow(
-        'AI analysis failed'
+        "AI analysis failed",
       );
     });
 
-    it('should handle invalid JSON responses', async () => {
+    it("should handle invalid JSON responses", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
-        choices: [{ message: { content: 'invalid json' } }],
+        choices: [{ message: { content: "invalid json" } }],
       } as any);
 
       await expect(analyzer.analyzeTweet(mockTweetInput)).rejects.toThrow();
     });
 
-    it('should handle empty API responses', async () => {
+    it("should handle empty API responses", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
         choices: [{ message: { content: null } }],
       } as any);
 
       await expect(analyzer.analyzeTweet(mockTweetInput)).rejects.toThrow(
-        'No response from AI'
+        "No response from AI",
       );
     });
   });
 
-  describe('classifyContent', () => {
-    it('should classify transfer-related content correctly', async () => {
+  describe("classifyContent", () => {
+    it("should classify transfer-related content correctly", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
         choices: [
           { message: { content: JSON.stringify(mockClassificationResponse) } },
@@ -258,18 +258,18 @@ describe('AIContentAnalyzer', () => {
       expect(result).toMatchObject(mockClassificationResponse);
       expect(mockOpenAI.chat.completions.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          model: 'gpt-4.1',
-          response_format: { type: 'json_object' },
-        })
+          model: "gpt-4.1",
+          response_format: { type: "json_object" },
+        }),
       );
     });
 
-    it('should handle non-transfer content', async () => {
+    it("should handle non-transfer content", async () => {
       const nonTransferResponse = {
         ...mockClassificationResponse,
         isTransferRelated: false,
         transferType: undefined,
-        priority: 'LOW',
+        priority: "LOW",
       };
 
       mockOpenAI.chat.completions.create.mockResolvedValue({
@@ -284,12 +284,12 @@ describe('AIContentAnalyzer', () => {
       });
 
       expect(result.isTransferRelated).toBe(false);
-      expect(result.priority).toBe('LOW');
+      expect(result.priority).toBe("LOW");
     });
   });
 
-  describe('extractEntities', () => {
-    it('should extract players, clubs, and transfer details', async () => {
+  describe("extractEntities", () => {
+    it("should extract players, clubs, and transfer details", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
         choices: [{ message: { content: JSON.stringify(mockEntityResponse) } }],
       } as any);
@@ -297,13 +297,13 @@ describe('AIContentAnalyzer', () => {
       const result = await (analyzer as any).extractEntities(mockTweetInput);
 
       expect(result.players).toHaveLength(1);
-      expect(result.players[0].name).toBe('Declan Rice');
+      expect(result.players[0].name).toBe("Declan Rice");
       expect(result.clubs).toHaveLength(1);
-      expect(result.clubs[0].name).toBe('Manchester United');
+      expect(result.clubs[0].name).toBe("Manchester United");
       expect(result.transferDetails).toHaveLength(2);
     });
 
-    it('should handle empty entity responses', async () => {
+    it("should handle empty entity responses", async () => {
       const emptyResponse = {
         players: [],
         clubs: [],
@@ -323,8 +323,8 @@ describe('AIContentAnalyzer', () => {
     });
   });
 
-  describe('analyzeSentiment', () => {
-    it('should analyze sentiment and reliability correctly', async () => {
+  describe("analyzeSentiment", () => {
+    it("should analyze sentiment and reliability correctly", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
         choices: [
           { message: { content: JSON.stringify(mockSentimentResponse) } },
@@ -333,18 +333,18 @@ describe('AIContentAnalyzer', () => {
 
       const result = await (analyzer as any).analyzeSentiment(mockTweetInput);
 
-      expect(result.sentiment).toBe('positive');
+      expect(result.sentiment).toBe("positive");
       expect(result.confidence).toBe(0.85);
-      expect(result.emotions).toContain('excitement');
+      expect(result.emotions).toContain("excitement");
       expect(result.reliability).toBe(0.95);
       expect(result.urgency).toBe(0.8);
     });
 
-    it('should handle negative sentiment correctly', async () => {
+    it("should handle negative sentiment correctly", async () => {
       const negativeSentimentResponse = {
-        sentiment: 'negative',
+        sentiment: "negative",
         confidence: 0.9,
-        emotions: ['disappointment', 'anxiety'],
+        emotions: ["disappointment", "anxiety"],
         reliability: 0.8,
         urgency: 0.3,
       };
@@ -357,30 +357,30 @@ describe('AIContentAnalyzer', () => {
 
       const result = await (analyzer as any).analyzeSentiment({
         ...mockTweetInput,
-        text: 'Deal collapsed! Manchester United failed to sign the player.',
+        text: "Deal collapsed! Manchester United failed to sign the player.",
       });
 
-      expect(result.sentiment).toBe('negative');
-      expect(result.emotions).toContain('disappointment');
+      expect(result.sentiment).toBe("negative");
+      expect(result.emotions).toContain("disappointment");
     });
   });
 
-  describe('quality scoring', () => {
-    it('should score tier1 verified authors highly', () => {
+  describe("quality scoring", () => {
+    it("should score tier1 verified authors highly", () => {
       const score = (analyzer as any).calculateQualityScore(
         mockClassificationResponse,
         mockEntityResponse,
         mockSentimentResponse,
-        mockTweetInput
+        mockTweetInput,
       );
 
       expect(score).toBeGreaterThan(70);
     });
 
-    it('should score tier3 unverified authors lower', () => {
+    it("should score tier3 unverified authors lower", () => {
       const tier3Input = {
         ...mockTweetInput,
-        authorTier: 'tier3' as const,
+        authorTier: "tier3" as const,
         authorVerified: false,
       };
 
@@ -388,22 +388,22 @@ describe('AIContentAnalyzer', () => {
         mockClassificationResponse,
         mockEntityResponse,
         mockSentimentResponse,
-        tier3Input
+        tier3Input,
       );
 
       expect(score).toBeLessThan(60);
     });
 
-    it('should boost score for specific entities', () => {
+    it("should boost score for specific entities", () => {
       const richEntityResponse = {
         ...mockEntityResponse,
         players: [
-          { name: 'Player 1', confidence: 0.9 },
-          { name: 'Player 2', confidence: 0.8 },
+          { name: "Player 1", confidence: 0.9 },
+          { name: "Player 2", confidence: 0.8 },
         ],
         clubs: [
-          { name: 'Club 1', confidence: 0.95 },
-          { name: 'Club 2', confidence: 0.85 },
+          { name: "Club 1", confidence: 0.95 },
+          { name: "Club 2", confidence: 0.85 },
         ],
       };
 
@@ -411,60 +411,60 @@ describe('AIContentAnalyzer', () => {
         mockClassificationResponse,
         richEntityResponse,
         mockSentimentResponse,
-        mockTweetInput
+        mockTweetInput,
       );
 
       expect(score).toBeGreaterThan(75);
     });
   });
 
-  describe('Terry compatibility scoring', () => {
-    it('should score chaotic content higher', () => {
+  describe("Terry compatibility scoring", () => {
+    it("should score chaotic content higher", () => {
       const chaoticSentiment = {
         ...mockSentimentResponse,
-        emotions: ['excitement', 'skepticism', 'anxiety'],
+        emotions: ["excitement", "skepticism", "anxiety"],
       };
 
       const chaoticEntities = {
         ...mockEntityResponse,
         transferDetails: [
-          { type: 'fee', value: '£200m', confidence: 0.9 },
-          { type: 'wage', value: '£500k per week', confidence: 0.8 },
+          { type: "fee", value: "£200m", confidence: 0.9 },
+          { type: "wage", value: "£500k per week", confidence: 0.8 },
         ],
       };
 
       const chaoticInput = {
         ...mockTweetInput,
-        text: 'This mental transfer chaos involves £200m and proper mayhem!',
+        text: "This mental transfer chaos involves £200m and proper mayhem!",
       };
 
       const score = (analyzer as any).calculateTerryCompatibility(
         chaoticInput,
         chaoticSentiment,
-        chaoticEntities
+        chaoticEntities,
       );
 
       expect(score).toBeGreaterThan(50);
     });
 
-    it('should score big fees higher', () => {
+    it("should score big fees higher", () => {
       const bigFeeEntities = {
         ...mockEntityResponse,
-        transferDetails: [{ type: 'fee', value: '£150m', confidence: 0.9 }],
+        transferDetails: [{ type: "fee", value: "£150m", confidence: 0.9 }],
       };
 
       const score = (analyzer as any).calculateTerryCompatibility(
         mockTweetInput,
         mockSentimentResponse,
-        bigFeeEntities
+        bigFeeEntities,
       );
 
       expect(score).toBeGreaterThan(30);
     });
   });
 
-  describe('cache management', () => {
-    it('should generate consistent cache keys', () => {
+  describe("cache management", () => {
+    it("should generate consistent cache keys", () => {
       const key1 = (analyzer as any).generateCacheKey(mockTweetInput);
       const key2 = (analyzer as any).generateCacheKey(mockTweetInput);
 
@@ -473,27 +473,27 @@ describe('AIContentAnalyzer', () => {
       expect(key1).toContain(mockTweetInput.authorHandle);
     });
 
-    it('should clear cache successfully', () => {
+    it("should clear cache successfully", () => {
       analyzer.clearCache();
 
       const stats = analyzer.getCacheStats();
       expect(stats.size).toBe(0);
     });
 
-    it('should return cache statistics', () => {
+    it("should return cache statistics", () => {
       const stats = analyzer.getCacheStats();
 
-      expect(stats).toHaveProperty('size');
-      expect(stats).toHaveProperty('hitRate');
-      expect(typeof stats.size).toBe('number');
-      expect(typeof stats.hitRate).toBe('number');
+      expect(stats).toHaveProperty("size");
+      expect(stats).toHaveProperty("hitRate");
+      expect(typeof stats.size).toBe("number");
+      expect(typeof stats.hitRate).toBe("number");
     });
   });
 
-  describe('configuration validation', () => {
-    it('should validate API configuration successfully', async () => {
+  describe("configuration validation", () => {
+    it("should validate API configuration successfully", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
-        choices: [{ message: { content: 'Test response' } }],
+        choices: [{ message: { content: "Test response" } }],
       } as any);
 
       const result = await analyzer.validateConfiguration();
@@ -502,23 +502,23 @@ describe('AIContentAnalyzer', () => {
       expect(result.error).toBeUndefined();
     });
 
-    it('should handle API configuration errors', async () => {
+    it("should handle API configuration errors", async () => {
       mockOpenAI.chat.completions.create.mockRejectedValue(
-        new Error('Invalid API key')
+        new Error("Invalid API key"),
       );
 
       const result = await analyzer.validateConfiguration();
 
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('Terry-enhanced');
+      expect(result.error).toContain("Terry-enhanced");
     });
   });
 
-  describe('edge cases and error handling', () => {
-    it('should handle tweets with minimal content', async () => {
+  describe("edge cases and error handling", () => {
+    it("should handle tweets with minimal content", async () => {
       const minimalTweet = {
         ...mockTweetInput,
-        text: 'Yes.',
+        text: "Yes.",
         metrics: {
           retweets: 0,
           likes: 1,
@@ -560,7 +560,7 @@ describe('AIContentAnalyzer', () => {
             {
               message: {
                 content: JSON.stringify({
-                  sentiment: 'neutral',
+                  sentiment: "neutral",
                   confidence: 0.5,
                   emotions: [],
                   reliability: 0.2,
@@ -577,10 +577,10 @@ describe('AIContentAnalyzer', () => {
       expect(result.terryCompatibility).toBeLessThan(20);
     });
 
-    it('should handle tweets with special characters and emojis', async () => {
+    it("should handle tweets with special characters and emojis", async () => {
       const emojiTweet = {
         ...mockTweetInput,
-        text: '🚨 BREAKING: Manchester United 🔴 are close to signing Declan Rice! 💰£100m deal 📝✅',
+        text: "🚨 BREAKING: Manchester United 🔴 are close to signing Declan Rice! 💰£100m deal 📝✅",
       };
 
       mockOpenAI.chat.completions.create
@@ -608,12 +608,12 @@ describe('AIContentAnalyzer', () => {
       expect(result.classification.isTransferRelated).toBe(true);
     });
 
-    it('should handle very long tweets', async () => {
+    it("should handle very long tweets", async () => {
       const longTweet = {
         ...mockTweetInput,
         text:
-          'Manchester United '.repeat(50) +
-          'are signing Declan Rice for £100m.',
+          "Manchester United ".repeat(50) +
+          "are signing Declan Rice for £100m.",
       };
 
       mockOpenAI.chat.completions.create
@@ -642,35 +642,35 @@ describe('AIContentAnalyzer', () => {
     });
   });
 
-  describe('prompt building', () => {
-    it('should build classification prompt with all context', () => {
+  describe("prompt building", () => {
+    it("should build classification prompt with all context", () => {
       const prompt = (analyzer as any).buildClassificationPrompt(
-        mockTweetInput
+        mockTweetInput,
       );
 
       expect(prompt).toContain(mockTweetInput.text);
       expect(prompt).toContain(mockTweetInput.authorHandle);
       expect(prompt).toContain(mockTweetInput.authorName);
       expect(prompt).toContain(mockTweetInput.authorTier);
-      expect(prompt).toContain('Verified: true');
-      expect(prompt).toContain('Transfer news');
+      expect(prompt).toContain("Verified: true");
+      expect(prompt).toContain("Transfer news");
     });
 
-    it('should build entity extraction prompt correctly', () => {
+    it("should build entity extraction prompt correctly", () => {
       const prompt = (analyzer as any).buildEntityExtractionPrompt(
-        mockTweetInput
+        mockTweetInput,
       );
 
-      expect(prompt).toContain('Extract Football Entities');
+      expect(prompt).toContain("Extract Football Entities");
       expect(prompt).toContain(mockTweetInput.text);
       expect(prompt).toContain(mockTweetInput.authorHandle);
       expect(prompt).toContain(mockTweetInput.authorTier);
     });
 
-    it('should build sentiment analysis prompt correctly', () => {
+    it("should build sentiment analysis prompt correctly", () => {
       const prompt = (analyzer as any).buildSentimentPrompt(mockTweetInput);
 
-      expect(prompt).toContain('Sentiment Analysis Request');
+      expect(prompt).toContain("Sentiment Analysis Request");
       expect(prompt).toContain(mockTweetInput.text);
       expect(prompt).toContain(`Verified: ${mockTweetInput.authorVerified}`);
       expect(prompt).toContain(`Tier: ${mockTweetInput.authorTier}`);

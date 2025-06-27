@@ -3,26 +3,26 @@
  * Generates hourly micro-updates with consistent Joel Golby-style voice
  */
 
-import { type FeedItem } from '@/lib/stores/feedStore';
+import { type FeedItem } from "@/lib/stores/feedStore";
 import {
   type TweetData,
   type ClassificationResult,
-} from '@/lib/twitter/transferClassifier';
-import { type ITKSource } from '@/lib/twitter/globalSources';
+} from "@/lib/twitter/transferClassifier";
+import { type ITKSource } from "@/lib/twitter/globalSources";
 
 export interface TerryCommentaryConfig {
-  enabledTypes: ('itk' | 'terry' | 'breaking' | 'partner')[];
+  enabledTypes: ("itk" | "terry" | "breaking" | "partner")[];
   minConfidenceForCommentary: number;
   maxCommentariesPerHour: number;
   voiceConsistencyThreshold: number; // 0-1, minimum voice consistency score
   breakingNewsCommentaryRate: number; // 0-1, how often to comment on breaking news
-  humorIntensity: 'mild' | 'medium' | 'sharp'; // How ascerbic Terry should be
+  humorIntensity: "mild" | "medium" | "sharp"; // How ascerbic Terry should be
 }
 
 export interface TerryCommentaryResult {
   commentary: string;
   voiceConsistencyScore: number;
-  humorLevel: 'dry' | 'sarcastic' | 'cutting' | 'withering';
+  humorLevel: "dry" | "sarcastic" | "cutting" | "withering";
   topics: string[];
   generationTimeMs: number;
   isBreakingNewsComment: boolean;
@@ -38,12 +38,12 @@ export interface TerryVoiceMetrics {
 
 // Default configuration
 export const DEFAULT_TERRY_CONFIG: TerryCommentaryConfig = {
-  enabledTypes: ['itk', 'breaking'],
+  enabledTypes: ["itk", "breaking"],
   minConfidenceForCommentary: 0.6,
   maxCommentariesPerHour: 8, // Max 8 Terry comments per hour
   voiceConsistencyThreshold: 0.75, // 75% minimum voice consistency
   breakingNewsCommentaryRate: 0.8, // 80% chance to comment on breaking news
-  humorIntensity: 'sharp',
+  humorIntensity: "sharp",
 };
 
 /**
@@ -65,7 +65,7 @@ export class TerryCommentarySystem {
   public async generateCommentary(
     feedItem: FeedItem,
     originalTweet?: TweetData,
-    classification?: ClassificationResult
+    classification?: ClassificationResult,
   ): Promise<TerryCommentaryResult | null> {
     // Check if we should generate commentary
     if (!this.shouldGenerateCommentary(feedItem, classification)) {
@@ -82,7 +82,7 @@ export class TerryCommentarySystem {
       const commentary = await this.generateTerryComment(
         feedItem,
         originalTweet,
-        classification
+        classification,
       );
 
       // Validate voice consistency
@@ -93,7 +93,7 @@ export class TerryCommentarySystem {
         voiceMetrics.overallConsistency < this.config.voiceConsistencyThreshold
       ) {
         console.log(
-          `Terry commentary rejected for low voice consistency: ${voiceMetrics.overallConsistency}`
+          `Terry commentary rejected for low voice consistency: ${voiceMetrics.overallConsistency}`,
         );
         return null;
       }
@@ -113,15 +113,15 @@ export class TerryCommentarySystem {
         humorLevel: this.classifyHumorLevel(commentary),
         topics: this.extractTopics(feedItem, commentary),
         generationTimeMs: Math.round(performance.now() - startTime),
-        isBreakingNewsComment: feedItem.type === 'breaking',
+        isBreakingNewsComment: feedItem.type === "breaking",
       };
 
       console.log(
-        `✍️ Terry commentary generated (${result.humorLevel}): ${commentary.substring(0, 50)}...`
+        `✍️ Terry commentary generated (${result.humorLevel}): ${commentary.substring(0, 50)}...`,
       );
       return result;
     } catch (error) {
-      console.error('Failed to generate Terry commentary:', error);
+      console.error("Failed to generate Terry commentary:", error);
       return null;
     }
   }
@@ -131,16 +131,16 @@ export class TerryCommentarySystem {
    */
   public async generateBreakingNewsCommentary(
     feedItem: FeedItem,
-    isGenuineDrama: boolean = false
+    isGenuineDrama: boolean = false,
   ): Promise<TerryCommentaryResult | null> {
-    if (!isGenuineDrama || feedItem.type !== 'breaking') {
+    if (!isGenuineDrama || feedItem.type !== "breaking") {
       return null;
     }
 
     // Check monthly breaking news commentary quota
     if (!this.canGenerateBreakingNewsCommentary()) {
       console.log(
-        'Terry breaking news commentary quota reached for this month'
+        "Terry breaking news commentary quota reached for this month",
       );
       return null;
     }
@@ -151,7 +151,7 @@ export class TerryCommentarySystem {
     return {
       commentary,
       voiceConsistencyScore: voiceMetrics.overallConsistency,
-      humorLevel: 'cutting',
+      humorLevel: "cutting",
       topics: this.extractTopics(feedItem, commentary),
       generationTimeMs: 0,
       isBreakingNewsComment: true,
@@ -163,7 +163,7 @@ export class TerryCommentarySystem {
    */
   private shouldGenerateCommentary(
     feedItem: FeedItem,
-    classification?: ClassificationResult
+    classification?: ClassificationResult,
   ): boolean {
     // Check hourly limit
     if (this.hourlyCommentaryCount >= this.config.maxCommentariesPerHour) {
@@ -184,7 +184,7 @@ export class TerryCommentarySystem {
     }
 
     // Breaking news gets higher chance
-    if (feedItem.type === 'breaking') {
+    if (feedItem.type === "breaking") {
       return Math.random() < this.config.breakingNewsCommentaryRate;
     }
 
@@ -205,7 +205,7 @@ export class TerryCommentarySystem {
   private async generateTerryComment(
     feedItem: FeedItem,
     originalTweet?: TweetData,
-    classification?: ClassificationResult
+    classification?: ClassificationResult,
   ): Promise<string> {
     // In production, this would call OpenAI/Anthropic API
     // For now, return contextual template-based commentary
@@ -218,17 +218,17 @@ export class TerryCommentarySystem {
     const players = feedItem.tags.players;
     const source = feedItem.source.name;
     const fee = this.extractFeeFromContent(feedItem.content);
-    const transferType = feedItem.metadata.transferType || 'rumour';
+    const transferType = feedItem.metadata.transferType || "rumour";
 
     return template
-      .replace('{club}', clubs[0] || 'the club')
-      .replace('{player}', players[0] || 'the player')
-      .replace('{source}', source)
-      .replace('{fee}', fee || '£50m')
-      .replace('{transferType}', transferType)
+      .replace("{club}", clubs[0] || "the club")
+      .replace("{player}", players[0] || "the player")
+      .replace("{source}", source)
+      .replace("{fee}", fee || "£50m")
+      .replace("{transferType}", transferType)
       .replace(
-        '{reliability}',
-        Math.round(feedItem.source.reliability * 100).toString()
+        "{reliability}",
+        Math.round(feedItem.source.reliability * 100).toString(),
       );
   }
 
@@ -237,12 +237,12 @@ export class TerryCommentarySystem {
    */
   private getTerryTemplates(
     feedItem: FeedItem,
-    classification?: ClassificationResult
+    classification?: ClassificationResult,
   ): string[] {
     const baseTemplates = {
       // Breaking news templates
       breaking: [
-        'Right, {club} spending {fee} on {player} is either genius or the most expensive way to disappoint their fanbase.',
+        "Right, {club} spending {fee} on {player} is either genius or the most expensive way to disappoint their fanbase.",
         "BREAKING: {player} to {club} is confirmed, which means we'll get 47 updates about them breathing correctly and walking in a straight line.",
         "{club} have signed {player}, and somewhere a scout is furiously deleting their PowerPoint about 'the one that got away'.",
         "The {player} to {club} deal is done. That's {fee} for someone who'll either be brilliant or end up in the Championship within two years.",
@@ -254,20 +254,20 @@ export class TerryCommentarySystem {
         "Personal terms agreed between {player} and {club}, which in football means they've successfully negotiated who pays for the fancy coffee machine.",
         '{club} are "confident" about signing {player}. In transfer speak, that\'s anywhere between now and the heat death of the universe.',
         "The {player} medical at {club}'s training ground will be more scrutinized than a space shuttle launch. Probably take longer too.",
-        'Payment structure negotiations between clubs is just posh blokes arguing about who pays for what while {player} packs his bags optimistically.',
+        "Payment structure negotiations between clubs is just posh blokes arguing about who pays for what while {player} packs his bags optimistically.",
       ],
 
       // High reliability source templates
       tier1: [
-        '{source} has spoken, so {player} to {club} is basically sorted. {reliability}% reliability means this is happening whether we like it or not.',
-        'When {source} says something, football Twitter collectively holds its breath. {player} to {club} is as good as done.',
+        "{source} has spoken, so {player} to {club} is basically sorted. {reliability}% reliability means this is happening whether we like it or not.",
+        "When {source} says something, football Twitter collectively holds its breath. {player} to {club} is as good as done.",
         "{source} doesn't mess about. If they say {player} is joining {club}, start printing the shirts.",
       ],
 
       // Low reliability/rumour templates
       rumour: [
-        'According to {source}, {player} might join {club}. And according to my horoscope, I might win the lottery.',
-        'The {player} to {club} rumour is doing the rounds again. Like a bad penny or a questionable tactical formation.',
+        "According to {source}, {player} might join {club}. And according to my horoscope, I might win the lottery.",
+        "The {player} to {club} rumour is doing the rounds again. Like a bad penny or a questionable tactical formation.",
         "{source} reckons {player} is {club}-bound. Take that with more salt than you'd put on chips from a questionable seaside chippy.",
       ],
 
@@ -282,7 +282,7 @@ export class TerryCommentarySystem {
       medical: [
         "The medical's tomorrow which means we'll get 47 updates about {player} breathing correctly and walking in a straight line.",
         "{player}'s medical is scheduled, because apparently kicking a ball requires the same scrutiny as astronaut selection.",
-        'Medical planned for {player}. In other news, local physiotherapist suddenly very wealthy.',
+        "Medical planned for {player}. In other news, local physiotherapist suddenly very wealthy.",
       ],
 
       // Personal terms templates
@@ -293,7 +293,7 @@ export class TerryCommentarySystem {
     };
 
     // Return appropriate templates based on context
-    if (feedItem.type === 'breaking') {
+    if (feedItem.type === "breaking") {
       return baseTemplates.breaking;
     }
 
@@ -301,11 +301,11 @@ export class TerryCommentarySystem {
       return baseTemplates.tier1;
     }
 
-    if (feedItem.metadata.transferType === 'medical') {
+    if (feedItem.metadata.transferType === "medical") {
       return baseTemplates.medical;
     }
 
-    if (feedItem.metadata.transferType === 'personal_terms') {
+    if (feedItem.metadata.transferType === "personal_terms") {
       return baseTemplates.terms;
     }
 
@@ -327,14 +327,14 @@ export class TerryCommentarySystem {
    * Generate special breaking news commentary
    */
   private async generateBreakingNewsComment(
-    feedItem: FeedItem
+    feedItem: FeedItem,
   ): Promise<string> {
     const breakingTemplates = [
-      'BREAKING: Football Twitter is about to lose its collective mind over this one.',
-      'Right, this is the kind of transfer that makes grown adults argue with strangers on the internet.',
+      "BREAKING: Football Twitter is about to lose its collective mind over this one.",
+      "Right, this is the kind of transfer that makes grown adults argue with strangers on the internet.",
       "Well, that's today's productivity gone. Everyone's about to become a transfer expert.",
-      'This is either the deal of the century or the most expensive mistake since someone bought Twitter.',
-      'And just like that, every other transfer story becomes irrelevant for the next 48 hours.',
+      "This is either the deal of the century or the most expensive mistake since someone bought Twitter.",
+      "And just like that, every other transfer story becomes irrelevant for the next 48 hours.",
     ];
 
     return breakingTemplates[
@@ -353,78 +353,78 @@ export class TerryCommentarySystem {
 
     // Ascerbic/cutting humor indicators
     const ascerbicIndicators = [
-      'either',
-      'or',
-      'question is',
-      'probably',
-      'apparently',
-      'supposedly',
-      'basically',
-      'just',
-      'somewhere',
-      'meanwhile',
-      'inevitably',
+      "either",
+      "or",
+      "question is",
+      "probably",
+      "apparently",
+      "supposedly",
+      "basically",
+      "just",
+      "somewhere",
+      "meanwhile",
+      "inevitably",
     ];
     const ascerbicScore = Math.min(
       ascerbicIndicators.filter((indicator) => text.includes(indicator))
         .length / 3,
-      1.0
+      1.0,
     );
 
     // British humour indicators
     const britishIndicators = [
-      'right,',
-      'proper',
-      'bloody',
-      'absolute',
-      'quid',
-      'brilliant',
-      'mental',
-      'mad',
-      'daft',
-      'chippy',
-      'seaside',
+      "right,",
+      "proper",
+      "bloody",
+      "absolute",
+      "quid",
+      "brilliant",
+      "mental",
+      "mad",
+      "daft",
+      "chippy",
+      "seaside",
     ];
     const britishHumourScore = Math.min(
       britishIndicators.filter((indicator) => text.includes(indicator)).length /
         2,
-      1.0
+      1.0,
     );
 
     // Football knowledge indicators
     const footballIndicators = [
-      'medical',
-      'personal terms',
-      'add-ons',
-      'fee structure',
-      'scout',
-      'championship',
-      'formation',
-      'training ground',
-      'shirt',
+      "medical",
+      "personal terms",
+      "add-ons",
+      "fee structure",
+      "scout",
+      "championship",
+      "formation",
+      "training ground",
+      "shirt",
     ];
     const footballKnowledgeScore = Math.min(
       footballIndicators.filter((indicator) => text.includes(indicator))
         .length / 2,
-      1.0
+      1.0,
     );
 
     // Joel Golby style indicators (dry, observational, specific cultural references)
     const golbyIndicators = [
-      'coffee machine',
-      'car keys',
-      'horoscope',
-      'lottery',
-      'astronaut',
-      'powerpoint',
-      'midlife crisis',
-      'space shuttle',
-      'productivity',
+      "coffee machine",
+      "car keys",
+      "horoscope",
+      "lottery",
+      "astronaut",
+      "powerpoint",
+      "midlife crisis",
+      "space shuttle",
+      "productivity",
     ];
     const joelGolbyLikenessScore = Math.min(
       golbyIndicators.filter((indicator) => text.includes(indicator)).length /
         1,
-      1.0
+      1.0,
     );
 
     // Calculate weighted overall consistency
@@ -447,39 +447,39 @@ export class TerryCommentarySystem {
    * Classify humor level of commentary
    */
   private classifyHumorLevel(
-    commentary: string
-  ): TerryCommentaryResult['humorLevel'] {
+    commentary: string,
+  ): TerryCommentaryResult["humorLevel"] {
     const text = commentary.toLowerCase();
 
     // Withering humor (most cutting)
     if (
-      text.includes('most expensive') ||
-      text.includes('questionable') ||
-      text.includes('midlife crisis')
+      text.includes("most expensive") ||
+      text.includes("questionable") ||
+      text.includes("midlife crisis")
     ) {
-      return 'withering';
+      return "withering";
     }
 
     // Cutting humor
     if (
-      text.includes('either') ||
-      text.includes('question is') ||
-      text.includes('apparently')
+      text.includes("either") ||
+      text.includes("question is") ||
+      text.includes("apparently")
     ) {
-      return 'cutting';
+      return "cutting";
     }
 
     // Sarcastic
     if (
-      text.includes('brilliant') ||
-      text.includes('confidence') ||
-      text.includes('somewhere')
+      text.includes("brilliant") ||
+      text.includes("confidence") ||
+      text.includes("somewhere")
     ) {
-      return 'sarcastic';
+      return "sarcastic";
     }
 
     // Default to dry
-    return 'dry';
+    return "dry";
   }
 
   /**
@@ -495,22 +495,22 @@ export class TerryCommentarySystem {
 
     // Add source reliability topic
     if (feedItem.source.tier === 1) {
-      topics.push('tier-1-source');
+      topics.push("tier-1-source");
     } else if (feedItem.source.reliability < 0.7) {
-      topics.push('unreliable-source');
+      topics.push("unreliable-source");
     }
 
     // Add fee-related topics
     const fee = this.extractFeeFromContent(feedItem.content);
     if (fee && parseFloat(fee) > 50) {
-      topics.push('big-fee');
+      topics.push("big-fee");
     }
 
     // Add humor topics based on commentary content
-    if (commentary.includes('medical')) topics.push('medical-drama');
-    if (commentary.includes('personal terms'))
-      topics.push('contract-negotiations');
-    if (commentary.includes('PowerPoint')) topics.push('scout-humor');
+    if (commentary.includes("medical")) topics.push("medical-drama");
+    if (commentary.includes("personal terms"))
+      topics.push("contract-negotiations");
+    if (commentary.includes("PowerPoint")) topics.push("scout-humor");
 
     return topics;
   }
@@ -570,7 +570,7 @@ export class TerryCommentarySystem {
    */
   public updateConfig(newConfig: Partial<TerryCommentaryConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    console.log('🎭 Updated Terry commentary config:', this.config);
+    console.log("🎭 Updated Terry commentary config:", this.config);
   }
 
   /**
@@ -582,7 +582,7 @@ export class TerryCommentarySystem {
     }
 
     const analyses = this.recentCommentaries.map((commentary) =>
-      this.validateVoiceConsistency(commentary)
+      this.validateVoiceConsistency(commentary),
     );
 
     return {

@@ -1,12 +1,12 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 export default {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  darkMode: 'class',
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -46,17 +46,17 @@ export default {
         },
         // Transfer Juice Brand Colors
         orange: {
-          DEFAULT: '#ff5a1f',
-          50: '#fff8f1',
-          100: '#feecdc',
-          200: '#fcd9bd',
-          300: '#fdba8c',
-          400: '#ff8a4c',
-          500: '#ff5a1f',
-          600: '#d03801',
-          700: '#b43403',
-          800: '#8a2c0d',
-          900: '#73230d',
+          DEFAULT: "#ff5a1f",
+          50: "#fff8f1",
+          100: "#feecdc",
+          200: "#fcd9bd",
+          300: "#fdba8c",
+          400: "#ff8a4c",
+          500: "#ff5a1f",
+          600: "#d03801",
+          700: "#b43403",
+          800: "#8a2c0d",
+          900: "#73230d",
         },
       },
       borderRadius: {
@@ -65,11 +65,11 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-geist-mono)', 'monospace'],
-        bouchers: ['Bouchers Sans', 'system-ui', 'sans-serif'],
+        sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "monospace"],
+        bouchers: ["Bouchers Sans", "system-ui", "sans-serif"],
       },
     },
   },
   plugins: [],
-} satisfies Config
+} satisfies Config;

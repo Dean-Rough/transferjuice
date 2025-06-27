@@ -3,30 +3,25 @@
  * Database operations for magazine-style briefings
  */
 
-import { prisma } from '@/lib/prisma';
-import type { 
-  Briefing, 
-  FeedItem, 
-  Tag,
-  Prisma 
-} from '@prisma/client';
-import { 
+import { prisma } from "@/lib/prisma";
+import type { Briefing, FeedItem, Tag, Prisma, League } from "@prisma/client";
+import {
   BriefingStatus,
   type BriefingContent,
   type BriefingFilter,
-  type BriefingWithRelations 
-} from '@/types/briefing';
-import { generateSlug } from '@/lib/utils/slug';
+  type BriefingWithRelations,
+} from "@/types/briefing";
+import { generateSlug } from "@/lib/utils/slug";
 
 /**
  * Create a new briefing
  */
 export async function createBriefing(data: {
   timestamp: Date;
-  title: BriefingContent['title'];
-  content: BriefingContent['sections'];
-  visualTimeline: BriefingContent['visualTimeline'];
-  sidebarSections: BriefingContent['sidebar'];
+  title: BriefingContent["title"];
+  content: BriefingContent["sections"];
+  visualTimeline: BriefingContent["visualTimeline"];
+  sidebarSections: BriefingContent["sidebar"];
   readTime: number;
   wordCount: number;
   terryScore: number;
@@ -34,35 +29,41 @@ export async function createBriefing(data: {
   tagIds: string[];
 }) {
   const slug = generateSlug(data.title.main, data.timestamp);
-  
+
   return await prisma.briefing.create({
     data: {
       slug,
       timestamp: data.timestamp,
-      title: data.title,
-      content: data.content,
-      visualTimeline: data.visualTimeline,
-      sidebarSections: data.sidebarSections,
+      title: data.title as any,
+      content: data.content as any,
+      visualTimeline: data.visualTimeline as any,
+      sidebarSections: data.sidebarSections as any,
       readTime: data.readTime,
       wordCount: data.wordCount,
       terryScore: data.terryScore,
-      feedItems: {
-        createMany: {
-          data: data.feedItemIds.map((feedItemId, index) => ({
-            feedItemId,
-            position: index,
-            section: 'main', // TODO: Map to actual sections
-          })),
-        },
-      },
-      tags: {
-        createMany: {
-          data: data.tagIds.map(tagId => ({
-            tagId,
-            relevance: 1.0, // TODO: Calculate relevance
-          })),
-        },
-      },
+      feedItems:
+        data.feedItemIds.length > 0
+          ? {
+              createMany: {
+                data: data.feedItemIds.map((feedItemId, index) => ({
+                  feedItemId,
+                  position: index,
+                  section: "main", // TODO: Map to actual sections
+                })),
+              },
+            }
+          : undefined,
+      tags:
+        data.tagIds.length > 0
+          ? {
+              createMany: {
+                data: data.tagIds.map((tagId) => ({
+                  tagId,
+                  relevance: 1.0, // TODO: Calculate relevance
+                })),
+              },
+            }
+          : undefined,
     },
     include: {
       feedItems: {
@@ -84,7 +85,7 @@ export async function createBriefing(data: {
  * Get briefing by timestamp
  */
 export async function getBriefingByTimestamp(
-  timestamp: Date
+  timestamp: Date,
 ): Promise<BriefingWithRelations | null> {
   return await prisma.briefing.findUnique({
     where: { timestamp },
@@ -103,16 +104,16 @@ export async function getBriefingByTimestamp(
             },
           },
         },
-        orderBy: { position: 'asc' },
+        orderBy: { position: "asc" },
       },
       tags: {
         include: {
           tag: true,
         },
-        orderBy: { relevance: 'desc' },
+        orderBy: { relevance: "desc" },
       },
       media: {
-        orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: "asc" },
       },
     },
   });
@@ -122,7 +123,7 @@ export async function getBriefingByTimestamp(
  * Get briefing by slug
  */
 export async function getBriefingBySlug(
-  slug: string
+  slug: string,
 ): Promise<BriefingWithRelations | null> {
   return await prisma.briefing.findUnique({
     where: { slug },
@@ -141,16 +142,16 @@ export async function getBriefingBySlug(
             },
           },
         },
-        orderBy: { position: 'asc' },
+        orderBy: { position: "asc" },
       },
       tags: {
         include: {
           tag: true,
         },
-        orderBy: { relevance: 'desc' },
+        orderBy: { relevance: "desc" },
       },
       media: {
-        orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: "asc" },
       },
     },
   });
@@ -174,9 +175,9 @@ export async function listBriefings({
       status === BriefingStatus.Published
         ? { isPublished: true }
         : status === BriefingStatus.Draft
-        ? { isPublished: false }
-        : {},
-      
+          ? { isPublished: false }
+          : {},
+
       // Date range filter
       startDate || endDate
         ? {
@@ -186,7 +187,7 @@ export async function listBriefings({
             },
           }
         : {},
-      
+
       // Tag filter
       tags && tags.length > 0
         ? {
@@ -201,7 +202,7 @@ export async function listBriefings({
             },
           }
         : {},
-      
+
       // League filter (through feed items)
       leagues && leagues.length > 0
         ? {
@@ -218,20 +219,39 @@ export async function listBriefings({
         : {},
     ],
   };
-  
+
   const [briefings, total] = await Promise.all([
     prisma.briefing.findMany({
       where,
       skip: (page - 1) * limit,
       take: limit,
-      orderBy: { timestamp: 'desc' },
+      orderBy: { timestamp: "desc" },
       include: {
+        feedItems: {
+          include: {
+            feedItem: {
+              include: {
+                source: true,
+                tags: {
+                  include: {
+                    tag: true,
+                  },
+                },
+                media: true,
+              },
+            },
+          },
+          orderBy: { position: "asc" },
+        },
         tags: {
           include: {
             tag: true,
           },
           take: 5,
-          orderBy: { relevance: 'desc' },
+          orderBy: { relevance: "desc" },
+        },
+        media: {
+          orderBy: { createdAt: "asc" },
         },
         _count: {
           select: {
@@ -243,7 +263,7 @@ export async function listBriefings({
     }),
     prisma.briefing.count({ where }),
   ]);
-  
+
   return {
     briefings,
     pagination: {
@@ -256,11 +276,106 @@ export async function listBriefings({
 }
 
 /**
+ * Get briefings for the continuous feed
+ */
+export async function getBriefingsForFeed({
+  limit = 10,
+  cursor,
+  tags,
+  leagues,
+}: {
+  limit?: number;
+  cursor?: string;
+  tags?: string[];
+  leagues?: League[];
+}): Promise<BriefingWithRelations[]> {
+  const where: Prisma.BriefingWhereInput = {
+    AND: [
+      // Only published briefings
+      { isPublished: true },
+
+      // Cursor-based pagination
+      cursor
+        ? {
+            timestamp: {
+              lt: new Date(cursor),
+            },
+          }
+        : {},
+
+      // Tag filter
+      tags && tags.length > 0
+        ? {
+            tags: {
+              some: {
+                tag: {
+                  name: {
+                    in: tags,
+                  },
+                },
+              },
+            },
+          }
+        : {},
+
+      // League filter
+      leagues && leagues.length > 0
+        ? {
+            feedItems: {
+              some: {
+                feedItem: {
+                  league: {
+                    in: leagues,
+                  },
+                },
+              },
+            },
+          }
+        : {},
+    ],
+  };
+
+  return await prisma.briefing.findMany({
+    where,
+    take: limit,
+    orderBy: { timestamp: "desc" },
+    include: {
+      feedItems: {
+        include: {
+          feedItem: {
+            include: {
+              source: true,
+              tags: {
+                include: {
+                  tag: true,
+                },
+              },
+              media: true,
+            },
+          },
+        },
+        orderBy: { position: "asc" },
+      },
+      tags: {
+        include: {
+          tag: true,
+        },
+        take: 5,
+        orderBy: { relevance: "desc" },
+      },
+      media: {
+        orderBy: { createdAt: "asc" },
+      },
+    },
+  });
+}
+
+/**
  * Get related briefings
  */
 export async function getRelatedBriefings(
   briefingId: string,
-  limit = 4
+  limit = 4,
 ): Promise<Briefing[]> {
   // Get the current briefing's tags
   const currentBriefing = await prisma.briefing.findUnique({
@@ -273,13 +388,13 @@ export async function getRelatedBriefings(
       },
     },
   });
-  
+
   if (!currentBriefing) {
     return [];
   }
-  
-  const tagIds = currentBriefing.tags.map(t => t.tagId);
-  
+
+  const tagIds = currentBriefing.tags.map((t) => t.tagId);
+
   // Find briefings with similar tags
   return await prisma.briefing.findMany({
     where: {
@@ -293,9 +408,7 @@ export async function getRelatedBriefings(
         },
       },
     },
-    orderBy: [
-      { timestamp: 'desc' },
-    ],
+    orderBy: [{ timestamp: "desc" }],
     take: limit,
   });
 }
@@ -306,24 +419,28 @@ export async function getRelatedBriefings(
 export async function updateBriefing(
   id: string,
   data: Partial<{
-    title: BriefingContent['title'];
-    content: BriefingContent['sections'];
-    visualTimeline: BriefingContent['visualTimeline'];
-    sidebarSections: BriefingContent['sidebar'];
+    title: BriefingContent["title"];
+    content: BriefingContent["sections"];
+    visualTimeline: BriefingContent["visualTimeline"];
+    sidebarSections: BriefingContent["sidebar"];
     readTime: number;
     wordCount: number;
     terryScore: number;
     isPublished: boolean;
     publishedAt: Date;
-  }>
+  }>,
 ) {
   return await prisma.briefing.update({
     where: { id },
     data: {
-      ...(data.title && { title: data.title }),
-      ...(data.content && { content: data.content }),
-      ...(data.visualTimeline && { visualTimeline: data.visualTimeline }),
-      ...(data.sidebarSections && { sidebarSections: data.sidebarSections }),
+      ...(data.title && { title: data.title as any }),
+      ...(data.content && { content: data.content as any }),
+      ...(data.visualTimeline && {
+        visualTimeline: data.visualTimeline as any,
+      }),
+      ...(data.sidebarSections && {
+        sidebarSections: data.sidebarSections as any,
+      }),
       ...(data.readTime !== undefined && { readTime: data.readTime }),
       ...(data.wordCount !== undefined && { wordCount: data.wordCount }),
       ...(data.terryScore !== undefined && { terryScore: data.terryScore }),
@@ -378,11 +495,11 @@ export async function getBriefingStats(briefingId: string) {
       },
     },
   });
-  
+
   if (!briefing) {
     return null;
   }
-  
+
   const emailStats = briefing.emails.reduce(
     (acc, email) => ({
       sent: acc.sent + 1,
@@ -390,16 +507,19 @@ export async function getBriefingStats(briefingId: string) {
       clicked: acc.clicked + (email.clickedAt ? 1 : 0),
       totalClicks: acc.totalClicks + email.clickCount,
     }),
-    { sent: 0, opened: 0, clicked: 0, totalClicks: 0 }
+    { sent: 0, opened: 0, clicked: 0, totalClicks: 0 },
   );
-  
+
   return {
     ...briefing,
     emailStats: {
       ...emailStats,
       openRate: emailStats.sent > 0 ? emailStats.opened / emailStats.sent : 0,
       clickRate: emailStats.sent > 0 ? emailStats.clicked / emailStats.sent : 0,
-      avgClicksPerEmail: emailStats.clicked > 0 ? emailStats.totalClicks / emailStats.clicked : 0,
+      avgClicksPerEmail:
+        emailStats.clicked > 0
+          ? emailStats.totalClicks / emailStats.clicked
+          : 0,
     },
   };
 }
@@ -407,12 +527,14 @@ export async function getBriefingStats(briefingId: string) {
 /**
  * Check if briefing exists for timestamp
  */
-export async function briefingExistsForTimestamp(timestamp: Date): Promise<boolean> {
+export async function briefingExistsForTimestamp(
+  timestamp: Date,
+): Promise<boolean> {
   const briefing = await prisma.briefing.findUnique({
     where: { timestamp },
     select: { id: true },
   });
-  
+
   return !!briefing;
 }
 
@@ -448,13 +570,14 @@ export async function updateBriefingReadDepth(id: string, depth: number) {
     where: { id },
     select: { avgReadDepth: true, viewCount: true },
   });
-  
+
   if (!briefing) return;
-  
+
   // Calculate new average read depth
-  const totalDepth = briefing.avgReadDepth * Math.max(briefing.viewCount - 1, 1);
+  const totalDepth =
+    briefing.avgReadDepth * Math.max(briefing.viewCount - 1, 1);
   const newAvgDepth = (totalDepth + depth) / briefing.viewCount;
-  
+
   return await prisma.briefing.update({
     where: { id },
     data: {

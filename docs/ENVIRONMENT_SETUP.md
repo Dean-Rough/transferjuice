@@ -615,20 +615,20 @@ const nextConfig = {
   },
 
   // Environment-specific settings
-  ...(process.env.NODE_ENV === 'production' && {
+  ...(process.env.NODE_ENV === "production" && {
     swcMinify: true,
-    output: 'standalone',
+    output: "standalone",
     poweredByHeader: false,
   }),
 
   // Image optimization
   images: {
-    formats: ['image/webp', 'image/avif'],
+    formats: ["image/webp", "image/avif"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     domains: [
-      'pbs.twimg.com', // Twitter images
-      'upload.wikimedia.org', // Wikipedia images
+      "pbs.twimg.com", // Twitter images
+      "upload.wikimedia.org", // Wikipedia images
     ],
   },
 
@@ -636,19 +636,19 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: "/(.*)",
         headers: [
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
+            key: "X-Frame-Options",
+            value: "DENY",
           },
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
           {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
+            key: "Referrer-Policy",
+            value: "origin-when-cross-origin",
           },
         ],
       },
@@ -659,8 +659,8 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/newsletter',
-        destination: '/#newsletter',
+        source: "/newsletter",
+        destination: "/#newsletter",
         permanent: true,
       },
     ];
@@ -702,7 +702,7 @@ model DevLog {
 
 ```typescript
 // lib/prisma.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -715,15 +715,15 @@ const createPrismaClient = () => {
         url: process.env.DATABASE_URL,
       },
     },
-    ...(process.env.NODE_ENV === 'development' && {
-      log: ['query', 'info', 'warn', 'error'],
+    ...(process.env.NODE_ENV === "development" && {
+      log: ["query", "info", "warn", "error"],
     }),
   });
 };
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
 ```
@@ -738,18 +738,18 @@ if (process.env.NODE_ENV !== 'production') {
 
 ```typescript
 // sentry.client.config.ts
-import * as Sentry from '@sentry/nextjs';
+import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   environment: process.env.NODE_ENV,
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
 
   beforeSend(event) {
     // Filter out sensitive information
     if (event.exception) {
       const exception = event.exception.values?.[0];
-      if (exception?.value?.includes('API_KEY')) {
+      if (exception?.value?.includes("API_KEY")) {
         return null;
       }
     }
@@ -758,12 +758,12 @@ Sentry.init({
 });
 
 // sentry.server.config.ts
-import * as Sentry from '@sentry/nextjs';
+import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   environment: process.env.NODE_ENV,
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
 });
 ```
 
@@ -776,8 +776,8 @@ Sentry.init({
 export const GA_TRACKING_ID = process.env.GOOGLE_ANALYTICS_ID;
 
 export const pageview = (url: string) => {
-  if (typeof window !== 'undefined' && GA_TRACKING_ID) {
-    window.gtag('config', GA_TRACKING_ID, {
+  if (typeof window !== "undefined" && GA_TRACKING_ID) {
+    window.gtag("config", GA_TRACKING_ID, {
       page_path: url,
     });
   }
@@ -794,8 +794,8 @@ export const event = ({
   label?: string;
   value?: number;
 }) => {
-  if (typeof window !== 'undefined' && GA_TRACKING_ID) {
-    window.gtag('event', action, {
+  if (typeof window !== "undefined" && GA_TRACKING_ID) {
+    window.gtag("event", action, {
       event_category: category,
       event_label: label,
       value: value,
@@ -814,12 +814,12 @@ export const event = ({
 
 ```typescript
 // scripts/test-environment.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function testEnvironment() {
-  console.log('🧪 Testing environment configuration...\n');
+  console.log("🧪 Testing environment configuration...\n");
 
   const tests = [
     testDatabaseConnection,
@@ -837,33 +837,33 @@ async function testEnvironment() {
     }
   }
 
-  console.log('\n✅ All environment tests passed!');
+  console.log("\n✅ All environment tests passed!");
 }
 
 async function testDatabaseConnection() {
   await prisma.$queryRaw`SELECT 1`;
-  console.log('✅ Database connection working');
+  console.log("✅ Database connection working");
 }
 
 async function testTwitterAPI() {
   const response = await fetch(
-    'https://api.twitter.com/2/users/by/username/FabrizioRomano',
+    "https://api.twitter.com/2/users/by/username/FabrizioRomano",
     {
       headers: {
         Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
       },
-    }
+    },
   );
 
   if (!response.ok) {
     throw new Error(`Twitter API failed: ${response.status}`);
   }
 
-  console.log('✅ Twitter API connection working');
+  console.log("✅ Twitter API connection working");
 }
 
 async function testOpenAIAPI() {
-  const response = await fetch('https://api.openai.com/v1/models', {
+  const response = await fetch("https://api.openai.com/v1/models", {
     headers: {
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
@@ -873,12 +873,12 @@ async function testOpenAIAPI() {
     throw new Error(`OpenAI API failed: ${response.status}`);
   }
 
-  console.log('✅ OpenAI API connection working');
+  console.log("✅ OpenAI API connection working");
 }
 
 async function testEmailService() {
   // Test ConvertKit API
-  const response = await fetch('https://api.convertkit.com/v3/account', {
+  const response = await fetch("https://api.convertkit.com/v3/account", {
     headers: {
       Authorization: `Bearer ${process.env.CONVERTKIT_API_KEY}`,
     },
@@ -888,7 +888,7 @@ async function testEmailService() {
     throw new Error(`Email service failed: ${response.status}`);
   }
 
-  console.log('✅ Email service connection working');
+  console.log("✅ Email service connection working");
 }
 
 testEnvironment().finally(() => prisma.$disconnect());

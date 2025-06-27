@@ -1,6 +1,6 @@
 /**
  * Real-time Broadcasting System
- * 
+ *
  * Handles live updates to connected clients via Server-Sent Events (SSE)
  * for the live transfer feed experience
  */
@@ -17,13 +17,13 @@ interface BroadcastClient {
 }
 
 interface BroadcastMessage {
-  type: 'feed-update' | 'breaking-news' | 'heartbeat' | 'connection-count';
+  type: "feed-update" | "breaking-news" | "heartbeat" | "connection-count";
   data: any;
   timestamp: Date;
   id: string;
 }
 
-class RealTimeBroadcaster {
+export class RealTimeBroadcaster {
   private clients: Map<string, BroadcastClient> = new Map();
   private messageHistory: BroadcastMessage[] = [];
   private heartbeatInterval: NodeJS.Timeout | null = null;
@@ -35,22 +35,29 @@ class RealTimeBroadcaster {
   /**
    * Add a new client connection
    */
-  addClient(clientId: string, response: Response, controller: ReadableStreamDefaultController, filters?: any): void {
+  addClient(
+    clientId: string,
+    response: Response,
+    controller: ReadableStreamDefaultController,
+    filters?: any,
+  ): void {
     const client: BroadcastClient = {
       id: clientId,
       response,
       controller,
       filters,
-      connectedAt: new Date()
+      connectedAt: new Date(),
     };
 
     this.clients.set(clientId, client);
-    
-    console.log(`📡 Client ${clientId} connected. Total clients: ${this.clients.size}`);
-    
+
+    console.log(
+      `📡 Client ${clientId} connected. Total clients: ${this.clients.size}`,
+    );
+
     // Send recent message history to new client
     this.sendHistoryToClient(client);
-    
+
     // Broadcast updated connection count
     this.broadcastConnectionCount();
   }
@@ -66,10 +73,12 @@ class RealTimeBroadcaster {
       } catch (error) {
         console.warn(`Error closing client ${clientId}:`, error);
       }
-      
+
       this.clients.delete(clientId);
-      console.log(`📡 Client ${clientId} disconnected. Total clients: ${this.clients.size}`);
-      
+      console.log(
+        `📡 Client ${clientId} disconnected. Total clients: ${this.clients.size}`,
+      );
+
       // Broadcast updated connection count
       this.broadcastConnectionCount();
     }
@@ -78,12 +87,12 @@ class RealTimeBroadcaster {
   /**
    * Broadcast a message to all connected clients
    */
-  broadcast(type: BroadcastMessage['type'], data: any): void {
+  broadcast(type: BroadcastMessage["type"], data: any): void {
     const message: BroadcastMessage = {
       type,
       data,
       timestamp: new Date(),
-      id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
 
     // Add to history (keep last 50 messages)
@@ -101,7 +110,7 @@ class RealTimeBroadcaster {
    */
   broadcastFeedUpdate(update: any): void {
     console.log(`📡 Broadcasting feed update: ${update.id}`);
-    this.broadcast('feed-update', update);
+    this.broadcast("feed-update", update);
   }
 
   /**
@@ -109,7 +118,7 @@ class RealTimeBroadcaster {
    */
   broadcastBreakingNews(news: any): void {
     console.log(`🚨 Broadcasting breaking news: ${news.id}`);
-    this.broadcast('breaking-news', news);
+    this.broadcast("breaking-news", news);
   }
 
   /**
@@ -127,7 +136,6 @@ class RealTimeBroadcaster {
 
         const formattedMessage = this.formatSSEMessage(message);
         client.controller.enqueue(formattedMessage);
-        
       } catch (error) {
         console.warn(`Failed to send message to client ${clientId}:`, error);
         clientsToRemove.push(clientId);
@@ -135,33 +143,37 @@ class RealTimeBroadcaster {
     }
 
     // Remove failed clients
-    clientsToRemove.forEach(clientId => this.removeClient(clientId));
+    clientsToRemove.forEach((clientId) => this.removeClient(clientId));
   }
 
   /**
    * Check if a message should be sent to a specific client based on filters
    */
-  private shouldSendToClient(client: BroadcastClient, message: BroadcastMessage): boolean {
+  private shouldSendToClient(
+    client: BroadcastClient,
+    message: BroadcastMessage,
+  ): boolean {
     // Always send heartbeat and connection count messages
-    if (message.type === 'heartbeat' || message.type === 'connection-count') {
+    if (message.type === "heartbeat" || message.type === "connection-count") {
       return true;
     }
 
     // Always send breaking news
-    if (message.type === 'breaking-news') {
+    if (message.type === "breaking-news") {
       return true;
     }
 
     // Check tag filters for feed updates
-    if (message.type === 'feed-update' && client.filters?.tags) {
-      const updateTags = message.data.tags?.map((tag: any) => tag.name.toLowerCase()) || [];
-      const clientTags = client.filters.tags.map(tag => tag.toLowerCase());
-      
+    if (message.type === "feed-update" && client.filters?.tags) {
+      const updateTags =
+        message.data.tags?.map((tag: any) => tag.name.toLowerCase()) || [];
+      const clientTags = client.filters.tags.map((tag) => tag.toLowerCase());
+
       // Send if any tag matches
-      const hasMatchingTag = clientTags.some(clientTag => 
-        updateTags.some((updateTag: string) => updateTag.includes(clientTag))
+      const hasMatchingTag = clientTags.some((clientTag) =>
+        updateTags.some((updateTag: string) => updateTag.includes(clientTag)),
       );
-      
+
       if (!hasMatchingTag) {
         return false;
       }
@@ -169,7 +181,9 @@ class RealTimeBroadcaster {
 
     // Check priority filters
     if (client.filters?.priority && message.data.priority) {
-      if (!client.filters.priority.includes(message.data.priority.toLowerCase())) {
+      if (
+        !client.filters.priority.includes(message.data.priority.toLowerCase())
+      ) {
         return false;
       }
     }
@@ -185,16 +199,16 @@ class RealTimeBroadcaster {
       id: message.id,
       type: message.type,
       data: message.data,
-      timestamp: message.timestamp.toISOString()
+      timestamp: message.timestamp.toISOString(),
     };
 
     const formattedMessage = [
       `id: ${message.id}`,
       `event: ${message.type}`,
       `data: ${JSON.stringify(sseData)}`,
-      '',
-      ''
-    ].join('\n');
+      "",
+      "",
+    ].join("\n");
 
     return new TextEncoder().encode(formattedMessage);
   }
@@ -205,7 +219,7 @@ class RealTimeBroadcaster {
   private sendHistoryToClient(client: BroadcastClient): void {
     // Send last 10 messages to catch up new clients
     const recentMessages = this.messageHistory.slice(-10);
-    
+
     for (const message of recentMessages) {
       if (this.shouldSendToClient(client, message)) {
         try {
@@ -223,9 +237,9 @@ class RealTimeBroadcaster {
    */
   private startHeartbeat(): void {
     this.heartbeatInterval = setInterval(() => {
-      this.broadcast('heartbeat', { 
+      this.broadcast("heartbeat", {
         timestamp: new Date().toISOString(),
-        clientCount: this.clients.size
+        clientCount: this.clients.size,
       });
     }, 30000); // Every 30 seconds
   }
@@ -244,9 +258,9 @@ class RealTimeBroadcaster {
    * Broadcast current connection count
    */
   private broadcastConnectionCount(): void {
-    this.broadcast('connection-count', {
+    this.broadcast("connection-count", {
       count: this.clients.size,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -267,11 +281,11 @@ class RealTimeBroadcaster {
       totalClients: this.clients.size,
       messagesSent: this.messageHistory.length,
       uptime: Date.now(), // This should track actual uptime
-      clientDetails: Array.from(this.clients.values()).map(client => ({
+      clientDetails: Array.from(this.clients.values()).map((client) => ({
         id: client.id,
         connectedAt: client.connectedAt,
-        filters: client.filters
-      }))
+        filters: client.filters,
+      })),
     };
   }
 
@@ -279,8 +293,8 @@ class RealTimeBroadcaster {
    * Cleanup all connections
    */
   cleanup(): void {
-    console.log('🧹 Cleaning up broadcaster...');
-    
+    console.log("🧹 Cleaning up broadcaster...");
+
     // Close all client connections
     for (const [clientId, client] of this.clients) {
       try {
@@ -289,7 +303,7 @@ class RealTimeBroadcaster {
         console.warn(`Error closing client ${clientId} during cleanup:`, error);
       }
     }
-    
+
     this.clients.clear();
     this.stopHeartbeat();
   }
@@ -299,7 +313,12 @@ class RealTimeBroadcaster {
 const broadcaster = new RealTimeBroadcaster();
 
 // Export functions for use in API routes
-export function addClient(clientId: string, response: Response, controller: ReadableStreamDefaultController, filters?: any): void {
+export function addClient(
+  clientId: string,
+  response: Response,
+  controller: ReadableStreamDefaultController,
+  filters?: any,
+): void {
   broadcaster.addClient(clientId, response, controller, filters);
 }
 
@@ -307,10 +326,13 @@ export function removeClient(clientId: string): void {
   broadcaster.removeClient(clientId);
 }
 
-export function broadcastUpdate(type: 'feed-update' | 'breaking-news', data: any): void {
-  if (type === 'feed-update') {
+export function broadcastUpdate(
+  type: "feed-update" | "breaking-news",
+  data: any,
+): void {
+  if (type === "feed-update") {
     broadcaster.broadcastFeedUpdate(data);
-  } else if (type === 'breaking-news') {
+  } else if (type === "breaking-news") {
     broadcaster.broadcastBreakingNews(data);
   }
 }
@@ -324,5 +346,5 @@ export function cleanupBroadcaster(): void {
 }
 
 // Cleanup on process exit
-process.on('SIGINT', cleanupBroadcaster);
-process.on('SIGTERM', cleanupBroadcaster);
+process.on("SIGINT", cleanupBroadcaster);
+process.on("SIGTERM", cleanupBroadcaster);

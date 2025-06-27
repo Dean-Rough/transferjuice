@@ -3,21 +3,21 @@
  * Handles email subscription and preference management
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { EmailFrequency } from '@prisma/client';
-import crypto from 'crypto';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { EmailFrequency } from "@prisma/client";
+import crypto from "crypto";
 
 // Validation schemas
 const SubscribeSchema = z.object({
   email: z.string().email(),
-  frequency: z.nativeEnum(EmailFrequency).default('DAILY'),
+  frequency: z.nativeEnum(EmailFrequency).default("DAILY"),
   preferredTime: z
     .string()
     .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
-    .default('08:00'),
-  timezone: z.string().default('Europe/London'),
+    .default("08:00"),
+  timezone: z.string().default("Europe/London"),
   source: z.string().optional(),
 });
 
@@ -38,11 +38,11 @@ const UpdatePreferencesSchema = z.object({
 
 // Helper function to generate unsubscribe token
 function generateUnsubscribeToken(email: string): string {
-  const secret = process.env.UNSUBSCRIBE_SECRET || 'default-secret';
+  const secret = process.env.UNSUBSCRIBE_SECRET || "default-secret";
   return crypto
-    .createHmac('sha256', secret)
+    .createHmac("sha256", secret)
     .update(email)
-    .digest('hex')
+    .digest("hex")
     .substring(0, 16);
 }
 
@@ -56,15 +56,15 @@ function verifyUnsubscribeToken(email: string, token: string): boolean {
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const email = url.searchParams.get('email');
+    const email = url.searchParams.get("email");
 
     if (!email) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Email parameter is required',
+          error: "Email parameter is required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         subscribed: false,
-        message: 'Email not subscribed',
+        message: "Email not subscribed",
       });
     }
 
@@ -101,15 +101,15 @@ export async function GET(request: NextRequest) {
       data: subscriber,
     });
   } catch (error) {
-    console.error('Failed to check subscription status:', error);
+    console.error("Failed to check subscription status:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to check subscription status',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to check subscription status",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -124,10 +124,10 @@ export async function POST(request: NextRequest) {
 
     // Get IP and user agent for analytics
     const ipAddress =
-      request.headers.get('x-forwarded-for') ||
-      request.headers.get('x-real-ip') ||
-      'unknown';
-    const userAgent = request.headers.get('user-agent') || 'unknown';
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+    const userAgent = request.headers.get("user-agent") || "unknown";
 
     // Check if already subscribed
     const existing = await prisma.emailSubscriber.findUnique({
@@ -139,13 +139,13 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             success: false,
-            error: 'Email already subscribed',
+            error: "Email already subscribed",
             data: {
               isActive: existing.isActive,
               frequency: existing.frequency,
             },
           },
-          { status: 409 }
+          { status: 409 },
         );
       } else {
         // Reactivate subscription
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: reactivated,
-          message: 'Subscription reactivated successfully',
+          message: "Subscription reactivated successfully",
         });
       }
     }
@@ -197,31 +197,31 @@ export async function POST(request: NextRequest) {
           isVerified: subscriber.isVerified,
         },
         message:
-          'Successfully subscribed! Please check your email to verify your subscription.',
+          "Successfully subscribed! Please check your email to verify your subscription.",
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid subscription data',
+          error: "Invalid subscription data",
           details: error.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    console.error('Failed to subscribe:', error);
+    console.error("Failed to subscribe:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to process subscription',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to process subscription",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -243,9 +243,9 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Email not found',
+          error: "Email not found",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -270,29 +270,29 @@ export async function PUT(request: NextRequest) {
         preferredTime: updated.preferredTime,
         timezone: updated.timezone,
       },
-      message: 'Preferences updated successfully',
+      message: "Preferences updated successfully",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid preference data',
+          error: "Invalid preference data",
           details: error.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    console.error('Failed to update preferences:', error);
+    console.error("Failed to update preferences:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to update preferences',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to update preferences",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -301,16 +301,16 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const email = url.searchParams.get('email');
-    const token = url.searchParams.get('token');
+    const email = url.searchParams.get("email");
+    const token = url.searchParams.get("token");
 
     if (!email) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Email parameter is required',
+          error: "Email parameter is required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -319,9 +319,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid unsubscribe token',
+          error: "Invalid unsubscribe token",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -334,9 +334,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Email not found',
+          error: "Email not found",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -351,18 +351,18 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Successfully unsubscribed from Transfer Juice newsletter',
+      message: "Successfully unsubscribed from Transfer Juice newsletter",
     });
   } catch (error) {
-    console.error('Failed to unsubscribe:', error);
+    console.error("Failed to unsubscribe:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to process unsubscribe',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to process unsubscribe",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

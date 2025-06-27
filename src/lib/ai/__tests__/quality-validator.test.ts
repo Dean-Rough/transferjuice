@@ -3,68 +3,68 @@
  * Comprehensive test suite for multi-layered content validation
  */
 
-import OpenAI from 'openai';
-import type { ArticleGeneration } from '../article-generator';
-import { ContentQualityValidator } from '../quality-validator';
+import OpenAI from "openai";
+import type { ArticleGeneration } from "../article-generator";
+import { ContentQualityValidator } from "../quality-validator";
 
 // Mock OpenAI
-jest.mock('openai');
+jest.mock("openai");
 const MockedOpenAI = OpenAI as jest.MockedClass<typeof OpenAI>;
 
 // Mock terry-style module
-jest.mock('@/lib/terry-style', () => ({
+jest.mock("@/lib/terry-style", () => ({
   applyTerryStyle: {
     enhanceError: jest.fn((msg: string) => `Terry-enhanced: ${msg}`),
   },
 }));
 
-describe('ContentQualityValidator', () => {
+describe("ContentQualityValidator", () => {
   let validator: ContentQualityValidator;
   let mockOpenAI: jest.Mocked<OpenAI>;
 
   const mockArticle: ArticleGeneration = {
-    title: 'Rice Finally Joins United After £100m Circus',
-    slug: 'rice-finally-joins-united-after-100m-circus',
+    title: "Rice Finally Joins United After £100m Circus",
+    slug: "rice-finally-joins-united-after-100m-circus",
     content: {
       sections: [
         {
-          id: 'section_intro_1',
-          type: 'intro',
-          title: 'The Latest Chaos',
+          id: "section_intro_1",
+          type: "intro",
+          title: "The Latest Chaos",
           content:
             "Right, this might be the most cursed transfer saga I've witnessed today, and I've been watching football for longer than I care to admit. Manchester United (currently in their \"cautiously optimistic\" phase) have finally managed to drag Declan Rice across the finish line for £100m (or roughly the GDP of a small Caribbean island). The whole medical circus (basically checking he has two legs and a pulse) was completed yesterday, which means we're now in that delightful phase where everyone pretends this was always going to happen.",
           order: 1,
-          sourceTweets: ['tweet_1'],
+          sourceTweets: ["tweet_1"],
           terryisms: [
             '(currently in their "cautiously optimistic" phase)',
-            '(or roughly the GDP of a small Caribbean island)',
-            '(basically checking he has two legs and a pulse)',
+            "(or roughly the GDP of a small Caribbean island)",
+            "(basically checking he has two legs and a pulse)",
           ],
         },
         {
-          id: 'section_main_2',
-          type: 'main',
-          title: 'The Main Event',
+          id: "section_main_2",
+          type: "main",
+          title: "The Main Event",
           content:
-            'What this actually means, beyond the obvious financial lunacy, is that United have finally addressed their midfield issues with the sort of decisive action that would make a sloth proud. Rice brings exactly the sort of defensive stability that United have been missing since, oh, approximately 2013. His ability to break up play and distribute the ball effectively should, in theory, allow Bruno Fernandes to focus on what he does best (creating chaos in the final third) rather than dropping deep to collect the ball.',
+            "What this actually means, beyond the obvious financial lunacy, is that United have finally addressed their midfield issues with the sort of decisive action that would make a sloth proud. Rice brings exactly the sort of defensive stability that United have been missing since, oh, approximately 2013. His ability to break up play and distribute the ball effectively should, in theory, allow Bruno Fernandes to focus on what he does best (creating chaos in the final third) rather than dropping deep to collect the ball.",
           order: 2,
-          sourceTweets: ['tweet_1', 'tweet_2'],
+          sourceTweets: ["tweet_1", "tweet_2"],
           terryisms: [
-            'beyond the obvious financial lunacy',
-            'oh, approximately 2013',
+            "beyond the obvious financial lunacy",
+            "oh, approximately 2013",
           ],
         },
         {
-          id: 'section_analysis_3',
-          type: 'analysis',
-          title: 'The Terry Take',
+          id: "section_analysis_3",
+          type: "analysis",
+          title: "The Terry Take",
           content:
             "Let's unpack this absolute car crash of a situation, shall we? The implications of this are either brilliant or catastrophic, depending on your tolerance for chaos. United paying £100m for a defensive midfielder is either the smartest thing they've done in years or evidence that they've completely lost their minds. Given their recent track record, I'm inclined towards the latter, but Rice is genuinely excellent at what he does.",
           order: 3,
-          sourceTweets: ['tweet_3'],
+          sourceTweets: ["tweet_3"],
           terryisms: [
             "Let's unpack this absolute car crash of a situation, shall we?",
-            'depending on your tolerance for chaos',
+            "depending on your tolerance for chaos",
           ],
         },
       ],
@@ -79,14 +79,14 @@ describe('ContentQualityValidator', () => {
       },
     },
     summary:
-      'Manchester United complete the signing of Declan Rice for £100m after medical tests.',
+      "Manchester United complete the signing of Declan Rice for £100m after medical tests.",
     metaDescription:
-      'Declan Rice joins Manchester United for £100m in latest transfer madness.',
-    tags: ['Manchester United', 'Declan Rice', 'Transfer', 'Premier League'],
-    briefingType: 'MORNING',
-    status: 'REVIEW',
+      "Declan Rice joins Manchester United for £100m in latest transfer madness.",
+    tags: ["Manchester United", "Declan Rice", "Transfer", "Premier League"],
+    briefingType: "MORNING",
+    status: "REVIEW",
     qualityScore: 86,
-    aiModel: 'gpt-4.1',
+    aiModel: "gpt-4.1",
     generationTime: 4500,
   };
 
@@ -94,10 +94,10 @@ describe('ContentQualityValidator', () => {
     score: 88,
     issues: [
       {
-        severity: 'low',
-        type: 'verification',
-        description: 'Transfer fee should be verified against official sources',
-        suggestion: 'Cross-reference with club announcements',
+        severity: "low",
+        type: "verification",
+        description: "Transfer fee should be verified against official sources",
+        suggestion: "Cross-reference with club announcements",
       },
     ],
   };
@@ -106,10 +106,10 @@ describe('ContentQualityValidator', () => {
     score: 85,
     issues: [
       {
-        severity: 'low',
-        type: 'voice_consistency',
-        description: 'Could use more parenthetical asides',
-        suggestion: 'Add more Terry-style commentary',
+        severity: "low",
+        type: "voice_consistency",
+        description: "Could use more parenthetical asides",
+        suggestion: "Add more Terry-style commentary",
       },
     ],
   };
@@ -123,11 +123,35 @@ describe('ContentQualityValidator', () => {
     score: 92,
     issues: [
       {
-        severity: 'low',
-        type: 'opinion',
+        severity: "low",
+        type: "opinion",
         description:
-          'Strong opinions about club decisions should be clearly marked as commentary',
-        suggestion: 'Add disclaimer for editorial opinion',
+          "Strong opinions about club decisions should be clearly marked as commentary",
+        suggestion: "Add disclaimer for editorial opinion",
+      },
+    ],
+  };
+
+  const mockEditorialResponse = {
+    score: 88,
+    issues: [
+      {
+        severity: "low",
+        type: "structure",
+        description: "Article could benefit from more subheadings",
+        suggestion: "Add section breaks for better readability",
+      },
+    ],
+  };
+
+  const mockAccessibilityResponse = {
+    score: 90,
+    issues: [
+      {
+        severity: "low",
+        type: "readability",
+        description: "Some sentences could be shorter for better accessibility",
+        suggestion: "Break down complex sentences",
       },
     ],
   };
@@ -147,26 +171,26 @@ describe('ContentQualityValidator', () => {
     MockedOpenAI.mockImplementation(() => mockOpenAI);
 
     validator = new ContentQualityValidator({
-      openaiApiKey: 'test-key',
-      model: 'gpt-4.1',
+      openaiApiKey: "test-key",
+      model: "gpt-4.1",
       strictMode: false,
       autoReviewThreshold: 85,
       terryMinimumScore: 75,
     });
   });
 
-  describe('constructor', () => {
-    it('should initialize with default configuration', () => {
+  describe("constructor", () => {
+    it("should initialize with default configuration", () => {
       const defaultValidator = new ContentQualityValidator({
-        openaiApiKey: 'test-key',
+        openaiApiKey: "test-key",
       });
       expect(defaultValidator).toBeInstanceOf(ContentQualityValidator);
     });
 
-    it('should initialize with custom configuration', () => {
+    it("should initialize with custom configuration", () => {
       const customValidator = new ContentQualityValidator({
-        openaiApiKey: 'test-key',
-        model: 'gpt-4o',
+        openaiApiKey: "test-key",
+        model: "gpt-4o",
         strictMode: true,
         autoReviewThreshold: 90,
         terryMinimumScore: 80,
@@ -175,7 +199,7 @@ describe('ContentQualityValidator', () => {
     });
   });
 
-  describe('validateContent', () => {
+  describe("validateContent", () => {
     beforeEach(() => {
       // Mock all validation check responses
       mockOpenAI.chat.completions.create
@@ -203,7 +227,7 @@ describe('ContentQualityValidator', () => {
         } as any);
     });
 
-    it('should perform comprehensive content validation', async () => {
+    it("should perform comprehensive content validation", async () => {
       const result = await validator.validateContent(mockArticle);
 
       expect(result).toMatchObject({
@@ -213,12 +237,12 @@ describe('ContentQualityValidator', () => {
         blockers: expect.any(Array),
         warnings: expect.any(Array),
         checks: expect.arrayContaining([
-          expect.objectContaining({ category: 'factual_accuracy' }),
-          expect.objectContaining({ category: 'brand_voice' }),
-          expect.objectContaining({ category: 'content_safety' }),
-          expect.objectContaining({ category: 'legal_compliance' }),
-          expect.objectContaining({ category: 'editorial_quality' }),
-          expect.objectContaining({ category: 'accessibility' }),
+          expect.objectContaining({ category: "factual_accuracy" }),
+          expect.objectContaining({ category: "brand_voice" }),
+          expect.objectContaining({ category: "content_safety" }),
+          expect.objectContaining({ category: "legal_compliance" }),
+          expect.objectContaining({ category: "editorial_quality" }),
+          expect.objectContaining({ category: "accessibility" }),
         ]),
         recommendations: expect.any(Array),
         validatedAt: expect.any(Date),
@@ -229,19 +253,34 @@ describe('ContentQualityValidator', () => {
       expect(mockOpenAI.chat.completions.create).toHaveBeenCalledTimes(4);
     });
 
-    it('should pass validation for high-quality content', async () => {
+    it("should pass validation for high-quality content", async () => {
       const result = await validator.validateContent(mockArticle);
 
       expect(result.passed).toBe(true);
       expect(result.overallScore).toBeGreaterThan(75);
     });
 
-    it('should require human review for content below threshold', async () => {
+    it("should require human review for content below threshold", async () => {
+      // Clear existing mocks
+      jest.clearAllMocks();
+      mockOpenAI.chat.completions.create = jest.fn();
+
+      // Modify the mock article to have lower terryScore for this test
+      const lowQualityArticle = {
+        ...mockArticle,
+        content: {
+          ...mockArticle.content,
+          terryScore: 50, // Lower than mock response
+        },
+      };
+
       const lowQualityResponses = [
-        { score: 70, issues: [] },
-        { score: 65, issues: [] },
-        { score: 80, issues: [] },
-        { score: 75, issues: [] },
+        { score: 70, issues: [] }, // factual_accuracy
+        { score: 65, issues: [] }, // brand_voice
+        { score: 80, issues: [] }, // content_safety
+        { score: 75, issues: [] }, // legal_compliance
+        { score: 60, issues: [] }, // editorial_quality
+        { score: 70, issues: [] }, // accessibility
       ];
 
       mockOpenAI.chat.completions.create
@@ -264,23 +303,37 @@ describe('ContentQualityValidator', () => {
           choices: [
             { message: { content: JSON.stringify(lowQualityResponses[3]) } },
           ],
+        } as any)
+        .mockResolvedValueOnce({
+          choices: [
+            { message: { content: JSON.stringify(lowQualityResponses[4]) } },
+          ],
+        } as any)
+        .mockResolvedValueOnce({
+          choices: [
+            { message: { content: JSON.stringify(lowQualityResponses[5]) } },
+          ],
         } as any);
 
-      const result = await validator.validateContent(mockArticle);
+      const result = await validator.validateContent(lowQualityArticle);
 
       expect(result.requiresHumanReview).toBe(true);
       expect(result.overallScore).toBeLessThan(85);
     });
 
-    it('should handle critical issues as blockers', async () => {
+    it("should handle critical issues as blockers", async () => {
+      // Clear existing mocks
+      jest.clearAllMocks();
+      mockOpenAI.chat.completions.create = jest.fn();
+
       const criticalResponse = {
         score: 95,
         issues: [
           {
-            severity: 'critical',
-            type: 'legal',
-            description: 'Potential defamation risk',
-            suggestion: 'Remove or modify problematic content',
+            severity: "critical",
+            type: "legal",
+            description: "Potential defamation risk",
+            suggestion: "Remove or modify problematic content",
           },
         ],
       };
@@ -305,6 +358,16 @@ describe('ContentQualityValidator', () => {
           choices: [
             { message: { content: JSON.stringify(mockLegalResponse) } },
           ],
+        } as any)
+        .mockResolvedValueOnce({
+          choices: [
+            { message: { content: JSON.stringify(mockEditorialResponse) } },
+          ],
+        } as any)
+        .mockResolvedValueOnce({
+          choices: [
+            { message: { content: JSON.stringify(mockAccessibilityResponse) } },
+          ],
         } as any);
 
       const result = await validator.validateContent(mockArticle);
@@ -312,23 +375,23 @@ describe('ContentQualityValidator', () => {
       expect(result.passed).toBe(false);
       expect(result.requiresHumanReview).toBe(true);
       expect(result.blockers).toContain(
-        'content_safety: Potential defamation risk'
+        "content_safety: Potential defamation risk",
       );
     });
 
-    it('should handle validation errors gracefully', async () => {
+    it("should handle validation errors gracefully", async () => {
       mockOpenAI.chat.completions.create.mockRejectedValue(
-        new Error('API Error')
+        new Error("API Error"),
       );
 
       await expect(validator.validateContent(mockArticle)).rejects.toThrow(
-        'Content validation failed'
+        "Content validation failed",
       );
     });
   });
 
-  describe('factual accuracy checking', () => {
-    it('should check factual accuracy using AI', async () => {
+  describe("factual accuracy checking", () => {
+    it("should check factual accuracy using AI", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
         choices: [
           { message: { content: JSON.stringify(mockFactualAccuracyResponse) } },
@@ -338,29 +401,29 @@ describe('ContentQualityValidator', () => {
       const result = await (validator as any).checkFactualAccuracy(mockArticle);
 
       expect(result).toMatchObject({
-        category: 'factual_accuracy',
+        category: "factual_accuracy",
         score: 88,
         passed: true,
         issues: expect.any(Array),
         checkedAt: expect.any(Date),
-        checker: 'ai',
+        checker: "ai",
       });
 
       expect(mockOpenAI.chat.completions.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          model: 'gpt-4.1',
-          response_format: { type: 'json_object' },
+          model: "gpt-4.1",
+          response_format: { type: "json_object" },
           messages: expect.arrayContaining([
             expect.objectContaining({
-              role: 'system',
-              content: expect.stringContaining('fact-checking expert'),
+              role: "system",
+              content: expect.stringContaining("fact-checking expert"),
             }),
           ]),
-        })
+        }),
       );
     });
 
-    it('should fail factual accuracy for low scores', async () => {
+    it("should fail factual accuracy for low scores", async () => {
       const lowAccuracyResponse = { ...mockFactualAccuracyResponse, score: 70 };
 
       mockOpenAI.chat.completions.create.mockResolvedValue({
@@ -376,8 +439,8 @@ describe('ContentQualityValidator', () => {
     });
   });
 
-  describe('brand voice checking', () => {
-    it('should check brand voice consistency', async () => {
+  describe("brand voice checking", () => {
+    it("should check brand voice consistency", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
         choices: [
           { message: { content: JSON.stringify(mockBrandVoiceResponse) } },
@@ -387,26 +450,26 @@ describe('ContentQualityValidator', () => {
       const result = await (validator as any).checkBrandVoice(mockArticle);
 
       expect(result).toMatchObject({
-        category: 'brand_voice',
+        category: "brand_voice",
         score: 85,
         passed: true,
         issues: expect.any(Array),
         checkedAt: expect.any(Date),
-        checker: 'ai',
+        checker: "ai",
       });
 
       expect(mockOpenAI.chat.completions.create).toHaveBeenCalledWith(
         expect.objectContaining({
           messages: expect.arrayContaining([
             expect.objectContaining({
-              content: expect.stringContaining('Terry/Joel Golby brand voice'),
+              content: expect.stringContaining("Terry/Joel Golby brand voice"),
             }),
           ]),
-        })
+        }),
       );
     });
 
-    it('should use higher of AI score and article Terry score', async () => {
+    it("should use higher of AI score and article Terry score", async () => {
       const lowBrandResponse = { ...mockBrandVoiceResponse, score: 60 };
 
       mockOpenAI.chat.completions.create.mockResolvedValue({
@@ -420,8 +483,8 @@ describe('ContentQualityValidator', () => {
     });
   });
 
-  describe('content safety checking', () => {
-    it('should perform pattern-based and AI safety checks', async () => {
+  describe("content safety checking", () => {
+    it("should perform pattern-based and AI safety checks", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
         choices: [{ message: { content: JSON.stringify(mockSafetyResponse) } }],
       } as any);
@@ -429,16 +492,16 @@ describe('ContentQualityValidator', () => {
       const result = await (validator as any).checkContentSafety(mockArticle);
 
       expect(result).toMatchObject({
-        category: 'content_safety',
+        category: "content_safety",
         score: expect.any(Number),
         passed: true,
         issues: expect.any(Array),
         checkedAt: expect.any(Date),
-        checker: 'ai',
+        checker: "ai",
       });
     });
 
-    it('should detect safety patterns in content', async () => {
+    it("should detect safety patterns in content", async () => {
       const unsafeArticle = {
         ...mockArticle,
         content: {
@@ -447,7 +510,7 @@ describe('ContentQualityValidator', () => {
             {
               ...mockArticle.content.sections[0],
               content:
-                'This is some content with profanity shit and inappropriate language.',
+                "This is some content with profanity shit and inappropriate language.",
             },
           ],
         },
@@ -461,12 +524,12 @@ describe('ContentQualityValidator', () => {
 
       expect(
         result.issues.some(
-          (issue) => issue.description === 'Profanity detected'
-        )
+          (issue) => issue.description === "Profanity detected",
+        ),
       ).toBe(true);
     });
 
-    it('should handle discriminatory language detection', async () => {
+    it("should handle discriminatory language detection", async () => {
       const discriminatoryArticle = {
         ...mockArticle,
         content: {
@@ -475,7 +538,7 @@ describe('ContentQualityValidator', () => {
             {
               ...mockArticle.content.sections[0],
               content:
-                'This content contains racist language that should be flagged.',
+                "This content contains racist language that should be flagged.",
             },
           ],
         },
@@ -486,22 +549,22 @@ describe('ContentQualityValidator', () => {
       } as any);
 
       const result = await (validator as any).checkContentSafety(
-        discriminatoryArticle
+        discriminatoryArticle,
       );
 
       expect(
         result.issues.some(
-          (issue) => issue.description === 'Discriminatory language'
-        )
+          (issue) => issue.description === "Discriminatory language",
+        ),
       ).toBe(true);
-      expect(result.issues.some((issue) => issue.severity === 'critical')).toBe(
-        true
+      expect(result.issues.some((issue) => issue.severity === "critical")).toBe(
+        true,
       );
     });
   });
 
-  describe('legal compliance checking', () => {
-    it('should check for legal compliance issues', async () => {
+  describe("legal compliance checking", () => {
+    it("should check for legal compliance issues", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
         choices: [{ message: { content: JSON.stringify(mockLegalResponse) } }],
       } as any);
@@ -509,26 +572,26 @@ describe('ContentQualityValidator', () => {
       const result = await (validator as any).checkLegalCompliance(mockArticle);
 
       expect(result).toMatchObject({
-        category: 'legal_compliance',
+        category: "legal_compliance",
         score: 92,
         passed: true,
         issues: expect.any(Array),
         checkedAt: expect.any(Date),
-        checker: 'ai',
+        checker: "ai",
       });
 
       expect(mockOpenAI.chat.completions.create).toHaveBeenCalledWith(
         expect.objectContaining({
           messages: expect.arrayContaining([
             expect.objectContaining({
-              content: expect.stringContaining('legal compliance'),
+              content: expect.stringContaining("legal compliance"),
             }),
           ]),
-        })
+        }),
       );
     });
 
-    it('should fail for low legal compliance scores', async () => {
+    it("should fail for low legal compliance scores", async () => {
       const lowLegalResponse = { ...mockLegalResponse, score: 75 };
 
       mockOpenAI.chat.completions.create.mockResolvedValue({
@@ -542,23 +605,23 @@ describe('ContentQualityValidator', () => {
     });
   });
 
-  describe('editorial quality checking', () => {
-    it('should check editorial quality automatically', async () => {
+  describe("editorial quality checking", () => {
+    it("should check editorial quality automatically", async () => {
       const result = await (validator as any).checkEditorialQuality(
-        mockArticle
+        mockArticle,
       );
 
       expect(result).toMatchObject({
-        category: 'editorial_quality',
+        category: "editorial_quality",
         score: expect.any(Number),
         passed: expect.any(Boolean),
         issues: expect.any(Array),
         checkedAt: expect.any(Date),
-        checker: 'automated',
+        checker: "automated",
       });
     });
 
-    it('should flag articles that are too short', async () => {
+    it("should flag articles that are too short", async () => {
       const shortArticle = {
         ...mockArticle,
         content: {
@@ -567,22 +630,22 @@ describe('ContentQualityValidator', () => {
           sections: [
             {
               ...mockArticle.content.sections[0],
-              content: 'Very short content.',
+              content: "Very short content.",
             },
           ],
         },
       };
 
       const result = await (validator as any).checkEditorialQuality(
-        shortArticle
+        shortArticle,
       );
 
       expect(
-        result.issues.some((issue) => issue.description.includes('too short'))
+        result.issues.some((issue) => issue.description.includes("too short")),
       ).toBe(true);
     });
 
-    it('should flag articles that are too long', async () => {
+    it("should flag articles that are too long", async () => {
       const longArticle = {
         ...mockArticle,
         content: {
@@ -592,55 +655,55 @@ describe('ContentQualityValidator', () => {
       };
 
       const result = await (validator as any).checkEditorialQuality(
-        longArticle
+        longArticle,
       );
 
       expect(
-        result.issues.some((issue) => issue.description.includes('too long'))
+        result.issues.some((issue) => issue.description.includes("too long")),
       ).toBe(true);
     });
 
-    it('should check section balance', async () => {
+    it("should check section balance", async () => {
       const imbalancedArticle = {
         ...mockArticle,
         content: {
           ...mockArticle.content,
           sections: [
-            { ...mockArticle.content.sections[0], content: 'Short.' },
+            { ...mockArticle.content.sections[0], content: "Short." },
             {
               ...mockArticle.content.sections[1],
               content:
-                'This is a much longer section with significantly more content than the previous one, creating an imbalance in the article structure.',
+                "This is a much longer section with significantly more content than the previous one, creating an imbalance in the article structure.",
             },
           ],
         },
       };
 
       const result = await (validator as any).checkEditorialQuality(
-        imbalancedArticle
+        imbalancedArticle,
       );
 
       expect(
-        result.issues.some((issue) => issue.description.includes('unbalanced'))
+        result.issues.some((issue) => issue.description.includes("unbalanced")),
       ).toBe(true);
     });
   });
 
-  describe('accessibility checking', () => {
-    it('should check accessibility automatically', async () => {
+  describe("accessibility checking", () => {
+    it("should check accessibility automatically", async () => {
       const result = await (validator as any).checkAccessibility(mockArticle);
 
       expect(result).toMatchObject({
-        category: 'accessibility',
+        category: "accessibility",
         score: expect.any(Number),
         passed: expect.any(Boolean),
         issues: expect.any(Array),
         checkedAt: expect.any(Date),
-        checker: 'automated',
+        checker: "automated",
       });
     });
 
-    it('should flag long sentences for readability', async () => {
+    it("should flag long sentences for readability", async () => {
       const longSentenceArticle = {
         ...mockArticle,
         content: {
@@ -649,24 +712,24 @@ describe('ContentQualityValidator', () => {
             {
               ...mockArticle.content.sections[0],
               content:
-                'This is an extremely long sentence that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and continues to go on without any breaks or pauses which makes it very difficult to read and understand for users who may have accessibility needs.',
+                "This is an extremely long sentence that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and continues to go on without any breaks or pauses which makes it very difficult to read and understand for users who may have accessibility needs.",
             },
           ],
         },
       };
 
       const result = await (validator as any).checkAccessibility(
-        longSentenceArticle
+        longSentenceArticle,
       );
 
       expect(
         result.issues.some((issue) =>
-          issue.description.includes('too long for accessibility')
-        )
+          issue.description.includes("too long for accessibility"),
+        ),
       ).toBe(true);
     });
 
-    it('should suggest better section structure', async () => {
+    it("should suggest better section structure", async () => {
       const poorStructureArticle = {
         ...mockArticle,
         content: {
@@ -679,26 +742,26 @@ describe('ContentQualityValidator', () => {
       };
 
       const result = await (validator as any).checkAccessibility(
-        poorStructureArticle
+        poorStructureArticle,
       );
 
       expect(
         result.issues.some((issue) =>
-          issue.description.includes('section structure')
-        )
+          issue.description.includes("section structure"),
+        ),
       ).toBe(true);
     });
   });
 
-  describe('quality scoring', () => {
-    it('should calculate weighted overall score', () => {
+  describe("quality scoring", () => {
+    it("should calculate weighted overall score", () => {
       const checks = [
-        { category: 'factual_accuracy' as const, score: 90 },
-        { category: 'brand_voice' as const, score: 85 },
-        { category: 'content_safety' as const, score: 95 },
-        { category: 'legal_compliance' as const, score: 88 },
-        { category: 'editorial_quality' as const, score: 80 },
-        { category: 'accessibility' as const, score: 85 },
+        { category: "factual_accuracy" as const, score: 90 },
+        { category: "brand_voice" as const, score: 85 },
+        { category: "content_safety" as const, score: 95 },
+        { category: "legal_compliance" as const, score: 88 },
+        { category: "editorial_quality" as const, score: 80 },
+        { category: "accessibility" as const, score: 85 },
       ];
 
       const overallScore = (validator as any).calculateOverallScore(checks);
@@ -707,47 +770,47 @@ describe('ContentQualityValidator', () => {
       expect(overallScore).toBeLessThanOrEqual(100);
     });
 
-    it('should weight factual accuracy and safety most heavily', () => {
+    it("should weight factual accuracy and safety most heavily", () => {
       const highFactualSafety = [
-        { category: 'factual_accuracy' as const, score: 100 },
-        { category: 'content_safety' as const, score: 100 },
-        { category: 'brand_voice' as const, score: 50 },
-        { category: 'legal_compliance' as const, score: 50 },
-        { category: 'editorial_quality' as const, score: 50 },
-        { category: 'accessibility' as const, score: 50 },
+        { category: "factual_accuracy" as const, score: 100 },
+        { category: "content_safety" as const, score: 100 },
+        { category: "brand_voice" as const, score: 50 },
+        { category: "legal_compliance" as const, score: 50 },
+        { category: "editorial_quality" as const, score: 50 },
+        { category: "accessibility" as const, score: 50 },
       ];
 
       const lowFactualSafety = [
-        { category: 'factual_accuracy' as const, score: 50 },
-        { category: 'content_safety' as const, score: 50 },
-        { category: 'brand_voice' as const, score: 100 },
-        { category: 'legal_compliance' as const, score: 100 },
-        { category: 'editorial_quality' as const, score: 100 },
-        { category: 'accessibility' as const, score: 100 },
+        { category: "factual_accuracy" as const, score: 50 },
+        { category: "content_safety" as const, score: 50 },
+        { category: "brand_voice" as const, score: 100 },
+        { category: "legal_compliance" as const, score: 100 },
+        { category: "editorial_quality" as const, score: 100 },
+        { category: "accessibility" as const, score: 100 },
       ];
 
       const highScore = (validator as any).calculateOverallScore(
-        highFactualSafety
+        highFactualSafety,
       );
       const lowScore = (validator as any).calculateOverallScore(
-        lowFactualSafety
+        lowFactualSafety,
       );
 
       expect(highScore).toBeGreaterThan(lowScore);
     });
   });
 
-  describe('pass/fail determination', () => {
-    it('should fail content with critical issues', () => {
+  describe("pass/fail determination", () => {
+    it("should fail content with critical issues", () => {
       const checks = [
         {
-          category: 'content_safety' as const,
+          category: "content_safety" as const,
           passed: true,
           issues: [
             {
-              severity: 'critical',
-              type: 'safety',
-              description: 'Critical issue',
+              severity: "critical",
+              type: "safety",
+              description: "Critical issue",
             },
           ],
         },
@@ -758,9 +821,9 @@ describe('ContentQualityValidator', () => {
       expect(passed).toBe(false);
     });
 
-    it('should fail content below score threshold', () => {
+    it("should fail content below score threshold", () => {
       const checks = [
-        { category: 'factual_accuracy' as const, passed: true, issues: [] },
+        { category: "factual_accuracy" as const, passed: true, issues: [] },
       ];
 
       const passed = (validator as any).determinePassStatus(checks, 60);
@@ -768,13 +831,13 @@ describe('ContentQualityValidator', () => {
       expect(passed).toBe(false);
     });
 
-    it('should pass high-quality content without critical issues', () => {
+    it("should pass high-quality content without critical issues", () => {
       const checks = [
         {
-          category: 'factual_accuracy' as const,
+          category: "factual_accuracy" as const,
           passed: true,
           issues: [
-            { severity: 'low', type: 'minor', description: 'Minor issue' },
+            { severity: "low", type: "minor", description: "Minor issue" },
           ],
         },
       ];
@@ -785,13 +848,13 @@ describe('ContentQualityValidator', () => {
     });
   });
 
-  describe('human review requirements', () => {
-    it('should require review for critical issues', () => {
+  describe("human review requirements", () => {
+    it("should require review for critical issues", () => {
       const checks = [
         {
-          category: 'legal_compliance' as const,
+          category: "legal_compliance" as const,
           issues: [
-            { severity: 'critical', type: 'legal', description: 'Legal risk' },
+            { severity: "critical", type: "legal", description: "Legal risk" },
           ],
         },
       ];
@@ -801,16 +864,16 @@ describe('ContentQualityValidator', () => {
       expect(requiresReview).toBe(true);
     });
 
-    it('should require review for scores below threshold', () => {
-      const checks = [{ category: 'factual_accuracy' as const, issues: [] }];
+    it("should require review for scores below threshold", () => {
+      const checks = [{ category: "factual_accuracy" as const, issues: [] }];
 
       const requiresReview = (validator as any).requiresHumanReview(checks, 75);
 
       expect(requiresReview).toBe(true);
     });
 
-    it('should not require review for high-quality content', () => {
-      const checks = [{ category: 'factual_accuracy' as const, issues: [] }];
+    it("should not require review for high-quality content", () => {
+      const checks = [{ category: "factual_accuracy" as const, issues: [] }];
 
       const requiresReview = (validator as any).requiresHumanReview(checks, 90);
 
@@ -818,48 +881,48 @@ describe('ContentQualityValidator', () => {
     });
   });
 
-  describe('issue categorization', () => {
-    it('should categorize critical and high issues as blockers', () => {
+  describe("issue categorization", () => {
+    it("should categorize critical and high issues as blockers", () => {
       const checks = [
         {
-          category: 'content_safety' as const,
+          category: "content_safety" as const,
           issues: [
             {
-              severity: 'critical',
-              type: 'safety',
-              description: 'Critical safety issue',
+              severity: "critical",
+              type: "safety",
+              description: "Critical safety issue",
             },
             {
-              severity: 'high',
-              type: 'quality',
-              description: 'High priority issue',
+              severity: "high",
+              type: "quality",
+              description: "High priority issue",
             },
-            { severity: 'medium', type: 'style', description: 'Medium issue' },
+            { severity: "medium", type: "style", description: "Medium issue" },
             {
-              severity: 'low',
-              type: 'minor',
-              description: 'Low priority issue',
+              severity: "low",
+              type: "minor",
+              description: "Low priority issue",
             },
           ],
         },
       ];
 
       const { blockers, warnings } = (validator as any).categorizeIssues(
-        checks
+        checks,
       );
 
       expect(blockers).toHaveLength(2);
       expect(warnings).toHaveLength(2);
-      expect(blockers[0]).toContain('Critical safety issue');
-      expect(blockers[1]).toContain('High priority issue');
+      expect(blockers[0]).toContain("Critical safety issue");
+      expect(blockers[1]).toContain("High priority issue");
     });
   });
 
-  describe('recommendations generation', () => {
-    it('should generate recommendations for failed checks', () => {
+  describe("recommendations generation", () => {
+    it("should generate recommendations for failed checks", () => {
       const checks = [
         {
-          category: 'brand_voice' as const,
+          category: "brand_voice" as const,
           passed: false,
           score: 60,
         },
@@ -867,16 +930,16 @@ describe('ContentQualityValidator', () => {
 
       const recommendations = (validator as any).generateRecommendations(
         checks,
-        mockArticle
+        mockArticle,
       );
 
-      expect(recommendations.some((r) => r.type === 'fix_required')).toBe(true);
+      expect(recommendations.some((r) => r.type === "fix_required")).toBe(true);
       expect(
-        recommendations.some((r) => r.description.includes('brand voice'))
+        recommendations.some((r) => r.description.includes("brand voice")),
       ).toBe(true);
     });
 
-    it('should recommend Terry voice improvements', () => {
+    it("should recommend Terry voice improvements", () => {
       const lowTerryArticle = {
         ...mockArticle,
         content: {
@@ -887,15 +950,15 @@ describe('ContentQualityValidator', () => {
 
       const recommendations = (validator as any).generateRecommendations(
         [],
-        lowTerryArticle
+        lowTerryArticle,
       );
 
       expect(
-        recommendations.some((r) => r.description.includes('Terry voice'))
+        recommendations.some((r) => r.description.includes("Terry voice")),
       ).toBe(true);
     });
 
-    it('should suggest quality improvements for low-scoring articles', () => {
+    it("should suggest quality improvements for low-scoring articles", () => {
       const lowQualityArticle = {
         ...mockArticle,
         qualityScore: 70,
@@ -903,26 +966,26 @@ describe('ContentQualityValidator', () => {
 
       const recommendations = (validator as any).generateRecommendations(
         [],
-        lowQualityArticle
+        lowQualityArticle,
       );
 
       expect(
-        recommendations.some((r) => r.description.includes('quality'))
+        recommendations.some((r) => r.description.includes("quality")),
       ).toBe(true);
     });
   });
 
-  describe('sentence analysis', () => {
-    it('should calculate average words per sentence', () => {
+  describe("sentence analysis", () => {
+    it("should calculate average words per sentence", () => {
       const avgWords = (validator as any).calculateAverageWordsPerSentence(
-        mockArticle
+        mockArticle,
       );
 
       expect(avgWords).toBeGreaterThan(0);
       expect(avgWords).toBeLessThan(50); // Reasonable upper bound
     });
 
-    it('should handle content with no sentences', () => {
+    it("should handle content with no sentences", () => {
       const noSentenceArticle = {
         ...mockArticle,
         content: {
@@ -930,24 +993,24 @@ describe('ContentQualityValidator', () => {
           sections: [
             {
               ...mockArticle.content.sections[0],
-              content: '',
+              content: "",
             },
           ],
         },
       };
 
       const avgWords = (validator as any).calculateAverageWordsPerSentence(
-        noSentenceArticle
+        noSentenceArticle,
       );
 
       expect(avgWords).toBe(0);
     });
   });
 
-  describe('configuration validation', () => {
-    it('should validate API configuration successfully', async () => {
+  describe("configuration validation", () => {
+    it("should validate API configuration successfully", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
-        choices: [{ message: { content: 'Test response' } }],
+        choices: [{ message: { content: "Test response" } }],
       } as any);
 
       const result = await validator.validateConfiguration();
@@ -956,20 +1019,20 @@ describe('ContentQualityValidator', () => {
       expect(result.error).toBeUndefined();
     });
 
-    it('should handle API configuration errors', async () => {
+    it("should handle API configuration errors", async () => {
       mockOpenAI.chat.completions.create.mockRejectedValue(
-        new Error('Invalid API key')
+        new Error("Invalid API key"),
       );
 
       const result = await validator.validateConfiguration();
 
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('Terry-enhanced');
+      expect(result.error).toContain("Terry-enhanced");
     });
   });
 
-  describe('edge cases and error handling', () => {
-    it('should handle empty article content', async () => {
+  describe("edge cases and error handling", () => {
+    it("should handle empty article content", async () => {
       const emptyArticle = {
         ...mockArticle,
         content: {
@@ -991,15 +1054,15 @@ describe('ContentQualityValidator', () => {
       expect(result.passed).toBe(false);
     });
 
-    it('should handle malformed AI responses', async () => {
+    it("should handle malformed AI responses", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
-        choices: [{ message: { content: 'invalid json' } }],
+        choices: [{ message: { content: "invalid json" } }],
       } as any);
 
       await expect(validator.validateContent(mockArticle)).rejects.toThrow();
     });
 
-    it('should handle null AI responses', async () => {
+    it("should handle null AI responses", async () => {
       mockOpenAI.chat.completions.create.mockResolvedValue({
         choices: [{ message: { content: null } }],
       } as any);
@@ -1007,9 +1070,9 @@ describe('ContentQualityValidator', () => {
       await expect(validator.validateContent(mockArticle)).rejects.toThrow();
     });
 
-    it('should handle strict mode configuration', async () => {
+    it("should handle strict mode configuration", async () => {
       const strictValidator = new ContentQualityValidator({
-        openaiApiKey: 'test-key',
+        openaiApiKey: "test-key",
         strictMode: true,
       });
 

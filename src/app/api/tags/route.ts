@@ -3,10 +3,10 @@
  * Handles tag operations and popular tag retrieval
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { TagType, League } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { TagType, League } from "@prisma/client";
 
 // Validation schemas
 const CreateTagSchema = z.object({
@@ -27,12 +27,12 @@ export async function GET(request: NextRequest) {
     const searchParams = url.searchParams;
 
     // Parse query parameters
-    const type = searchParams.get('type') as TagType | null;
-    const league = searchParams.get('league') as League | null;
-    const popular = searchParams.get('popular') === 'true';
-    const search = searchParams.get('search');
-    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 200);
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const type = searchParams.get("type") as TagType | null;
+    const league = searchParams.get("league") as League | null;
+    const popular = searchParams.get("popular") === "true";
+    const search = searchParams.get("search");
+    const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 200);
+    const offset = parseInt(searchParams.get("offset") || "0");
 
     // Build where clause
     const where: any = {};
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: "insensitive" } },
         { normalizedName: { contains: search.toLowerCase() } },
       ];
     }
@@ -67,8 +67,8 @@ export async function GET(request: NextRequest) {
         },
       },
       orderBy: popular
-        ? [{ usageCount: 'desc' }, { lastUsedAt: 'desc' }]
-        : [{ name: 'asc' }],
+        ? [{ usageCount: "desc" }, { lastUsedAt: "desc" }]
+        : [{ name: "asc" }],
       take: limit,
       skip: offset,
     });
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     // Get popular tags by type if no specific filter
     const popularByType: Record<string, any> = {};
     if (!type && !search) {
-      const tagTypes: TagType[] = ['CLUB', 'PLAYER', 'SOURCE'];
+      const tagTypes: TagType[] = ["CLUB", "PLAYER", "SOURCE"];
 
       for (const tagType of tagTypes) {
         const popularTags = await prisma.tag.findMany({
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
             isPopular: true,
           },
           orderBy: {
-            usageCount: 'desc',
+            usageCount: "desc",
           },
           take: 10,
           select: {
@@ -134,15 +134,15 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Failed to fetch tags:', error);
+    console.error("Failed to fetch tags:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to fetch tags',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to fetch tags",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
     const validatedData = CreateTagSchema.parse(body);
 
     // Normalize name for matching
-    const normalizedName = validatedData.name.toLowerCase().replace(/\s+/g, '');
+    const normalizedName = validatedData.name.toLowerCase().replace(/\s+/g, "");
 
     // Check if tag already exists
     const existing = await prisma.tag.findFirst({
@@ -170,10 +170,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Tag already exists',
+          error: "Tag already exists",
           data: existing,
         },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -195,31 +195,31 @@ export async function POST(request: NextRequest) {
           ...tag,
           transferValue: tag.transferValue ? Number(tag.transferValue) : null,
         },
-        message: 'Tag created successfully',
+        message: "Tag created successfully",
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid input data',
+          error: "Invalid input data",
           details: error.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    console.error('Failed to create tag:', error);
+    console.error("Failed to create tag:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to create tag',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to create tag",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -234,9 +234,9 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Tag ID is required',
+          error: "Tag ID is required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -271,7 +271,7 @@ export async function PUT(request: NextRequest) {
           ...(validatedData.name && {
             normalizedName: validatedData.name
               .toLowerCase()
-              .replace(/\s+/g, ''),
+              .replace(/\s+/g, ""),
           }),
           ...(validatedData.transferValue !== undefined && {
             transferValue: validatedData.transferValue
@@ -290,29 +290,29 @@ export async function PUT(request: NextRequest) {
           ? Number(updatedTag.transferValue)
           : null,
       },
-      message: 'Tag updated successfully',
+      message: "Tag updated successfully",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid update data',
+          error: "Invalid update data",
           details: error.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    console.error('Failed to update tag:', error);
+    console.error("Failed to update tag:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to update tag',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to update tag",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -321,15 +321,15 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const id = url.searchParams.get('id');
+    const id = url.searchParams.get("id");
 
     if (!id) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Tag ID is required',
+          error: "Tag ID is required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -342,10 +342,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Cannot delete tag that is in use',
+          error: "Cannot delete tag that is in use",
           details: `Tag is used by ${usageCount} feed items`,
         },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -356,18 +356,18 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Tag deleted successfully',
+      message: "Tag deleted successfully",
     });
   } catch (error) {
-    console.error('Failed to delete tag:', error);
+    console.error("Failed to delete tag:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to delete tag',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to delete tag",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

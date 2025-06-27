@@ -8,17 +8,17 @@ import {
   TwitterUser,
   TwitterTweet,
   TwitterTimelineResponse,
-} from './client';
-import { applyTerryStyle } from '@/lib/terry-style';
-import { prisma } from '@/lib/prisma';
-import { transferKeywordClassifier } from './transfer-classifier';
-import type { TransferType, Priority } from '@prisma/client';
+} from "./client";
+import { applyTerryStyle } from "@/lib/terry-style";
+import { prisma } from "@/lib/prisma";
+import { transferKeywordClassifier } from "./transfer-classifier";
+import type { TransferType, Priority } from "@prisma/client";
 
 // ITK Account Configuration
 export interface ITKAccount {
   username: string;
   displayName: string;
-  tier: 'tier1' | 'tier2' | 'tier3'; // Reliability tier
+  tier: "tier1" | "tier2" | "tier3"; // Reliability tier
   specialties: string[]; // Areas of expertise (e.g., ['Arsenal', 'Premier League'])
   averageDelay: number; // Minutes between breaking news and tweet
   reliabilityScore: number; // 0-1 reliability rating
@@ -27,82 +27,82 @@ export interface ITKAccount {
 // The holy grail of transfer accounts
 export const ITK_ACCOUNTS: ITKAccount[] = [
   {
-    username: 'FabrizioRomano',
-    displayName: 'Fabrizio Romano',
-    tier: 'tier1',
-    specialties: ['Global', 'Serie A', 'Premier League'],
+    username: "FabrizioRomano",
+    displayName: "Fabrizio Romano",
+    tier: "tier1",
+    specialties: ["Global", "Serie A", "Premier League"],
     averageDelay: 15,
     reliabilityScore: 0.95,
   },
   {
-    username: 'David_Ornstein',
-    displayName: 'David Ornstein',
-    tier: 'tier1',
-    specialties: ['Arsenal', 'Premier League', 'England'],
+    username: "David_Ornstein",
+    displayName: "David Ornstein",
+    tier: "tier1",
+    specialties: ["Arsenal", "Premier League", "England"],
     averageDelay: 30,
     reliabilityScore: 0.98,
   },
   {
-    username: 'JamesOlley',
-    displayName: 'James Olley',
-    tier: 'tier1',
-    specialties: ['Arsenal', 'Chelsea', 'London clubs'],
+    username: "JamesOlley",
+    displayName: "James Olley",
+    tier: "tier1",
+    specialties: ["Arsenal", "Chelsea", "London clubs"],
     averageDelay: 45,
     reliabilityScore: 0.92,
   },
   {
-    username: 'SkySports_Keith',
-    displayName: 'Keith Downie',
-    tier: 'tier2',
-    specialties: ['Newcastle', 'North East', 'Premier League'],
+    username: "SkySports_Keith",
+    displayName: "Keith Downie",
+    tier: "tier2",
+    specialties: ["Newcastle", "North East", "Premier League"],
     averageDelay: 20,
     reliabilityScore: 0.88,
   },
   {
-    username: 'JPercyTelegraph',
-    displayName: 'John Percy',
-    tier: 'tier2',
-    specialties: ['Leicester', 'Championship', 'Midlands'],
+    username: "JPercyTelegraph",
+    displayName: "John Percy",
+    tier: "tier2",
+    specialties: ["Leicester", "Championship", "Midlands"],
     averageDelay: 35,
     reliabilityScore: 0.89,
   },
   {
-    username: 'City_Xtra',
-    displayName: 'City Xtra',
-    tier: 'tier2',
-    specialties: ['Manchester City', 'Premier League'],
+    username: "City_Xtra",
+    displayName: "City Xtra",
+    tier: "tier2",
+    specialties: ["Manchester City", "Premier League"],
     averageDelay: 10,
     reliabilityScore: 0.83,
   },
   {
-    username: 'lequipe',
+    username: "lequipe",
     displayName: "L'Équipe",
-    tier: 'tier2',
-    specialties: ['Ligue 1', 'French football', 'PSG'],
+    tier: "tier2",
+    specialties: ["Ligue 1", "French football", "PSG"],
     averageDelay: 25,
     reliabilityScore: 0.85,
   },
   {
-    username: 'DiMarzio',
-    displayName: 'Gianluca Di Marzio',
-    tier: 'tier2',
-    specialties: ['Serie A', 'Italian football', 'Juventus'],
+    username: "DiMarzio",
+    displayName: "Gianluca Di Marzio",
+    tier: "tier2",
+    specialties: ["Serie A", "Italian football", "Juventus"],
     averageDelay: 20,
     reliabilityScore: 0.87,
   },
   {
-    username: 'marca',
-    displayName: 'MARCA',
-    tier: 'tier3',
-    specialties: ['La Liga', 'Real Madrid', 'Spanish football'],
+    username: "marca",
+    displayName: "MARCA",
+    tier: "tier3",
+    specialties: ["La Liga", "Real Madrid", "Spanish football"],
     averageDelay: 15,
     reliabilityScore: 0.75,
   },
   {
-    username: 'mundodeportivo',
-    displayName: 'Mundo Deportivo',
-    tier: 'tier3',
-    specialties: ['La Liga', 'Barcelona', 'Spanish football'],
+    username: "mundodeportivo",
+    displayName: "Mundo Deportivo",
+    tier: "tier3",
+    specialties: ["La Liga", "Barcelona", "Spanish football"],
     averageDelay: 20,
     reliabilityScore: 0.72,
   },
@@ -146,8 +146,8 @@ export class ITKMonitor {
   async initialize(): Promise<void> {
     console.log(
       applyTerryStyle.enhanceMessage(
-        'Initializing ITK monitoring - preparing for the chaos'
-      )
+        "Initializing ITK monitoring - preparing for the chaos",
+      ),
     );
 
     const errors: string[] = [];
@@ -155,7 +155,7 @@ export class ITKMonitor {
     for (const account of ITK_ACCOUNTS) {
       try {
         const user = await this.twitterClient.getUserByUsername(
-          account.username
+          account.username,
         );
         this.userCache.set(account.username, user);
 
@@ -171,11 +171,11 @@ export class ITKMonitor {
 
         console.log(
           applyTerryStyle.enhanceMessage(
-            `Cached user info for @${account.username} (${user.public_metrics.followers_count.toLocaleString()} followers)`
-          )
+            `Cached user info for @${account.username} (${user.public_metrics.followers_count.toLocaleString()} followers)`,
+          ),
         );
       } catch (error) {
-        const errorMsg = `Failed to cache @${account.username}: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        const errorMsg = `Failed to cache @${account.username}: ${error instanceof Error ? error.message : "Unknown error"}`;
         errors.push(errorMsg);
         console.error(applyTerryStyle.enhanceError(errorMsg));
       }
@@ -184,15 +184,15 @@ export class ITKMonitor {
     if (errors.length > 0) {
       throw new Error(
         applyTerryStyle.enhanceError(
-          `Failed to initialize ${errors.length} ITK accounts: ${errors.join(', ')}`
-        )
+          `Failed to initialize ${errors.length} ITK accounts: ${errors.join(", ")}`,
+        ),
       );
     }
 
     console.log(
       applyTerryStyle.enhanceMessage(
-        `Successfully initialized monitoring for ${ITK_ACCOUNTS.length} ITK accounts`
-      )
+        `Successfully initialized monitoring for ${ITK_ACCOUNTS.length} ITK accounts`,
+      ),
     );
   }
 
@@ -201,7 +201,7 @@ export class ITKMonitor {
    */
   async monitorAllAccounts(): Promise<TweetProcessingResult[]> {
     console.log(
-      applyTerryStyle.enhanceMessage('Starting ITK monitoring sweep')
+      applyTerryStyle.enhanceMessage("Starting ITK monitoring sweep"),
     );
 
     const allResults: TweetProcessingResult[] = [];
@@ -215,10 +215,10 @@ export class ITKMonitor {
         this.updateStats(
           account.username,
           results.length,
-          results.filter((r) => r.isTransferRelated).length
+          results.filter((r) => r.isTransferRelated).length,
         );
       } catch (error) {
-        const errorMsg = `Failed to monitor @${account.username}: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        const errorMsg = `Failed to monitor @${account.username}: ${error instanceof Error ? error.message : "Unknown error"}`;
         errors.push(errorMsg);
         console.error(applyTerryStyle.enhanceError(errorMsg));
 
@@ -232,15 +232,15 @@ export class ITKMonitor {
     if (errors.length > 0) {
       console.warn(
         applyTerryStyle.enhanceMessage(
-          `Completed monitoring with ${errors.length} errors: ${errors.join(', ')}`
-        )
+          `Completed monitoring with ${errors.length} errors: ${errors.join(", ")}`,
+        ),
       );
     }
 
     console.log(
       applyTerryStyle.enhanceMessage(
-        `Monitoring complete: ${allResults.length} tweets processed, ${allResults.filter((r) => r.isTransferRelated).length} transfer-relevant`
-      )
+        `Monitoring complete: ${allResults.length} tweets processed, ${allResults.filter((r) => r.isTransferRelated).length} transfer-relevant`,
+      ),
     );
 
     return allResults;
@@ -253,7 +253,7 @@ export class ITKMonitor {
     const user = this.userCache.get(account.username);
     if (!user) {
       throw new Error(
-        `User @${account.username} not cached. Call initialize() first.`
+        `User @${account.username} not cached. Call initialize() first.`,
       );
     }
 
@@ -262,6 +262,7 @@ export class ITKMonitor {
     const response = await this.twitterClient.getUserTimeline(user.id, {
       maxResults: 50, // Reasonable batch size
       sinceId,
+      username: account.username, // For Apify fallback
     });
 
     if (!response.data || response.data.length === 0) {
@@ -285,8 +286,8 @@ export class ITKMonitor {
       } catch (error) {
         console.error(
           applyTerryStyle.enhanceError(
-            `Failed to process tweet ${tweet.id}: ${error instanceof Error ? error.message : 'Unknown error'}`
-          )
+            `Failed to process tweet ${tweet.id}: ${error instanceof Error ? error.message : "Unknown error"}`,
+          ),
         );
       }
     }
@@ -300,7 +301,7 @@ export class ITKMonitor {
   private async processTweet(
     tweet: TwitterTweet,
     user: TwitterUser,
-    account: ITKAccount
+    account: ITKAccount,
   ): Promise<TweetProcessingResult> {
     // Classify tweet for transfer relevance
     const classification = await transferKeywordClassifier.classifyTweet({
@@ -315,12 +316,12 @@ export class ITKMonitor {
       tweet,
       user,
       account,
-      classification
+      classification,
     );
 
     // Extract entities (players, clubs, etc.)
     const entities = await transferKeywordClassifier.extractEntities(
-      tweet.text
+      tweet.text,
     );
 
     // Calculate overall relevance score
@@ -328,7 +329,7 @@ export class ITKMonitor {
       classification,
       account,
       tweet.public_metrics,
-      entities
+      entities,
     );
 
     return {
@@ -352,41 +353,41 @@ export class ITKMonitor {
     tweet: TwitterTweet,
     user: TwitterUser,
     account: ITKAccount,
-    classification: any
+    classification: any,
   ): Priority {
     let score = 0;
 
     // Account tier influence
     switch (account.tier) {
-      case 'tier1':
+      case "tier1":
         score += 40;
         break;
-      case 'tier2':
+      case "tier2":
         score += 25;
         break;
-      case 'tier3':
+      case "tier3":
         score += 10;
         break;
     }
 
     // Transfer type influence
     switch (classification.transferType) {
-      case 'OFFICIAL':
+      case "OFFICIAL":
         score += 30;
         break;
-      case 'CONFIRMED':
+      case "CONFIRMED":
         score += 25;
         break;
-      case 'MEDICAL':
+      case "MEDICAL":
         score += 20;
         break;
-      case 'ADVANCED':
+      case "ADVANCED":
         score += 15;
         break;
-      case 'TALKS':
+      case "TALKS":
         score += 10;
         break;
-      case 'RUMOUR':
+      case "RUMOUR":
         score += 5;
         break;
     }
@@ -405,10 +406,10 @@ export class ITKMonitor {
     score += account.reliabilityScore * 10;
 
     // Convert score to priority
-    if (score >= 80) return 'BREAKING';
-    if (score >= 60) return 'HIGH';
-    if (score >= 40) return 'MEDIUM';
-    return 'LOW';
+    if (score >= 80) return "BREAKING";
+    if (score >= 60) return "HIGH";
+    if (score >= 40) return "MEDIUM";
+    return "LOW";
   }
 
   /**
@@ -417,8 +418,8 @@ export class ITKMonitor {
   private calculateRelevanceScore(
     classification: any,
     account: ITKAccount,
-    metrics: TwitterTweet['public_metrics'],
-    entities: { players: string[]; clubs: string[] }
+    metrics: TwitterTweet["public_metrics"],
+    entities: { players: string[]; clubs: string[] },
   ): number {
     if (!classification.isTransferRelated) return 0;
 
@@ -430,7 +431,7 @@ export class ITKMonitor {
     // Engagement boost
     const engagementScore = Math.min(
       (metrics.retweet_count + metrics.like_count) / 1000,
-      0.1
+      0.1,
     );
     score += engagementScore;
 
@@ -445,7 +446,7 @@ export class ITKMonitor {
     // TODO: Implement database storage with FeedItem model
     // Temporarily disabled until FeedItem integration is complete
     return;
-    
+
     /* const {
       tweet,
       user,
@@ -539,7 +540,7 @@ export class ITKMonitor {
   private updateStats(
     username: string,
     totalTweets: number,
-    transferRelevant: number
+    transferRelevant: number,
   ): void {
     const stats = this.stats.get(username);
     if (stats) {
@@ -595,6 +596,6 @@ export class ITKMonitor {
 // Export singleton instance
 // Note: This requires TWITTER_BEARER_TOKEN to be set in environment variables
 const twitterClient = new TwitterClient({
-  bearerToken: process.env.TWITTER_BEARER_TOKEN || '',
+  bearerToken: process.env.TWITTER_BEARER_TOKEN || "",
 });
 export const itkMonitor = new ITKMonitor(twitterClient);

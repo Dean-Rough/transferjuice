@@ -22,7 +22,7 @@ import {
   type PartnerSource,
   getPartnerSourcesByCategory,
   formatAttribution,
-} from './partnerSources';
+} from "./partnerSources";
 
 export interface PartnerContent {
   id: string;
@@ -55,7 +55,7 @@ export interface ContentMixingResult {
 export const DEFAULT_MIXING_CONFIG: ContentMixingConfig = {
   maxPartnerContentPerHour: 4, // Max 4 partner articles per hour
   minTimeBetweenPartnerContent: 15, // Min 15 minutes between partner content
-  priorityCategories: ['analysis', 'news'], // Prefer analysis and news over entertainment
+  priorityCategories: ["analysis", "news"], // Prefer analysis and news over entertainment
   enableDuringBreakingNews: false, // Don't mix during breaking transfer news
   quietPeriodThreshold: 30, // Mix content if no ITK updates for 30+ minutes
 };
@@ -79,7 +79,7 @@ export class ContentMixer {
    */
   public shouldMixPartnerContent(
     recentFeedItems: FeedItem[],
-    currentTime: Date = new Date()
+    currentTime: Date = new Date(),
   ): ContentMixingResult {
     // Reset hourly counter if needed
     this.resetHourlyCounterIfNeeded(currentTime);
@@ -88,7 +88,7 @@ export class ContentMixer {
     if (this.hourlyPartnerCount >= this.config.maxPartnerContentPerHour) {
       return {
         shouldMixContent: false,
-        reason: 'Hourly partner content limit reached',
+        reason: "Hourly partner content limit reached",
         nextCheckIn: this.getMinutesToHourlyReset(),
       };
     }
@@ -114,15 +114,15 @@ export class ContentMixer {
     if (!this.config.enableDuringBreakingNews) {
       const hasRecentBreaking = recentFeedItems.some(
         (item) =>
-          item.type === 'breaking' &&
+          item.type === "breaking" &&
           currentTime.getTime() - new Date(item.timestamp).getTime() <
-            30 * 60 * 1000 // 30 min
+            30 * 60 * 1000, // 30 min
       );
 
       if (hasRecentBreaking) {
         return {
           shouldMixContent: false,
-          reason: 'Breaking transfer news in progress',
+          reason: "Breaking transfer news in progress",
           nextCheckIn: 10, // Check again in 10 minutes
         };
       }
@@ -147,7 +147,7 @@ export class ContentMixer {
     // All checks passed - we should mix content
     return {
       shouldMixContent: true,
-      reason: 'ITK quiet period detected - mixing partner content',
+      reason: "ITK quiet period detected - mixing partner content",
       nextCheckIn: this.config.minTimeBetweenPartnerContent,
     };
   }
@@ -157,49 +157,40 @@ export class ContentMixer {
    */
   public async getSuggestedContent(
     recentFeedItems: FeedItem[],
-    userPreferences?: string[]
+    userPreferences?: string[],
   ): Promise<PartnerContent | null> {
     try {
-      // In production, this would fetch from partner APIs/RSS feeds
-      // For now, return mock content based on categories
+      // Import RSS fetcher dynamically to avoid circular dependencies
+      const { rssFetcher } = await import("./rssFetcher");
 
-      const preferredCategories = userPreferences?.length
-        ? userPreferences
-        : this.config.priorityCategories;
+      // Extract recent topics for relevance matching
+      const recentTopics = {
+        clubs: this.getTrendingClubs(recentFeedItems),
+        players: this.getTrendingPlayers(recentFeedItems),
+      };
 
-      // Get sources from preferred categories
-      const candidateSources: PartnerSource[] = [];
-      for (const category of preferredCategories) {
-        const sources = getPartnerSourcesByCategory(category as any);
-        candidateSources.push(...sources);
-      }
+      // Determine tone based on time and context
+      const tone = this.determineToneForQuietPeriod(recentFeedItems);
 
-      if (candidateSources.length === 0) {
-        return null;
-      }
-
-      // Select a random high-credibility source
-      const highCredibilitySources = candidateSources.filter(
-        (s) => s.credibility >= 0.85
-      );
-      const selectedSource =
-        highCredibilitySources.length > 0
-          ? highCredibilitySources[
-              Math.floor(Math.random() * highCredibilitySources.length)
-            ]
-          : candidateSources[
-              Math.floor(Math.random() * candidateSources.length)
-            ];
-
-      // Generate contextual content based on recent feed activity
-      const content = this.generateContextualContent(
-        selectedSource,
-        recentFeedItems
+      // Try to get relevant content from RSS feeds
+      const partnerContent = await rssFetcher.getQuietPeriodContent(
+        recentTopics,
+        tone,
       );
 
-      return content;
+      if (partnerContent) {
+        // Add Terry's introduction
+        const terryIntro = rssFetcher.generateTerryIntro(partnerContent);
+        partnerContent.content = `${terryIntro}\n\n${partnerContent.content}`;
+
+        return partnerContent;
+      }
+
+      // Fallback to mock content if RSS fails
+      console.warn("RSS fetching failed, falling back to mock content");
+      return this.generateMockContent(recentFeedItems);
     } catch (error) {
-      console.error('Failed to get suggested partner content:', error);
+      console.error("Failed to get suggested partner content:", error);
       return null;
     }
   }
@@ -209,11 +200,11 @@ export class ContentMixer {
    */
   public convertPartnerContentToFeedItem(
     partnerContent: PartnerContent,
-    withTerryCommentary: boolean = false
+    withTerryCommentary: boolean = false,
   ): FeedItem {
     const feedItem: FeedItem = {
       id: `partner-${partnerContent.id}`,
-      type: 'partner',
+      type: "partner",
       content: partnerContent.content,
       timestamp: partnerContent.publishedAt,
       source: {
@@ -224,7 +215,7 @@ export class ContentMixer {
           | 2
           | 3, // Convert credibility to tier
         reliability: partnerContent.source.credibility,
-        region: 'UK', // Most partner sources are UK-based
+        region: "UK", // Most partner sources are UK-based
       },
       tags: {
         clubs: this.extractClubsFromContent(partnerContent.content),
@@ -232,13 +223,13 @@ export class ContentMixer {
         sources: [partnerContent.source.name],
       },
       metadata: {
-        priority: partnerContent.source.credibility >= 0.9 ? 'high' : 'medium',
+        priority: partnerContent.source.credibility >= 0.9 ? "high" : "medium",
         transferType: this.detectTransferType(partnerContent.content),
         relevanceScore: partnerContent.source.credibility,
         originalUrl: partnerContent.url,
         attribution: formatAttribution(
           partnerContent.source,
-          partnerContent.url
+          partnerContent.url,
         ),
       },
     };
@@ -269,10 +260,10 @@ export class ContentMixer {
     }
 
     console.log(
-      `📰 Partner content added: ${content.source.name} - "${content.title}"`
+      `📰 Partner content added: ${content.source.name} - "${content.title}"`,
     );
     console.log(
-      `   Attribution: ${formatAttribution(content.source, content.url)}`
+      `   Attribution: ${formatAttribution(content.source, content.url)}`,
     );
   }
 
@@ -283,7 +274,7 @@ export class ContentMixer {
     const now = new Date();
     const last24Hours = this.partnerContentHistory.filter(
       (content) =>
-        now.getTime() - content.publishedAt.getTime() <= 24 * 60 * 60 * 1000
+        now.getTime() - content.publishedAt.getTime() <= 24 * 60 * 60 * 1000,
     );
 
     const sourceStats = last24Hours.reduce(
@@ -292,7 +283,7 @@ export class ContentMixer {
         acc[sourceName] = (acc[sourceName] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const categoryStats = last24Hours.reduce(
@@ -300,7 +291,7 @@ export class ContentMixer {
         acc[content.category] = (acc[content.category] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     return {
@@ -322,7 +313,7 @@ export class ContentMixer {
    */
   public updateConfig(newConfig: Partial<ContentMixingConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    console.log('🔧 Updated content mixing config:', this.config);
+    console.log("🔧 Updated content mixing config:", this.config);
   }
 
   // Private helper methods
@@ -347,10 +338,10 @@ export class ContentMixer {
 
   private getLastITKTime(recentFeedItems: FeedItem[]): Date | null {
     const itkItems = recentFeedItems
-      .filter((item) => item.type === 'itk' || item.type === 'breaking')
+      .filter((item) => item.type === "itk" || item.type === "breaking")
       .sort(
         (a, b) =>
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
       );
 
     return itkItems.length > 0 ? new Date(itkItems[0].timestamp) : null;
@@ -358,7 +349,7 @@ export class ContentMixer {
 
   private generateContextualContent(
     source: PartnerSource,
-    recentFeedItems: FeedItem[]
+    recentFeedItems: FeedItem[],
   ): PartnerContent {
     // Extract trending topics from recent feed
     const trendingClubs = this.getTrendingClubs(recentFeedItems);
@@ -370,12 +361,12 @@ export class ContentMixer {
       contentTemplates[Math.floor(Math.random() * contentTemplates.length)];
 
     const title = template.title
-      .replace('{club}', trendingClubs[0] || 'Premier League')
-      .replace('{player}', trendingPlayers[0] || 'star player');
+      .replace("{club}", trendingClubs[0] || "Premier League")
+      .replace("{player}", trendingPlayers[0] || "star player");
 
     const content = template.content
-      .replace('{club}', trendingClubs[0] || 'the club')
-      .replace('{player}', trendingPlayers[0] || 'the player');
+      .replace("{club}", trendingClubs[0] || "the club")
+      .replace("{player}", trendingPlayers[0] || "the player");
 
     return {
       id: `${source.id}-${Date.now()}`,
@@ -393,9 +384,11 @@ export class ContentMixer {
     const clubCounts: Record<string, number> = {};
 
     recentFeedItems.forEach((item) => {
-      item.tags.clubs.forEach((club: string) => {
-        clubCounts[club] = (clubCounts[club] || 0) + 1;
-      });
+      if (item.tags && item.tags.clubs) {
+        item.tags.clubs.forEach((club: string) => {
+          clubCounts[club] = (clubCounts[club] || 0) + 1;
+        });
+      }
     });
 
     return Object.entries(clubCounts)
@@ -408,9 +401,11 @@ export class ContentMixer {
     const playerCounts: Record<string, number> = {};
 
     recentFeedItems.forEach((item) => {
-      item.tags.players.forEach((player: string) => {
-        playerCounts[player] = (playerCounts[player] || 0) + 1;
-      });
+      if (item.tags && item.tags.players) {
+        item.tags.players.forEach((player: string) => {
+          playerCounts[player] = (playerCounts[player] || 0) + 1;
+        });
+      }
     });
 
     return Object.entries(playerCounts)
@@ -436,26 +431,26 @@ export class ContentMixer {
       ],
       news: [
         {
-          title: 'Transfer Roundup: Latest developments around {club}',
+          title: "Transfer Roundup: Latest developments around {club}",
           content:
             "Comprehensive update on {club}'s transfer activities, including confirmed deals, ongoing negotiations, and potential future targets for the current window.",
         },
         {
-          title: 'Market Watch: {player} situation developments',
+          title: "Market Watch: {player} situation developments",
           content:
             "Latest updates on {player}'s transfer situation, including club interest, personal terms negotiations, and potential impact on squad dynamics.",
         },
       ],
       entertainment: [
         {
-          title: 'Football Culture: The {club} phenomenon explained',
+          title: "Football Culture: The {club} phenomenon explained",
           content:
             "Exploring the cultural impact of {club}'s recent transfer activities and what it means for fan culture and football entertainment worldwide.",
         },
       ],
       tactical: [
         {
-          title: 'Formation Focus: How {club} could line up with new signings',
+          title: "Formation Focus: How {club} could line up with new signings",
           content:
             "Tactical breakdown of {club}'s potential formations and strategies with their new signings, including strengths, weaknesses, and matchup advantages.",
         },
@@ -467,21 +462,21 @@ export class ContentMixer {
 
   private extractClubsFromContent(content: string): string[] {
     const commonClubs = [
-      'Arsenal',
-      'Chelsea',
-      'Liverpool',
-      'Manchester United',
-      'Manchester City',
-      'Tottenham',
-      'Real Madrid',
-      'Barcelona',
-      'Bayern Munich',
-      'PSG',
-      'Juventus',
+      "Arsenal",
+      "Chelsea",
+      "Liverpool",
+      "Manchester United",
+      "Manchester City",
+      "Tottenham",
+      "Real Madrid",
+      "Barcelona",
+      "Bayern Munich",
+      "PSG",
+      "Juventus",
     ];
 
     return commonClubs.filter((club) =>
-      content.toLowerCase().includes(club.toLowerCase())
+      content.toLowerCase().includes(club.toLowerCase()),
     );
   }
 
@@ -492,20 +487,20 @@ export class ContentMixer {
   }
 
   private detectTransferType(
-    content: string
+    content: string,
   ):
-    | 'confirmed'
-    | 'medical'
-    | 'rumour'
-    | 'signing'
-    | 'bid'
-    | 'personal_terms'
+    | "confirmed"
+    | "medical"
+    | "rumour"
+    | "signing"
+    | "bid"
+    | "personal_terms"
     | undefined {
     const transferKeywords = {
-      confirmed: ['confirmed', 'official', 'announced'],
-      rumour: ['rumoured', 'linked', 'interested'],
-      medical: ['medical', 'medical tests'],
-      personal_terms: ['personal terms', 'contract negotiations'],
+      confirmed: ["confirmed", "official", "announced"],
+      rumour: ["rumoured", "linked", "interested"],
+      medical: ["medical", "medical tests"],
+      personal_terms: ["personal terms", "contract negotiations"],
     };
 
     const contentLower = content.toLowerCase();
@@ -513,12 +508,12 @@ export class ContentMixer {
     for (const [type, keywords] of Object.entries(transferKeywords)) {
       if (keywords.some((keyword) => contentLower.includes(keyword))) {
         return type as
-          | 'confirmed'
-          | 'medical'
-          | 'rumour'
-          | 'signing'
-          | 'bid'
-          | 'personal_terms';
+          | "confirmed"
+          | "medical"
+          | "rumour"
+          | "signing"
+          | "bid"
+          | "personal_terms";
       }
     }
 
@@ -552,7 +547,64 @@ export class ContentMixer {
 
     const template =
       partnerTemplates[Math.floor(Math.random() * partnerTemplates.length)];
-    return template.replace('{source}', content.source.name);
+    return template.replace("{source}", content.source.name);
+  }
+
+  private determineToneForQuietPeriod(
+    recentFeedItems: FeedItem[],
+  ): "scandal" | "banter" | "mixed" {
+    const hour = new Date().getHours();
+
+    // Evening - more entertainment/scandal content
+    if (hour >= 18 || hour < 2) {
+      return "scandal";
+    }
+
+    // Weekend afternoons - banter content
+    const day = new Date().getDay();
+    if ((day === 0 || day === 6) && hour >= 12 && hour < 18) {
+      return "banter";
+    }
+
+    // Default to mixed content
+    return "mixed";
+  }
+
+  private async generateMockContent(
+    recentFeedItems: FeedItem[],
+  ): Promise<PartnerContent | null> {
+    // Fallback mock content generation (existing implementation)
+    const preferredCategories = this.config.priorityCategories;
+
+    // Get sources from preferred categories
+    const candidateSources: PartnerSource[] = [];
+    for (const category of preferredCategories) {
+      const sources = getPartnerSourcesByCategory(category as any);
+      candidateSources.push(...sources);
+    }
+
+    if (candidateSources.length === 0) {
+      return null;
+    }
+
+    // Select a random high-credibility source
+    const highCredibilitySources = candidateSources.filter(
+      (s) => s.credibility >= 0.85,
+    );
+    const selectedSource =
+      highCredibilitySources.length > 0
+        ? highCredibilitySources[
+            Math.floor(Math.random() * highCredibilitySources.length)
+          ]
+        : candidateSources[Math.floor(Math.random() * candidateSources.length)];
+
+    // Generate contextual content based on recent feed activity
+    const content = this.generateContextualContent(
+      selectedSource,
+      recentFeedItems,
+    );
+
+    return content;
   }
 }
 

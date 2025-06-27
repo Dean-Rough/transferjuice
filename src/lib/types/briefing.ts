@@ -5,7 +5,7 @@
 
 export interface BriefingSection {
   id: string;
-  type: 'lead' | 'context' | 'analysis' | 'bullshit_corner';
+  type: "lead" | "context" | "analysis" | "bullshit_corner";
   title: string;
   content: string;
   order: number;
@@ -52,7 +52,7 @@ export interface PolaroidImage {
   rotation: number; // -8 to +8 degrees
   position: number; // Scroll position where it appears
   altText: string;
-  source: 'wikipedia' | 'manual' | 'generated';
+  source: "wikipedia" | "manual" | "generated";
 }
 
 export interface BriefingSharing {
@@ -89,19 +89,19 @@ export interface Briefing {
   title: BriefingTitle;
   timestamp: Date;
   published: boolean;
-  
+
   // Content structure
   sections: BriefingSection[];
   summary: string;
   metaDescription: string;
-  
+
   // Visual elements
   polaroids: PolaroidImage[];
   featuredImage?: string;
-  
+
   // Metadata
   metadata: BriefingMetadata;
-  
+
   // Engagement
   sharing: BriefingSharing;
   tags: {
@@ -111,7 +111,7 @@ export interface Briefing {
     leagues: string[];
     transferTypes: string[];
   };
-  
+
   // SEO
   slug: string;
   canonicalUrl: string;
@@ -119,9 +119,9 @@ export interface Briefing {
     title: string;
     description: string;
     image: string;
-    type: 'article';
+    type: "article";
   };
-  
+
   // Analytics
   engagement?: {
     views: number;
@@ -167,7 +167,7 @@ export interface BriefingGenerationConfig {
   contentMix: {
     maxPartnerContentRatio: number; // 0-1
     minShitTierMockery: number; // minutes of content
-    preferredSections: BriefingSection['type'][];
+    preferredSections: BriefingSection["type"][];
   };
   polaroidSettings: {
     maxPerBriefing: number;
@@ -180,7 +180,12 @@ export interface BriefingGenerationConfig {
 }
 
 // Helper types for briefing generation
-export type BriefingStatus = 'draft' | 'generating' | 'reviewing' | 'published' | 'failed';
+export type BriefingStatus =
+  | "draft"
+  | "generating"
+  | "reviewing"
+  | "published"
+  | "failed";
 
 export interface BriefingJob {
   id: string;
@@ -197,17 +202,38 @@ export interface BriefingJob {
 export const BriefingUtils = {
   // Generate title format: "Monday 14:00 Briefing May '25 - [Funny Title]"
   formatTitle: (date: Date, funnyTitle: string): BriefingTitle => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
     const day = days[date.getDay()];
-    const hour = date.getHours().toString().padStart(2, '0') + ':00';
+    const hour = date.getHours().toString().padStart(2, "0") + ":00";
     const month = months[date.getMonth()];
     const year = "'" + date.getFullYear().toString().slice(-2);
-    
+
     const full = `${day} ${hour} Briefing ${month} ${year} - ${funnyTitle}`;
-    const slug = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getHours().toString().padStart(2, '0')}`;
-    
+    const slug = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}-${date.getHours().toString().padStart(2, "0")}`;
+
     return {
       full,
       funny: funnyTitle,
@@ -219,42 +245,61 @@ export const BriefingUtils = {
       slug,
     };
   },
-  
+
   // Extract player mentions from content for polaroid triggering
   extractPlayerMentions: (content: string): string[] => {
     // This would be enhanced with a proper player database
     const commonPlayers = [
-      'Haaland', 'Mbappe', 'Bellingham', 'Kane', 'Salah', 'Vinicius',
-      'Pedri', 'Gavi', 'Musiala', 'Camavinga', 'Osimhen', 'Leao',
-      'Kvaratskhelia', 'Vlahovic', 'Saka', 'Foden', 'Wirtz', 'Moukoko'
+      "Haaland",
+      "Mbappe",
+      "Bellingham",
+      "Kane",
+      "Salah",
+      "Vinicius",
+      "Pedri",
+      "Gavi",
+      "Musiala",
+      "Camavinga",
+      "Osimhen",
+      "Leao",
+      "Kvaratskhelia",
+      "Vlahovic",
+      "Saka",
+      "Foden",
+      "Wirtz",
+      "Moukoko",
     ];
-    
-    return commonPlayers.filter(player => 
-      content.toLowerCase().includes(player.toLowerCase())
+
+    return commonPlayers.filter((player) =>
+      content.toLowerCase().includes(player.toLowerCase()),
     );
   },
-  
+
   // Generate slug for URL
   generateSlug: (date: Date): string => {
-    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getHours().toString().padStart(2, '0')}`;
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}-${date.getHours().toString().padStart(2, "0")}`;
   },
-  
+
   // Calculate estimated read time
   calculateReadTime: (wordCount: number): number => {
     const wordsPerMinute = 200; // Average reading speed
     return Math.ceil(wordCount / wordsPerMinute);
   },
-  
+
   // Check if briefing meets quality standards
-  meetsQualityStandards: (briefing: Briefing, config: BriefingGenerationConfig): boolean => {
+  meetsQualityStandards: (
+    briefing: Briefing,
+    config: BriefingGenerationConfig,
+  ): boolean => {
     const { metadata } = briefing;
     const { qualityThresholds, targetWordCount } = config;
-    
+
     return (
       metadata.wordCount >= targetWordCount.min &&
       metadata.wordCount <= targetWordCount.max &&
       metadata.terryScore >= qualityThresholds.minTerryScore &&
-      metadata.qualityMetrics.factualAccuracy >= qualityThresholds.minFactualAccuracy &&
+      metadata.qualityMetrics.factualAccuracy >=
+        qualityThresholds.minFactualAccuracy &&
       metadata.qualityMetrics.brandVoice >= qualityThresholds.minBrandVoice &&
       metadata.qualityMetrics.coherence >= qualityThresholds.minCoherence
     );
@@ -277,7 +322,7 @@ export const DEFAULT_BRIEFING_CONFIG: BriefingGenerationConfig = {
   contentMix: {
     maxPartnerContentRatio: 0.25, // 25% max partner content
     minShitTierMockery: 2, // At least 2 minutes of Fechejes mockery
-    preferredSections: ['lead', 'context', 'analysis', 'bullshit_corner'],
+    preferredSections: ["lead", "context", "analysis", "bullshit_corner"],
   },
   polaroidSettings: {
     maxPerBriefing: 8,

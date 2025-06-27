@@ -3,16 +3,16 @@
  * Weaponised irritation for comedic transfer journalism
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 // Style configuration schema
 export const TerryStyleConfigSchema = z.object({
-  snarkLevel: z.enum(['mild', 'medium', 'nuclear']).default('medium'),
+  snarkLevel: z.enum(["mild", "medium", "nuclear"]).default("medium"),
   terryReferences: z.boolean().default(false), // Use "The Terry" sparingly
   targetAudience: z
-    .enum(['general', 'football_nerds', 'transfer_addicts'])
-    .default('general'),
-  topicSeriousness: z.enum(['low', 'medium', 'high']).default('medium'),
+    .enum(["general", "football_nerds", "transfer_addicts"])
+    .default("general"),
+  topicSeriousness: z.enum(["low", "medium", "high"]).default("medium"),
 });
 
 export type TerryStyleConfig = z.infer<typeof TerryStyleConfigSchema>;
@@ -21,57 +21,57 @@ export type TerryStyleConfig = z.infer<typeof TerryStyleConfigSchema>;
 export const transferVocabulary = {
   // Money descriptions (increasingly unhinged)
   fees: [
-    '£40m (or roughly the GDP of a small Caribbean island)',
-    '£75m (which is exactly £75m more than I have)',
-    '£100m (enough to buy a modest house in London, or one decent midfielder)',
-    '£150m (the sort of money that makes accountants weep openly)',
+    "£40m (or roughly the GDP of a small Caribbean island)",
+    "£75m (which is exactly £75m more than I have)",
+    "£100m (enough to buy a modest house in London, or one decent midfielder)",
+    "£150m (the sort of money that makes accountants weep openly)",
   ],
 
   // Medical descriptions
   medicals: [
-    'the ritualistic poking and prodding that passes for a medical these days',
-    'a medical examination (basically checking he has two legs and a pulse)',
-    'medical tests that would make the NHS weep with envy',
-    'the traditional medical circus of clipboard-wielding professionals',
+    "the ritualistic poking and prodding that passes for a medical these days",
+    "a medical examination (basically checking he has two legs and a pulse)",
+    "medical tests that would make the NHS weep with envy",
+    "the traditional medical circus of clipboard-wielding professionals",
   ],
 
   // Agent descriptions
   agents: [
-    'his agent (a man who could sell ice to penguins)',
-    'representatives who charge more per hour than most people earn per month',
-    'agents circling like well-dressed vultures',
-    'the sort of agent who wears sunglasses indoors unironically',
+    "his agent (a man who could sell ice to penguins)",
+    "representatives who charge more per hour than most people earn per month",
+    "agents circling like well-dressed vultures",
+    "the sort of agent who wears sunglasses indoors unironically",
   ],
 
   // Club descriptions
   clubs: {
     arsenal: [
       'Arsenal (currently in their "cautiously optimistic" phase)',
-      'the Gunners (who love a dramatic summer signing)',
+      "the Gunners (who love a dramatic summer signing)",
     ],
     united: [
       "Manchester United (still pretending it's 2008)",
-      'United (masters of the expensive disappointment)',
+      "United (masters of the expensive disappointment)",
     ],
     city: [
-      'Manchester City (where money goes to feel less lonely)',
-      'City (who treat transfer fees like pocket change)',
+      "Manchester City (where money goes to feel less lonely)",
+      "City (who treat transfer fees like pocket change)",
     ],
     chelsea: [
-      'Chelsea (currently experiencing an identity crisis)',
-      'the Blues (who change managers like most people change socks)',
+      "Chelsea (currently experiencing an identity crisis)",
+      "the Blues (who change managers like most people change socks)",
     ],
     liverpool: [
       'Liverpool (always "monitoring the situation")',
-      'the Reds (who somehow make thriftiness seem romantic)',
+      "the Reds (who somehow make thriftiness seem romantic)",
     ],
     spurs: [
       'Tottenham (perpetually "building for the future")',
-      'Spurs (where hope goes to die beautifully)',
+      "Spurs (where hope goes to die beautifully)",
     ],
     generic: [
-      'a club that shall remain nameless (for legal reasons)',
-      'one of those clubs with more money than sense',
+      "a club that shall remain nameless (for legal reasons)",
+      "one of those clubs with more money than sense",
     ],
   },
 };
@@ -80,7 +80,7 @@ export const transferVocabulary = {
 export const terryStarters = {
   breaking: [
     "Right, this might be the most cursed transfer saga I've witnessed today, and I've been watching football for longer than I care to admit.",
-    'Breaking news, or as close to breaking as anything gets in the glacial world of transfer negotiations:',
+    "Breaking news, or as close to breaking as anything gets in the glacial world of transfer negotiations:",
     "Hold onto your sanity, because this transfer story is about to make your brain hurt in ways you didn't know were possible.",
     "In a development that surprises absolutely no one who's been paying attention:",
   ],
@@ -89,45 +89,45 @@ export const terryStarters = {
     "According to sources (and by sources, I mean someone who knows someone who once met an agent in a Nando's):",
     "The rumour mill is churning out fresh nonsense, and today's special is:",
     'In today\'s edition of "Journalists Making Things Up For Clicks":',
-    'Word on the street (specifically, the very expensive street where football agents live):',
+    "Word on the street (specifically, the very expensive street where football agents live):",
   ],
 
   analysis: [
     "Let's unpack this absolute car crash of a situation, shall we?",
-    'Now, this is where things get properly mental:',
-    'The implications of this are either brilliant or catastrophic, depending on your tolerance for chaos:',
-    'What this actually means, beyond the obvious financial lunacy:',
+    "Now, this is where things get properly mental:",
+    "The implications of this are either brilliant or catastrophic, depending on your tolerance for chaos:",
+    "What this actually means, beyond the obvious financial lunacy:",
   ],
 
   conclusion: [
-    'So there you have it: modern football in all its gloriously unhinged splendour.',
-    'And that, dear readers, is why nothing works anymore in the beautiful game.',
+    "So there you have it: modern football in all its gloriously unhinged splendour.",
+    "And that, dear readers, is why nothing works anymore in the beautiful game.",
     "This is either the future of football or evidence that we've all lost our collective minds.",
-    'The Terry suggests we all take a moment to appreciate the magnificent absurdity of it all.',
+    "The Terry suggests we all take a moment to appreciate the magnificent absurdity of it all.",
   ],
 };
 
 // Emotional register mappings
 export const emotionalRegisters = {
   excitement: {
-    mild: 'mildly intrigued',
-    medium: 'cautiously optimistic (a dangerous state for any football fan)',
-    high: 'buzzing like a caffeinated wasp',
+    mild: "mildly intrigued",
+    medium: "cautiously optimistic (a dangerous state for any football fan)",
+    high: "buzzing like a caffeinated wasp",
   },
   frustration: {
-    mild: 'slightly vexed',
-    medium: 'properly wound up',
-    high: 'experiencing the sort of rage that makes you question your life choices',
+    mild: "slightly vexed",
+    medium: "properly wound up",
+    high: "experiencing the sort of rage that makes you question your life choices",
   },
   disbelief: {
-    mild: 'marginally baffled',
-    medium: 'thoroughly perplexed by the madness of it all',
-    high: 'so confused I can feel my brain trying to escape through my ears',
+    mild: "marginally baffled",
+    medium: "thoroughly perplexed by the madness of it all",
+    high: "so confused I can feel my brain trying to escape through my ears",
   },
   satisfaction: {
-    mild: 'grudgingly pleased',
-    medium: 'actually quite chuffed',
-    high: 'delighted in that smug way that makes other people want to punch you',
+    mild: "grudgingly pleased",
+    medium: "actually quite chuffed",
+    high: "delighted in that smug way that makes other people want to punch you",
   },
 };
 
@@ -138,48 +138,48 @@ export function generateTerryModifiers(config: TerryStyleConfig) {
   const modifiers = {
     // Parenthetical asides (The Terry's trademark)
     asides:
-      snarkLevel === 'nuclear'
+      snarkLevel === "nuclear"
         ? [
             "(and yes, I'm aware of the irony)",
-            '(which is exactly as mental as it sounds)',
+            "(which is exactly as mental as it sounds)",
             "(assuming any of this makes sense, which it doesn't)",
-            '(because nothing matters anymore)',
+            "(because nothing matters anymore)",
           ]
-        : snarkLevel === 'medium'
+        : snarkLevel === "medium"
           ? [
-              '(because of course they did)',
-              '(which surprises precisely no one)',
-              '(in a move that baffles football purists)',
-              '(as if any of this is normal)',
+              "(because of course they did)",
+              "(which surprises precisely no one)",
+              "(in a move that baffles football purists)",
+              "(as if any of this is normal)",
             ]
           : [
-              '(apparently)',
-              '(somehow)',
-              '(for reasons unknown)',
-              '(allegedly)',
+              "(apparently)",
+              "(somehow)",
+              "(for reasons unknown)",
+              "(allegedly)",
             ],
 
     // Escalation patterns
     escalation:
-      topicSeriousness === 'high'
+      topicSeriousness === "high"
         ? [
             "This isn't just football anymore. This is late-stage capitalism with shinpads.",
             "We've officially entered the realm of financial fantasy football.",
-            'This is what happens when you let accountants run the beautiful game.',
+            "This is what happens when you let accountants run the beautiful game.",
           ]
         : [
             "This is why we can't have nice things.",
-            'And people wonder why football fans drink.',
-            'Modern football, ladies and gentlemen.',
+            "And people wonder why football fans drink.",
+            "Modern football, ladies and gentlemen.",
           ],
 
     // Specificity bombs (Terry's secret weapon)
     specifics: [
-      'wet pasta, three grapes, and a single sad Babybel',
-      'a man wearing Crocs to a wedding',
-      'watching someone try to eat soup with a fork',
+      "wet pasta, three grapes, and a single sad Babybel",
+      "a man wearing Crocs to a wedding",
+      "watching someone try to eat soup with a fork",
       "a pigeon that's learned to use Twitter",
-      'the sound a football makes when it hits the crossbar at 3am',
+      "the sound a football makes when it hits the crossbar at 3am",
     ],
   };
 
@@ -239,19 +239,19 @@ Keep the facts accurate but make the delivery magnificently chaotic.
 // Quality assessment with Terry standards
 export const terryQualityMetrics = {
   snark: {
-    low: 'Needs more weaponised irritation',
-    medium: 'Appropriately snarky without being mean',
-    high: 'Peak Terry energy—magnificently acerbic',
+    low: "Needs more weaponised irritation",
+    medium: "Appropriately snarky without being mean",
+    high: "Peak Terry energy—magnificently acerbic",
   },
   specificity: {
-    low: 'Too generic. Where are the absurd details?',
-    medium: 'Good specificity, could use more weird examples',
-    high: 'Perfectly specific—like watching someone eat soup with a fork',
+    low: "Too generic. Where are the absurd details?",
+    medium: "Good specificity, could use more weird examples",
+    high: "Perfectly specific—like watching someone eat soup with a fork",
   },
   voice: {
-    low: 'Sounds like a corporate press release',
-    medium: 'Getting there, but needs more emotional intelligence',
-    high: 'Pure Terry—acerbic but warm, chaotic but smart',
+    low: "Sounds like a corporate press release",
+    medium: "Getting there, but needs more emotional intelligence",
+    high: "Pure Terry—acerbic but warm, chaotic but smart",
   },
 };
 
@@ -261,11 +261,11 @@ export const applyTerryStyle = {
   enhanceMessage: (
     message: string,
     config: TerryStyleConfig = {
-      snarkLevel: 'medium',
+      snarkLevel: "medium",
       terryReferences: false,
-      targetAudience: 'general',
-      topicSeriousness: 'medium',
-    }
+      targetAudience: "general",
+      topicSeriousness: "medium",
+    },
   ): string => {
     const styled = applyTerryStyleToContent(message, config);
     return styled;
@@ -274,11 +274,11 @@ export const applyTerryStyle = {
   // Enhance error messages with Terry attitude
   enhanceError: (error: string): string => {
     const terryErrorPrefixes = [
-      'Right, this is properly mental:',
+      "Right, this is properly mental:",
       "Well, that's gone spectacularly wrong:",
-      'Oh brilliant, just brilliant:',
-      'Of course this happened:',
-      'This is exactly the sort of chaos we needed:',
+      "Oh brilliant, just brilliant:",
+      "Of course this happened:",
+      "This is exactly the sort of chaos we needed:",
     ];
     const prefix =
       terryErrorPrefixes[Math.floor(Math.random() * terryErrorPrefixes.length)];
@@ -292,7 +292,7 @@ export const applyTerryStyle = {
 // Rename the original function to avoid naming conflict
 function applyTerryStyleToContent(
   content: string,
-  config: TerryStyleConfig
+  config: TerryStyleConfig,
 ): string {
   const modifiers = generateTerryModifiers(config);
 
@@ -308,8 +308,8 @@ function applyTerryStyleToContent(
 
   // Replace generic terms with Terry-specific vocabulary
   Object.entries(transferVocabulary.clubs).forEach(([club, variations]) => {
-    if (club !== 'generic') {
-      const clubRegex = new RegExp(`\\b${club}\\b`, 'gi');
+    if (club !== "generic") {
+      const clubRegex = new RegExp(`\\b${club}\\b`, "gi");
       if (styledContent.match(clubRegex)) {
         const variation =
           variations[Math.floor(Math.random() * variations.length)];

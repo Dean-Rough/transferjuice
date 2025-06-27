@@ -7,20 +7,20 @@ import {
   getTransferKeywords,
   getSourceByHandle,
   type ITKSource,
-} from './globalSources';
+} from "./globalSources";
 
 export interface ClassificationResult {
   isTransferRelated: boolean;
   confidence: number;
   transferType?:
-    | 'signing'
-    | 'rumour'
-    | 'medical'
-    | 'confirmed'
-    | 'bid'
-    | 'personal_terms';
+    | "signing"
+    | "rumour"
+    | "medical"
+    | "confirmed"
+    | "bid"
+    | "personal_terms";
   keywords: string[];
-  language?: ITKSource['language'];
+  language?: ITKSource["language"];
   reasonCode: string;
   explanation: string;
 }
@@ -41,7 +41,7 @@ export interface TweetData {
   };
   urls?: string[];
   media?: Array<{
-    type: 'photo' | 'video';
+    type: "photo" | "video";
     url: string;
   }>;
 }
@@ -64,121 +64,121 @@ const LANGUAGE_PATTERNS = {
 const TRANSFER_CONTEXTS = {
   en: {
     confirmed: [
-      'done deal',
-      'here we go',
-      'official',
-      'confirmed',
-      'signed',
-      'completed',
+      "done deal",
+      "here we go",
+      "official",
+      "confirmed",
+      "signed",
+      "completed",
     ],
     rumour: [
-      'linked',
-      'interested',
-      'monitoring',
-      'considering',
-      'could',
-      'might',
-      'rumoured',
+      "linked",
+      "interested",
+      "monitoring",
+      "considering",
+      "could",
+      "might",
+      "rumoured",
     ],
-    medical: ['medical', 'medicals', 'tests', 'examination', 'check-up'],
-    bid: ['bid', 'offer', 'proposed', 'rejected', 'accepted', 'negotiating'],
+    medical: ["medical", "medicals", "tests", "examination", "check-up"],
+    bid: ["bid", "offer", "proposed", "rejected", "accepted", "negotiating"],
     personal_terms: [
-      'personal terms',
-      'terms agreed',
-      'contract agreed',
-      'wages agreed',
+      "personal terms",
+      "terms agreed",
+      "contract agreed",
+      "wages agreed",
     ],
   },
   es: {
-    confirmed: ['hecho', 'oficial', 'confirmado', 'firmado', 'completado'],
+    confirmed: ["hecho", "oficial", "confirmado", "firmado", "completado"],
     rumour: [
-      'vinculado',
-      'interesado',
-      'monitoreando',
-      'considerando',
-      'podría',
-      'rumoreado',
+      "vinculado",
+      "interesado",
+      "monitoreando",
+      "considerando",
+      "podría",
+      "rumoreado",
     ],
-    medical: ['reconocimiento médico', 'exámenes', 'pruebas médicas'],
-    bid: ['oferta', 'propuesta', 'rechazado', 'aceptado', 'negociando'],
+    medical: ["reconocimiento médico", "exámenes", "pruebas médicas"],
+    bid: ["oferta", "propuesta", "rechazado", "aceptado", "negociando"],
     personal_terms: [
-      'términos personales',
-      'contrato acordado',
-      'salario acordado',
+      "términos personales",
+      "contrato acordado",
+      "salario acordado",
     ],
   },
   it: {
-    confirmed: ['fatto', 'ufficiale', 'confermato', 'firmato', 'completato'],
+    confirmed: ["fatto", "ufficiale", "confermato", "firmato", "completato"],
     rumour: [
-      'collegato',
-      'interessato',
-      'monitoraggio',
-      'considerando',
-      'potrebbe',
-      'voci',
+      "collegato",
+      "interessato",
+      "monitoraggio",
+      "considerando",
+      "potrebbe",
+      "voci",
     ],
-    medical: ['visite mediche', 'esami', 'controlli medici'],
-    bid: ['offerta', 'proposta', 'rifiutato', 'accettato', 'trattativa'],
+    medical: ["visite mediche", "esami", "controlli medici"],
+    bid: ["offerta", "proposta", "rifiutato", "accettato", "trattativa"],
     personal_terms: [
-      'accordo personale',
-      'contratto concordato',
-      'stipendio concordato',
+      "accordo personale",
+      "contratto concordato",
+      "stipendio concordato",
     ],
   },
   fr: {
-    confirmed: ['fait', 'officiel', 'confirmé', 'signé', 'terminé'],
+    confirmed: ["fait", "officiel", "confirmé", "signé", "terminé"],
     rumour: [
-      'lié',
-      'intéressé',
-      'surveillance',
-      'considérant',
-      'pourrait',
-      'rumeur',
+      "lié",
+      "intéressé",
+      "surveillance",
+      "considérant",
+      "pourrait",
+      "rumeur",
     ],
-    medical: ['visite médicale', 'examens', 'tests médicaux'],
-    bid: ['offre', 'proposition', 'rejeté', 'accepté', 'négociation'],
-    personal_terms: ['accord personnel', 'contrat convenu', 'salaire convenu'],
+    medical: ["visite médicale", "examens", "tests médicaux"],
+    bid: ["offre", "proposition", "rejeté", "accepté", "négociation"],
+    personal_terms: ["accord personnel", "contrat convenu", "salaire convenu"],
   },
   de: {
     confirmed: [
-      'gemacht',
-      'offiziell',
-      'bestätigt',
-      'unterschrieben',
-      'abgeschlossen',
+      "gemacht",
+      "offiziell",
+      "bestätigt",
+      "unterschrieben",
+      "abgeschlossen",
     ],
     rumour: [
-      'verknüpft',
-      'interessiert',
-      'beobachtung',
-      'erwägt',
-      'könnte',
-      'gerücht',
+      "verknüpft",
+      "interessiert",
+      "beobachtung",
+      "erwägt",
+      "könnte",
+      "gerücht",
     ],
-    medical: ['medizincheck', 'untersuchungen', 'medizinische tests'],
-    bid: ['angebot', 'vorschlag', 'abgelehnt', 'akzeptiert', 'verhandlung'],
+    medical: ["medizincheck", "untersuchungen", "medizinische tests"],
+    bid: ["angebot", "vorschlag", "abgelehnt", "akzeptiert", "verhandlung"],
     personal_terms: [
-      'persönliche bedingungen',
-      'vertrag vereinbart',
-      'gehalt vereinbart',
+      "persönliche bedingungen",
+      "vertrag vereinbart",
+      "gehalt vereinbart",
     ],
   },
   pt: {
-    confirmed: ['feito', 'oficial', 'confirmado', 'assinado', 'completado'],
+    confirmed: ["feito", "oficial", "confirmado", "assinado", "completado"],
     rumour: [
-      'ligado',
-      'interessado',
-      'monitoramento',
-      'considerando',
-      'poderia',
-      'rumor',
+      "ligado",
+      "interessado",
+      "monitoramento",
+      "considerando",
+      "poderia",
+      "rumor",
     ],
-    medical: ['exames médicos', 'exames', 'testes médicos'],
-    bid: ['oferta', 'proposta', 'rejeitado', 'aceito', 'negociação'],
+    medical: ["exames médicos", "exames", "testes médicos"],
+    bid: ["oferta", "proposta", "rejeitado", "aceito", "negociação"],
     personal_terms: [
-      'termos pessoais',
-      'contrato acordado',
-      'salário acordado',
+      "termos pessoais",
+      "contrato acordado",
+      "salário acordado",
     ],
   },
 };
@@ -186,8 +186,8 @@ const TRANSFER_CONTEXTS = {
 /**
  * Detect language of tweet content
  */
-export const detectLanguage = (text: string): ITKSource['language'] => {
-  const scores: Record<ITKSource['language'], number> = {
+export const detectLanguage = (text: string): ITKSource["language"] => {
+  const scores: Record<ITKSource["language"], number> = {
     en: 0,
     es: 0,
     it: 0,
@@ -199,17 +199,17 @@ export const detectLanguage = (text: string): ITKSource['language'] => {
   // Count pattern matches for each language
   Object.entries(LANGUAGE_PATTERNS).forEach(([lang, pattern]) => {
     const matches = text.match(pattern);
-    scores[lang as ITKSource['language']] = matches ? matches.length : 0;
+    scores[lang as ITKSource["language"]] = matches ? matches.length : 0;
   });
 
   // Return language with highest score, default to English
   const maxScore = Math.max(...Object.values(scores));
-  if (maxScore === 0) return 'en';
+  if (maxScore === 0) return "en";
 
   return (
     (Object.entries(scores).find(
-      ([_, score]) => score === maxScore
-    )?.[0] as ITKSource['language']) || 'en'
+      ([_, score]) => score === maxScore,
+    )?.[0] as ITKSource["language"]) || "en"
   );
 };
 
@@ -218,13 +218,13 @@ export const detectLanguage = (text: string): ITKSource['language'] => {
  */
 export const extractTransferKeywords = (
   text: string,
-  language: ITKSource['language']
+  language: ITKSource["language"],
 ): string[] => {
   const keywords = getTransferKeywords(language);
   const lowerText = text.toLowerCase();
 
   return keywords.filter((keyword) =>
-    lowerText.includes(keyword.toLowerCase())
+    lowerText.includes(keyword.toLowerCase()),
   );
 };
 
@@ -233,15 +233,15 @@ export const extractTransferKeywords = (
  */
 export const determineTransferType = (
   text: string,
-  language: ITKSource['language']
-): ClassificationResult['transferType'] | undefined => {
+  language: ITKSource["language"],
+): ClassificationResult["transferType"] | undefined => {
   const lowerText = text.toLowerCase();
   const contexts = TRANSFER_CONTEXTS[language];
 
   // Check each transfer type
   for (const [type, patterns] of Object.entries(contexts)) {
     if (patterns.some((pattern) => lowerText.includes(pattern.toLowerCase()))) {
-      return type as ClassificationResult['transferType'];
+      return type as ClassificationResult["transferType"];
     }
   }
 
@@ -255,12 +255,12 @@ export const calculateConfidence = (
   text: string,
   keywords: string[],
   source?: ITKSource,
-  transferType?: ClassificationResult['transferType']
+  transferType?: ClassificationResult["transferType"],
 ): number => {
   let confidence = 0;
 
   // Keyword density (30% weight)
-  const keywordDensity = keywords.length / text.split(' ').length;
+  const keywordDensity = keywords.length / text.split(" ").length;
   confidence += Math.min(keywordDensity * 3, 0.3);
 
   // Source reliability (40% weight)
@@ -284,9 +284,9 @@ export const calculateConfidence = (
   }
 
   // Content quality indicators (10% weight)
-  const qualityIndicators = ['exclusive', 'breaking', '🚨', '✅', 'here we go'];
+  const qualityIndicators = ["exclusive", "breaking", "🚨", "✅", "here we go"];
   const hasQualityIndicators = qualityIndicators.some((indicator) =>
-    text.toLowerCase().includes(indicator.toLowerCase())
+    text.toLowerCase().includes(indicator.toLowerCase()),
   );
   if (hasQualityIndicators) confidence += 0.1;
 
@@ -297,7 +297,7 @@ export const calculateConfidence = (
  * Main classification function
  */
 export const classifyTransferContent = (
-  tweet: TweetData
+  tweet: TweetData,
 ): ClassificationResult => {
   const text = tweet.text;
   const detectedLanguage = detectLanguage(text);
@@ -313,8 +313,8 @@ export const classifyTransferContent = (
       confidence: 0,
       keywords: [],
       language: detectedLanguage,
-      reasonCode: 'NO_TRANSFER_KEYWORDS',
-      explanation: 'No transfer-related keywords found in the content',
+      reasonCode: "NO_TRANSFER_KEYWORDS",
+      explanation: "No transfer-related keywords found in the content",
     };
   }
 
@@ -342,7 +342,7 @@ export const classifyTransferContent = (
     transferType,
     keywords,
     language: detectedLanguage,
-    reasonCode: isTransferRelated ? 'TRANSFER_DETECTED' : 'LOW_CONFIDENCE',
+    reasonCode: isTransferRelated ? "TRANSFER_DETECTED" : "LOW_CONFIDENCE",
     explanation,
   };
 };
@@ -351,7 +351,7 @@ export const classifyTransferContent = (
  * Batch classification for multiple tweets
  */
 export const classifyBatchTransferContent = (
-  tweets: TweetData[]
+  tweets: TweetData[],
 ): ClassificationResult[] => {
   return tweets.map(classifyTransferContent);
 };
@@ -361,10 +361,10 @@ export const classifyBatchTransferContent = (
  */
 export const filterByConfidence = (
   classifications: ClassificationResult[],
-  minConfidence: number = 0.5
+  minConfidence: number = 0.5,
 ): ClassificationResult[] => {
   return classifications.filter(
-    (result) => result.isTransferRelated && result.confidence >= minConfidence
+    (result) => result.isTransferRelated && result.confidence >= minConfidence,
   );
 };
 
@@ -372,23 +372,23 @@ export const filterByConfidence = (
  * Get classification statistics
  */
 export const getClassificationStats = (
-  classifications: ClassificationResult[]
+  classifications: ClassificationResult[],
 ) => {
   const total = classifications.length;
   const transferRelated = classifications.filter(
-    (c) => c.isTransferRelated
+    (c) => c.isTransferRelated,
   ).length;
   const highConfidence = classifications.filter(
-    (c) => c.confidence >= 0.7
+    (c) => c.confidence >= 0.7,
   ).length;
 
   const languageStats = classifications.reduce(
     (acc, c) => {
-      const lang = c.language || 'unknown';
+      const lang = c.language || "unknown";
       acc[lang] = (acc[lang] || 0) + 1;
       return acc;
     },
-    {} as Record<string, number>
+    {} as Record<string, number>,
   );
 
   const typeStats = classifications.reduce(
@@ -398,7 +398,7 @@ export const getClassificationStats = (
       }
       return acc;
     },
-    {} as Record<string, number>
+    {} as Record<string, number>,
   );
 
   return {
@@ -407,7 +407,7 @@ export const getClassificationStats = (
     highConfidence,
     transferRate: Math.round((transferRelated / total) * 100),
     averageConfidence: Math.round(
-      (classifications.reduce((sum, c) => sum + c.confidence, 0) / total) * 100
+      (classifications.reduce((sum, c) => sum + c.confidence, 0) / total) * 100,
     ),
     languageStats,
     typeStats,
@@ -417,17 +417,19 @@ export const getClassificationStats = (
 /**
  * Alias for classifyTransferContent to match expected import
  */
-export const classifyTransferTweet = async (text: string): Promise<ClassificationResult> => {
+export const classifyTransferTweet = async (
+  text: string,
+): Promise<ClassificationResult> => {
   // Create a minimal tweet object for classification
   const tweet: TweetData = {
-    id: 'temp',
+    id: "temp",
     text,
     author: {
-      username: 'unknown',
-      displayName: 'Unknown',
+      username: "unknown",
+      displayName: "Unknown",
     },
     createdAt: new Date().toISOString(),
   };
-  
+
   return classifyTransferContent(tweet);
 };

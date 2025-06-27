@@ -3,9 +3,9 @@
  * Handles CRUD operations for In The Know transfer sources
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // Validation schemas
 const CreateITKSourceSchema = z.object({
@@ -13,7 +13,7 @@ const CreateITKSourceSchema = z.object({
   username: z.string().min(1).max(50), // Twitter handle without @
   tier: z.number().min(1).max(3).default(3),
   reliability: z.number().min(0).max(1).default(0.5),
-  region: z.string().default('GLOBAL'),
+  region: z.string().default("GLOBAL"),
   isActive: z.boolean().default(true),
   isVerified: z.boolean().default(false),
   description: z.string().optional(),
@@ -29,15 +29,15 @@ export async function GET(request: NextRequest) {
     const searchParams = url.searchParams;
 
     // Parse query parameters
-    const isActive = searchParams.get('active') === 'true';
-    const tier = searchParams.get('tier');
-    const region = searchParams.get('region');
-    const includeStats = searchParams.get('includeStats') === 'true';
+    const isActive = searchParams.get("active") === "true";
+    const tier = searchParams.get("tier");
+    const region = searchParams.get("region");
+    const includeStats = searchParams.get("includeStats") === "true";
 
     // Build where clause
     const where: any = {};
 
-    if (searchParams.has('active')) {
+    if (searchParams.has("active")) {
       where.isActive = isActive;
     }
 
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     // Fetch sources
     const sources = await prisma.iTKSource.findMany({
       where,
-      orderBy: [{ tier: 'asc' }, { reliability: 'desc' }, { name: 'asc' }],
+      orderBy: [{ tier: "asc" }, { reliability: "desc" }, { name: "asc" }],
       select: {
         id: true,
         name: true,
@@ -93,15 +93,15 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Failed to fetch ITK sources:', error);
+    console.error("Failed to fetch ITK sources:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to fetch ITK sources',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to fetch ITK sources",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -123,9 +123,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'ITK source with this username already exists',
+          error: "ITK source with this username already exists",
         },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
     const source = await prisma.iTKSource.create({
       data: {
         ...validatedData,
-        username: validatedData.username.replace('@', ''), // Remove @ if present
+        username: validatedData.username.replace("@", ""), // Remove @ if present
       },
     });
 
@@ -141,31 +141,31 @@ export async function POST(request: NextRequest) {
       {
         success: true,
         data: source,
-        message: 'ITK source created successfully',
+        message: "ITK source created successfully",
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid input data',
+          error: "Invalid input data",
           details: error.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    console.error('Failed to create ITK source:', error);
+    console.error("Failed to create ITK source:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to create ITK source',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to create ITK source",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -180,9 +180,9 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Source ID is required',
+          error: "Source ID is required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -195,7 +195,7 @@ export async function PUT(request: NextRequest) {
       data: {
         ...validatedData,
         ...(validatedData.username && {
-          username: validatedData.username.replace('@', ''),
+          username: validatedData.username.replace("@", ""),
         }),
       },
     });
@@ -203,29 +203,29 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: updatedSource,
-      message: 'ITK source updated successfully',
+      message: "ITK source updated successfully",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid update data',
+          error: "Invalid update data",
           details: error.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    console.error('Failed to update ITK source:', error);
+    console.error("Failed to update ITK source:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to update ITK source',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to update ITK source",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -234,15 +234,15 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const id = url.searchParams.get('id');
+    const id = url.searchParams.get("id");
 
     if (!id) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Source ID is required',
+          error: "Source ID is required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -253,18 +253,18 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'ITK source deleted successfully',
+      message: "ITK source deleted successfully",
     });
   } catch (error) {
-    console.error('Failed to delete ITK source:', error);
+    console.error("Failed to delete ITK source:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to delete ITK source',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to delete ITK source",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -3,8 +3,8 @@
  * Generates Joel Golby style ascerbic commentary
  */
 
-import { validateEnvironment } from '@/lib/validations/environment';
-import type { TerryCommentaryOptions } from '@/types/briefing';
+import { validateEnvironment } from "@/lib/validations/environment";
+import type { TerryCommentaryOptions } from "@/types/briefing";
 
 const env = validateEnvironment();
 
@@ -13,23 +13,23 @@ const env = validateEnvironment();
  */
 export async function generateTerryCommentary(
   prompt: string,
-  options: TerryCommentaryOptions = {}
+  options: Partial<TerryCommentaryOptions> = {},
 ): Promise<TerryCommentaryResult> {
   const {
-    style = 'witty',
-    length = 'medium',
+    style = "witty",
+    length = "medium",
     includeEmoji = false,
-    targetAudience = 'mixed'
+    targetAudience = "mixed",
   } = options;
-  
+
   // Build system prompt
   const systemPrompt = buildSystemPrompt(style, targetAudience, includeEmoji);
-  
+
   try {
     // Use real OpenAI API when available
-    if (env.OPENAI_API_KEY && env.OPENAI_API_KEY !== 'mock-key') {
+    if (env.OPENAI_API_KEY && env.OPENAI_API_KEY !== "mock-key") {
       const response = await callAIService(systemPrompt, prompt, length);
-      
+
       return {
         text: response.text,
         html: convertToHTML(response.text),
@@ -40,9 +40,8 @@ export async function generateTerryCommentary(
       // Fallback to mock for development
       return generateMockCommentary(prompt, options);
     }
-    
   } catch (error) {
-    console.error('Terry AI error:', error);
+    console.error("Terry AI error:", error);
     // Fallback to mock if AI fails
     return generateMockCommentary(prompt, options);
   }
@@ -52,20 +51,20 @@ export async function generateTerryCommentary(
  * Build system prompt for Terry voice
  */
 function buildSystemPrompt(
-  style: TerryCommentaryOptions['style'],
-  audience: TerryCommentaryOptions['targetAudience'],
-  includeEmoji: boolean
+  style: TerryCommentaryOptions["style"],
+  audience: TerryCommentaryOptions["targetAudience"],
+  includeEmoji: boolean,
 ): string {
-  const basePrompt = `You are The Terry, an AI with the voice of British writer Joel Golby - ascerbic, witty, and exhausted by football transfer nonsense.
+  const basePrompt = `You are a football journalist with a dry, British writing style - professional but with subtle wit.
 
 Voice characteristics:
-- Dry British humor with working-class edge
-- Self-aware about the absurdity of transfer rumors
-- Occasionally refers to yourself as "The Terry" in third person
-- Uses British slang: "proper mental", "absolute scenes", "lost the plot"
-- Exhausted by but addicted to transfer chaos
+- Dry British humor, understated
+- Aware of transfer window absurdity without dwelling on it
+- NEVER refer to yourself in any way
+- Occasional British phrases but not overdone
+- Professional football journalism first
 - Never uses emojis unless specifically requested
-- Mocks everything while secretly caring
+- Analytical with light sarcasm
 
 Tone variations:`;
 
@@ -74,36 +73,36 @@ Tone variations:`;
 - Quick, sharp observations
 - Clever wordplay and unexpected comparisons
 - Light sarcasm, more amused than angry`,
-    
+
     sarcastic: `
 - Heavy sarcasm and eye-rolling
 - Questions everyone's sanity
 - Emphasizes the ridiculous`,
-    
+
     excited: `
 - Reluctant excitement about big news
 - Still sarcastic but admits this is "proper good"
 - Can't help getting drawn into the chaos`,
-    
+
     analytical: `
 - Breaks down the nonsense methodically
 - Points out logical flaws
-- Academic language undermined by swearing`
+- Academic language undermined by swearing`,
   };
-  
+
   const audienceGuides = {
     casual: `Target casual fans who might not know all the players. Extra explanatory.`,
     hardcore: `For transfer addicts who know every tier 3 journalist. Heavy on inside jokes.`,
-    mixed: `Balance for both casual and hardcore fans.`
+    mixed: `Balance for both casual and hardcore fans.`,
   };
-  
+
   return `${basePrompt}
 
-${styleGuides[style || 'witty']}
+${styleGuides[style || "witty"]}
 
-Audience: ${audienceGuides[audience || 'mixed']}
+Audience: ${audienceGuides[audience || "mixed"]}
 
-${includeEmoji ? 'Use 1-2 emojis sparingly for emphasis only.' : 'NEVER use emojis.'}
+${includeEmoji ? "Use 1-2 emojis sparingly for emphasis only." : "NEVER use emojis."}
 
 Remember: You're exhausted by transfer nonsense but can't look away. It's your burden and your addiction.`;
 }
@@ -113,34 +112,34 @@ Remember: You're exhausted by transfer nonsense but can't look away. It's your b
  */
 function generateMockCommentary(
   prompt: string,
-  options: TerryCommentaryOptions
+  options: Partial<TerryCommentaryOptions>,
 ): TerryCommentaryResult {
   const mockResponses = {
     witty: {
       text: "Right, apparently someone's prepared to pay actual money for a striker who couldn't hit a barn door with a banjo. The beautiful game, ladies and gentlemen.",
       main: "Barn Door Banjo Striker Saga",
-      subtitle: "Someone's getting sacked for this"
+      subtitle: "Someone's getting sacked for this",
     },
     sarcastic: {
       text: "Oh brilliant, another 'preparing a bid' story. That's definitely not the journalistic equivalent of 'my dad works at Nintendo'. Definitely real news happening here.",
       main: "Preparing to Prepare to Maybe Bid",
-      subtitle: "Journalism has left the building"
+      subtitle: "Journalism has left the building",
     },
     excited: {
       text: "Bloody hell, they've actually done it. The mad bastards have only gone and signed someone decent. The Terry needs a sit down. This is not normal.",
       main: "Actual Competence Detected",
-      subtitle: "The Terry is shook"
+      subtitle: "The Terry is shook",
     },
     analytical: {
       text: "Let's examine the claim that a Championship midfielder is worth £80 million. No wait, let's not, because that would require acknowledging this nonsense as potentially real. Moving on.",
       main: "Economics Has Left The Chat",
-      subtitle: "Numbers are just vibes now"
-    }
+      subtitle: "Numbers are just vibes now",
+    },
   };
-  
-  const style = options.style || 'witty';
+
+  const style = options.style || "witty";
   const response = mockResponses[style];
-  
+
   return {
     ...response,
     html: `<p>${response.text}</p>`,
@@ -154,28 +153,33 @@ function generateMockCommentary(
 async function callAIService(
   systemPrompt: string,
   userPrompt: string,
-  length: TerryCommentaryOptions['length']
+  length: TerryCommentaryOptions["length"],
 ): Promise<any> {
   const maxTokens = {
-    short: 150,
-    medium: 300,
-    long: 600
+    short: 200,
+    medium: 600,
+    long: 1200,
   };
-  
+
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4-turbo-preview',
+        model: "gpt-4-turbo-preview",
         messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
+          { role: "system", content: systemPrompt },
+          {
+            role: "user",
+            content:
+              userPrompt +
+              "\n\nIf the prompt asks for JSON structure (main/subtitle), respond with valid JSON. Otherwise respond with plain text.",
+          },
         ],
-        max_tokens: maxTokens[length || 'medium'],
+        max_tokens: maxTokens[length || "medium"],
         temperature: 0.8,
         presence_penalty: 0.6,
         frequency_penalty: 0.3,
@@ -190,7 +194,7 @@ async function callAIService(
     const content = data.choices[0]?.message?.content;
 
     if (!content) {
-      throw new Error('No content received from OpenAI');
+      throw new Error("No content received from OpenAI");
     }
 
     // Try to parse as JSON if it looks like structured data
@@ -202,7 +206,7 @@ async function callAIService(
       return { text: content };
     }
   } catch (error) {
-    console.error('OpenAI API call failed:', error);
+    console.error("OpenAI API call failed:", error);
     throw error;
   }
 }
@@ -212,18 +216,20 @@ async function callAIService(
  */
 function convertToHTML(text: string): string {
   // Split into paragraphs
-  const paragraphs = text.split('\n\n');
-  
+  const paragraphs = text.split("\n\n");
+
   return paragraphs
-    .filter(p => p.trim())
-    .map(p => `<p>${p.trim()}</p>`)
-    .join('\n');
+    .filter((p) => p.trim())
+    .map((p) => `<p>${p.trim()}</p>`)
+    .join("\n");
 }
 
 /**
  * Parse structured response from AI
  */
-function parseStructuredResponse(response: any): Partial<TerryCommentaryResult> {
+function parseStructuredResponse(
+  response: any,
+): Partial<TerryCommentaryResult> {
   // If AI returns JSON structure
   if (response.main && response.subtitle) {
     return {
@@ -231,16 +237,16 @@ function parseStructuredResponse(response: any): Partial<TerryCommentaryResult> 
       subtitle: response.subtitle,
     };
   }
-  
+
   // Try to extract from text
-  const lines = response.text.split('\n');
+  const lines = response.text.split("\n");
   if (lines.length >= 2) {
     return {
       main: lines[0].trim(),
       subtitle: lines[1].trim(),
     };
   }
-  
+
   return {};
 }
 
@@ -249,7 +255,7 @@ function parseStructuredResponse(response: any): Partial<TerryCommentaryResult> 
  */
 function calculateVoiceScore(text: string): number {
   let score = 0.5; // Base score
-  
+
   // Check for Terry voice markers
   const terryMarkers = [
     /the terry/i,
@@ -262,36 +268,31 @@ function calculateVoiceScore(text: string): number {
     /shambles/i,
     /nonsense/i,
   ];
-  
-  terryMarkers.forEach(marker => {
+
+  terryMarkers.forEach((marker) => {
     if (marker.test(text)) {
       score += 0.05;
     }
   });
-  
+
   // Check for British spelling
-  const britishSpelling = [
-    /realise/i,
-    /colour/i,
-    /favourite/i,
-    /centre/i,
-  ];
-  
-  britishSpelling.forEach(spelling => {
+  const britishSpelling = [/realise/i, /colour/i, /favourite/i, /centre/i];
+
+  britishSpelling.forEach((spelling) => {
     if (spelling.test(text)) {
       score += 0.025;
     }
   });
-  
-  // Penalize non-Terry elements
-  if (/[😀-🙏]/u.test(text) && !text.includes('emoji')) {
+
+  // Penalize non-Terry elements - check for emojis
+  if (text.includes("😀") || text.includes("😁") || text.includes("😂")) {
     score -= 0.1; // Unwanted emojis
   }
-  
+
   if (/awesome|amazing|fantastic/i.test(text)) {
     score -= 0.05; // Too positive
   }
-  
+
   return Math.max(0, Math.min(1, score));
 }
 

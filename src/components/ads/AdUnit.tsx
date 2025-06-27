@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 interface AdUnitProps {
   slot: string;
-  format?: 'auto' | 'fluid' | 'rectangle' | 'vertical' | 'horizontal';
+  format?: "auto" | "fluid" | "rectangle" | "vertical" | "horizontal";
   style?: React.CSSProperties;
   className?: string;
 }
 
-export function AdUnit({ 
-  slot, 
-  format = 'auto', 
-  style = {}, 
-  className = '' 
+export function AdUnit({
+  slot,
+  format = "auto",
+  style = {},
+  className = "",
 }: AdUnitProps) {
   useEffect(() => {
     try {
       // @ts-ignore
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch (err) {
-      console.error('AdSense error:', err);
+      console.error("AdSense error:", err);
     }
   }, []);
 
@@ -29,7 +29,7 @@ export function AdUnit({
       <ins
         className="adsbygoogle"
         style={{
-          display: 'block',
+          display: "block",
           ...style,
         }}
         data-ad-client="ca-pub-XXXXXXXXXXXXXXXXX" // Replace with your AdSense client ID
@@ -51,7 +51,7 @@ export function FeedAd() {
             SPONSORED
           </span>
         </div>
-        <AdUnit 
+        <AdUnit
           slot="1234567890" // Replace with your ad slot ID
           format="fluid"
           className="min-h-[200px]"
@@ -65,11 +65,13 @@ export function FeedAd() {
 export function SidebarAd() {
   return (
     <div className="bg-card border border-border rounded-lg p-4">
-      <p className="text-xs text-muted-foreground mb-2 text-center">Advertisement</p>
-      <AdUnit 
+      <p className="text-xs text-muted-foreground mb-2 text-center">
+        Advertisement
+      </p>
+      <AdUnit
         slot="0987654321" // Replace with your ad slot ID
         format="rectangle"
-        style={{ width: '300px', height: '250px' }}
+        style={{ width: "300px", height: "250px" }}
       />
     </div>
   );

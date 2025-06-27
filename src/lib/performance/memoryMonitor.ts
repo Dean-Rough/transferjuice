@@ -28,7 +28,7 @@ export const DEFAULT_THRESHOLDS: MemoryThresholds = {
  * Get current memory usage metrics
  */
 export function getMemoryMetrics(): MemoryMetrics | null {
-  if (typeof window === 'undefined' || !('performance' in window)) {
+  if (typeof window === "undefined" || !("performance" in window)) {
     return null;
   }
 
@@ -62,9 +62,9 @@ export function getMemoryMetrics(): MemoryMetrics | null {
  */
 export function checkMemoryThresholds(
   metrics: MemoryMetrics,
-  thresholds: MemoryThresholds = DEFAULT_THRESHOLDS
+  thresholds: MemoryThresholds = DEFAULT_THRESHOLDS,
 ): {
-  level: 'safe' | 'warning' | 'critical' | 'exceeded';
+  level: "safe" | "warning" | "critical" | "exceeded";
   message: string;
   shouldCleanup: boolean;
 } {
@@ -72,7 +72,7 @@ export function checkMemoryThresholds(
 
   if (usedMB >= thresholds.maximum) {
     return {
-      level: 'exceeded',
+      level: "exceeded",
       message: `Memory usage (${usedMB}MB) exceeds maximum threshold (${thresholds.maximum}MB)`,
       shouldCleanup: true,
     };
@@ -80,7 +80,7 @@ export function checkMemoryThresholds(
 
   if (usedMB >= thresholds.critical) {
     return {
-      level: 'critical',
+      level: "critical",
       message: `Memory usage (${usedMB}MB) is at critical level (${thresholds.critical}MB+)`,
       shouldCleanup: true,
     };
@@ -88,14 +88,14 @@ export function checkMemoryThresholds(
 
   if (usedMB >= thresholds.warning) {
     return {
-      level: 'warning',
+      level: "warning",
       message: `Memory usage (${usedMB}MB) approaching warning level (${thresholds.warning}MB+)`,
       shouldCleanup: false,
     };
   }
 
   return {
-    level: 'safe',
+    level: "safe",
     message: `Memory usage (${usedMB}MB) is within safe limits`,
     shouldCleanup: false,
   };
@@ -127,7 +127,7 @@ export class MemoryMonitor {
         this.callbacks.forEach((callback) => callback(metrics));
 
         const status = checkMemoryThresholds(metrics, this.thresholds);
-        if (status.level === 'critical' || status.level === 'exceeded') {
+        if (status.level === "critical" || status.level === "exceeded") {
           console.warn(`Memory Monitor: ${status.message}`);
         }
       }
@@ -170,12 +170,12 @@ export class MemoryMonitor {
    * Force garbage collection if available (dev mode)
    */
   forceGarbageCollection(): void {
-    if (typeof window !== 'undefined' && (window as any).gc) {
+    if (typeof window !== "undefined" && (window as any).gc) {
       try {
         (window as any).gc();
-        console.log('Manual garbage collection triggered');
+        console.log("Manual garbage collection triggered");
       } catch (error) {
-        console.warn('Failed to trigger garbage collection:', error);
+        console.warn("Failed to trigger garbage collection:", error);
       }
     }
   }
@@ -190,7 +190,7 @@ export const MemoryOptimizer = {
    */
   optimizeObject<T extends Record<string, any>>(
     obj: T,
-    keepKeys: (keyof T)[]
+    keepKeys: (keyof T)[],
   ): Partial<T> {
     const optimized: Partial<T> = {};
     keepKeys.forEach((key) => {
@@ -213,7 +213,7 @@ export const MemoryOptimizer = {
 
     Object.getOwnPropertyNames(obj).forEach((prop) => {
       const value = (obj as any)[prop];
-      if (value && typeof value === 'object') {
+      if (value && typeof value === "object") {
         this.deepFreeze(value, visited);
       }
     });
@@ -275,7 +275,7 @@ export const MemoryOptimizer = {
  */
 export function useMemoryMonitor(
   thresholds: MemoryThresholds = DEFAULT_THRESHOLDS,
-  intervalMs: number = 5000
+  intervalMs: number = 5000,
 ): {
   metrics: MemoryMetrics | null;
   status: ReturnType<typeof checkMemoryThresholds> | null;
@@ -305,4 +305,4 @@ export function useMemoryMonitor(
 }
 
 // Add React import for the hook
-import React from 'react';
+import React from "react";

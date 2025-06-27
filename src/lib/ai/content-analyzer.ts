@@ -5,8 +5,8 @@
 
 // TODO: Fix circular dependency with terry-style
 // import { applyTerryStyle } from '@/lib/terry-style';
-import OpenAI from 'openai';
-import { z } from 'zod';
+import OpenAI from "openai";
+import { z } from "zod";
 
 // Analysis result schemas
 export const EntityExtractionSchema = z.object({
@@ -17,7 +17,7 @@ export const EntityExtractionSchema = z.object({
       position: z.string().optional(),
       currentClub: z.string().optional(),
       nationality: z.string().optional(),
-    })
+    }),
   ),
   clubs: z.array(
     z.object({
@@ -25,35 +25,35 @@ export const EntityExtractionSchema = z.object({
       confidence: z.number().min(0).max(1),
       league: z.string().optional(),
       country: z.string().optional(),
-    })
+    }),
   ),
   transferDetails: z.array(
     z.object({
-      type: z.enum(['fee', 'contract_length', 'wage', 'agent', 'medical_date']),
+      type: z.enum(["fee", "contract_length", "wage", "agent", "medical_date"]),
       value: z.string(),
       confidence: z.number().min(0).max(1),
-    })
+    }),
   ),
   agents: z.array(
     z.object({
       name: z.string().optional(),
       company: z.string().optional(),
       confidence: z.number().min(0).max(1),
-    })
+    }),
   ),
 });
 
 export const SentimentAnalysisSchema = z.object({
-  sentiment: z.enum(['positive', 'negative', 'neutral']),
+  sentiment: z.enum(["positive", "negative", "neutral"]),
   confidence: z.number().min(0).max(1),
   emotions: z.array(
     z.enum([
-      'excitement',
-      'disappointment',
-      'skepticism',
-      'optimism',
-      'anxiety',
-    ])
+      "excitement",
+      "disappointment",
+      "skepticism",
+      "optimism",
+      "anxiety",
+    ]),
   ),
   reliability: z.number().min(0).max(1), // How reliable the source seems
   urgency: z.number().min(0).max(1), // How urgent/breaking the news is
@@ -62,23 +62,23 @@ export const SentimentAnalysisSchema = z.object({
 export const ContentClassificationSchema = z.object({
   isTransferRelated: z.boolean(),
   transferType: z
-    .enum(['RUMOUR', 'TALKS', 'ADVANCED', 'MEDICAL', 'CONFIRMED', 'OFFICIAL'])
+    .enum(["RUMOUR", "TALKS", "ADVANCED", "MEDICAL", "CONFIRMED", "OFFICIAL"])
     .optional(),
-  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]),
   confidence: z.number().min(0).max(1),
   categories: z.array(
     z.enum([
-      'signing',
-      'departure',
-      'contract_extension',
-      'loan',
-      'medical',
-      'negotiation',
-      'rumour',
-      'denial',
-      'agent_talk',
-      'fee_discussion',
-    ])
+      "signing",
+      "departure",
+      "contract_extension",
+      "loan",
+      "medical",
+      "negotiation",
+      "rumour",
+      "denial",
+      "agent_talk",
+      "fee_discussion",
+    ]),
   ),
   keyPoints: z.array(z.string()),
   duplicateOf: z.string().optional(), // ID of original tweet if this is duplicate
@@ -114,7 +114,7 @@ export interface TweetInput {
   authorHandle: string;
   authorName: string;
   authorVerified: boolean;
-  authorTier: 'tier1' | 'tier2' | 'tier3';
+  authorTier: "tier1" | "tier2" | "tier3";
   createdAt: Date;
   metrics: {
     retweets: number;
@@ -135,7 +135,7 @@ export class AIContentAnalyzer {
 
   constructor(config: AnalyzerConfig) {
     this.config = {
-      model: 'gpt-4.1',
+      model: "gpt-4.1",
       maxTokens: 1500,
       temperature: 0.3,
       enableCaching: true,
@@ -173,12 +173,12 @@ export class AIContentAnalyzer {
         classification,
         entities,
         sentiment,
-        input
+        input,
       );
       const terryCompatibility = this.calculateTerryCompatibility(
         input,
         sentiment,
-        entities
+        entities,
       );
 
       const analysis: ContentAnalysis = {
@@ -199,7 +199,7 @@ export class AIContentAnalyzer {
       return analysis;
     } catch (error) {
       throw new Error(
-        `AI analysis failed for tweet ${input.id}: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `AI analysis failed for tweet ${input.id}: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -208,7 +208,7 @@ export class AIContentAnalyzer {
    * Classify tweet content using AI
    */
   private async classifyContent(
-    input: TweetInput
+    input: TweetInput,
   ): Promise<ContentClassification> {
     const prompt = this.buildClassificationPrompt(input);
 
@@ -216,7 +216,7 @@ export class AIContentAnalyzer {
       model: this.config.model,
       messages: [
         {
-          role: 'system',
+          role: "system",
           content: `You are an expert football transfer journalist and content classifier. Analyze tweets for transfer relevance with high accuracy.
 
 Your task is to classify the following tweet and return a JSON response with these exact fields:
@@ -231,18 +231,18 @@ Your task is to classify the following tweet and return a JSON response with the
 Focus on transfer-related content only. Non-transfer football content should be classified as not transfer related.`,
         },
         {
-          role: 'user',
+          role: "user",
           content: prompt,
         },
       ],
       max_tokens: this.config.maxTokens,
       temperature: this.config.temperature,
-      response_format: { type: 'json_object' },
+      response_format: { type: "json_object" },
     });
 
     const content = response.choices[0]?.message?.content;
     if (!content) {
-      throw new Error('No response from AI classification');
+      throw new Error("No response from AI classification");
     }
 
     try {
@@ -250,7 +250,7 @@ Focus on transfer-related content only. Non-transfer football content should be 
       return ContentClassificationSchema.parse(parsed);
     } catch (error) {
       throw new Error(
-        `Invalid AI classification response: ${error instanceof Error ? error.message : 'Parse error'}`
+        `Invalid AI classification response: ${error instanceof Error ? error.message : "Parse error"}`,
       );
     }
   }
@@ -265,7 +265,7 @@ Focus on transfer-related content only. Non-transfer football content should be 
       model: this.config.model,
       messages: [
         {
-          role: 'system',
+          role: "system",
           content: `You are an expert in football knowledge and named entity recognition. Extract all football-related entities from tweets.
 
 Return a JSON response with these exact fields:
@@ -277,18 +277,18 @@ Return a JSON response with these exact fields:
 Be precise with confidence scores (0-1). Only include entities you're confident about.`,
         },
         {
-          role: 'user',
+          role: "user",
           content: prompt,
         },
       ],
       max_tokens: this.config.maxTokens,
       temperature: this.config.temperature,
-      response_format: { type: 'json_object' },
+      response_format: { type: "json_object" },
     });
 
     const content = response.choices[0]?.message?.content;
     if (!content) {
-      throw new Error('No response from AI entity extraction');
+      throw new Error("No response from AI entity extraction");
     }
 
     try {
@@ -296,7 +296,7 @@ Be precise with confidence scores (0-1). Only include entities you're confident 
       return EntityExtractionSchema.parse(parsed);
     } catch (error) {
       throw new Error(
-        `Invalid AI entity extraction response: ${error instanceof Error ? error.message : 'Parse error'}`
+        `Invalid AI entity extraction response: ${error instanceof Error ? error.message : "Parse error"}`,
       );
     }
   }
@@ -305,7 +305,7 @@ Be precise with confidence scores (0-1). Only include entities you're confident 
    * Analyze sentiment and reliability
    */
   private async analyzeSentiment(
-    input: TweetInput
+    input: TweetInput,
   ): Promise<SentimentAnalysis> {
     const prompt = this.buildSentimentPrompt(input);
 
@@ -313,7 +313,7 @@ Be precise with confidence scores (0-1). Only include entities you're confident 
       model: this.config.model,
       messages: [
         {
-          role: 'system',
+          role: "system",
           content: `You are a sentiment analysis expert specializing in football transfer news. Analyze the sentiment, reliability, and urgency of transfer-related content.
 
 Return a JSON response with these exact fields:
@@ -326,18 +326,18 @@ Return a JSON response with these exact fields:
 Consider the author's tier, verification status, and language used when assessing reliability.`,
         },
         {
-          role: 'user',
+          role: "user",
           content: prompt,
         },
       ],
       max_tokens: this.config.maxTokens,
       temperature: this.config.temperature,
-      response_format: { type: 'json_object' },
+      response_format: { type: "json_object" },
     });
 
     const content = response.choices[0]?.message?.content;
     if (!content) {
-      throw new Error('No response from AI sentiment analysis');
+      throw new Error("No response from AI sentiment analysis");
     }
 
     try {
@@ -345,7 +345,7 @@ Consider the author's tier, verification status, and language used when assessin
       return SentimentAnalysisSchema.parse(parsed);
     } catch (error) {
       throw new Error(
-        `Invalid AI sentiment analysis response: ${error instanceof Error ? error.message : 'Parse error'}`
+        `Invalid AI sentiment analysis response: ${error instanceof Error ? error.message : "Parse error"}`,
       );
     }
   }
@@ -365,8 +365,8 @@ Engagement: ${input.metrics.retweets} RTs, ${input.metrics.likes} likes, ${input
 Posted: ${input.createdAt.toISOString()}
 
 Context:
-${input.context?.authorSpecialties ? `Author specializes in: ${input.context.authorSpecialties.join(', ')}` : ''}
-${input.context?.recentTweets ? `Recent tweets: ${input.context.recentTweets.join(' | ')}` : ''}
+${input.context?.authorSpecialties ? `Author specializes in: ${input.context.authorSpecialties.join(", ")}` : ""}
+${input.context?.recentTweets ? `Recent tweets: ${input.context.recentTweets.join(" | ")}` : ""}
 
 Please classify this tweet for transfer relevance and provide detailed analysis.
     `.trim();
@@ -411,7 +411,7 @@ Consider the author's credibility and the language used.
     classification: ContentClassification,
     entities: EntityExtraction,
     sentiment: SentimentAnalysis,
-    input: TweetInput
+    input: TweetInput,
   ): number {
     let score = 0;
 
@@ -424,13 +424,13 @@ Consider the author's credibility and the language used.
 
     // Source reliability
     switch (input.authorTier) {
-      case 'tier1':
+      case "tier1":
         score += 25;
         break;
-      case 'tier2':
+      case "tier2":
         score += 15;
         break;
-      case 'tier3':
+      case "tier3":
         score += 5;
         break;
     }
@@ -450,27 +450,27 @@ Consider the author's credibility and the language used.
   private calculateTerryCompatibility(
     input: TweetInput,
     sentiment: SentimentAnalysis,
-    entities: EntityExtraction
+    entities: EntityExtraction,
   ): number {
     let score = 0;
 
     // Emotional content (Terry loves drama)
-    if (sentiment.emotions.includes('excitement')) score += 20;
-    if (sentiment.emotions.includes('skepticism')) score += 25;
-    if (sentiment.emotions.includes('anxiety')) score += 15;
+    if (sentiment.emotions.includes("excitement")) score += 20;
+    if (sentiment.emotions.includes("skepticism")) score += 25;
+    if (sentiment.emotions.includes("anxiety")) score += 15;
 
     // Specific details (Terry loves specificity)
     score += entities.transferDetails.length * 10;
 
     // Big fees (Terry loves financial absurdity)
     const hasBigFee = entities.transferDetails.some(
-      (detail) => detail.type === 'fee' && /\d{3}/.test(detail.value)
+      (detail) => detail.type === "fee" && /\d{3}/.test(detail.value),
     );
     if (hasBigFee) score += 20;
 
     // Chaos potential
-    if (input.text.toLowerCase().includes('chaos')) score += 10;
-    if (input.text.toLowerCase().includes('mental')) score += 15;
+    if (input.text.toLowerCase().includes("chaos")) score += 10;
+    if (input.text.toLowerCase().includes("mental")) score += 15;
 
     return Math.min(Math.round(score), 100);
   }
@@ -506,7 +506,7 @@ Consider the author's credibility and the language used.
     try {
       const response = await this.openai.chat.completions.create({
         model: this.config.model,
-        messages: [{ role: 'user', content: 'Test connection' }],
+        messages: [{ role: "user", content: "Test connection" }],
         max_tokens: 10,
       });
 
@@ -514,7 +514,7 @@ Consider the author's credibility and the language used.
     } catch (error) {
       return {
         valid: false,
-        error: `OpenAI API validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error: `OpenAI API validation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       };
     }
   }

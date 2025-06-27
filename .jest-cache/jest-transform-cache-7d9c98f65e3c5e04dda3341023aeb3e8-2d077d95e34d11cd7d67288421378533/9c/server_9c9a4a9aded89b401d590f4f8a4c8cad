@@ -1,0 +1,82 @@
+76f7434bb1d0c132ed6d0d0ffe8322d0
+/* istanbul ignore next */
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.server = void 0;
+var
+/* istanbul ignore next */
+_node = require("msw/node");
+var
+/* istanbul ignore next */
+_handlers = require("./handlers");
+/* istanbul ignore next */
+function cov_rkh0s5vwf() {
+  var path = "/Users/deannewton/Documents/TransferJuice/src/test/mocks/server.ts";
+  var hash = "cd707876c0a53f620520c5ea682115cf134d4847";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/Users/deannewton/Documents/TransferJuice/src/test/mocks/server.ts",
+    statementMap: {
+      "0": {
+        start: {
+          line: 5,
+          column: 22
+        },
+        end: {
+          line: 5,
+          column: 46
+        }
+      }
+    },
+    fnMap: {},
+    branchMap: {},
+    s: {
+      "0": 0
+    },
+    f: {},
+    b: {},
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "cd707876c0a53f620520c5ea682115cf134d4847"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_rkh0s5vwf = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_rkh0s5vwf();
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+// Create MSW server for API mocking in tests
+var server =
+/* istanbul ignore next */
+exports.server = (cov_rkh0s5vwf().s[0]++,
+/* istanbul ignore next */
+/* istanbul ignore next */
+_node.
+/* istanbul ignore next */
+setupServer.apply(
+/* istanbul ignore next */
+void 0,
+/* istanbul ignore next */
+_toConsumableArray(
+/* istanbul ignore next */
+_handlers.
+/* istanbul ignore next */
+handlers)));
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJfbm9kZSIsInJlcXVpcmUiLCJfaGFuZGxlcnMiLCJjb3ZfcmtoMHM1dndmIiwicGF0aCIsImhhc2giLCJnbG9iYWwiLCJGdW5jdGlvbiIsImdjdiIsImNvdmVyYWdlRGF0YSIsInN0YXRlbWVudE1hcCIsInN0YXJ0IiwibGluZSIsImNvbHVtbiIsImVuZCIsImZuTWFwIiwiYnJhbmNoTWFwIiwicyIsImYiLCJiIiwiX2NvdmVyYWdlU2NoZW1hIiwiY292ZXJhZ2UiLCJhY3R1YWxDb3ZlcmFnZSIsIl90b0NvbnN1bWFibGVBcnJheSIsInIiLCJfYXJyYXlXaXRob3V0SG9sZXMiLCJfaXRlcmFibGVUb0FycmF5IiwiX3Vuc3VwcG9ydGVkSXRlcmFibGVUb0FycmF5IiwiX25vbkl0ZXJhYmxlU3ByZWFkIiwiVHlwZUVycm9yIiwiYSIsIl9hcnJheUxpa2VUb0FycmF5IiwidCIsInRvU3RyaW5nIiwiY2FsbCIsInNsaWNlIiwiY29uc3RydWN0b3IiLCJuYW1lIiwiQXJyYXkiLCJmcm9tIiwidGVzdCIsIlN5bWJvbCIsIml0ZXJhdG9yIiwiaXNBcnJheSIsImxlbmd0aCIsImUiLCJuIiwic2VydmVyIiwiZXhwb3J0cyIsInNldHVwU2VydmVyIiwiYXBwbHkiLCJoYW5kbGVycyJdLCJzb3VyY2VzIjpbInNlcnZlci50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBzZXR1cFNlcnZlciB9IGZyb20gXCJtc3cvbm9kZVwiO1xuaW1wb3J0IHsgaGFuZGxlcnMgfSBmcm9tIFwiLi9oYW5kbGVyc1wiO1xuXG4vLyBDcmVhdGUgTVNXIHNlcnZlciBmb3IgQVBJIG1vY2tpbmcgaW4gdGVzdHNcbmV4cG9ydCBjb25zdCBzZXJ2ZXIgPSBzZXR1cFNlcnZlciguLi5oYW5kbGVycyk7XG4iXSwibWFwcGluZ3MiOiI7Ozs7Ozs7QUFBQTtBQUFBO0FBQUFBLEtBQUEsR0FBQUMsT0FBQTtBQUNBO0FBQUE7QUFBQUMsU0FBQSxHQUFBRCxPQUFBO0FBQXNDO0FBQUEsU0FBQUUs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

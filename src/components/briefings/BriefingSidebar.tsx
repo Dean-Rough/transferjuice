@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { NewsletterSignup } from '@/components/features/NewsletterSignup';
+import { useState, useEffect } from "react";
+import { NewsletterSignup } from "@/components/features/NewsletterSignup";
 
 interface BriefingSidebarProps {
   sections?: any[]; // Sidebar sections from briefing
@@ -25,30 +25,34 @@ interface ReadingProgress {
   currentSection: string;
 }
 
-export function BriefingSidebar({ 
-  briefingData, 
-  scrollPosition, 
-  className = '' 
+export function BriefingSidebar({
+  briefingData,
+  scrollPosition,
+  className = "",
 }: BriefingSidebarProps) {
   const [readingProgress, setReadingProgress] = useState<ReadingProgress>({
     percentage: 0,
-    estimatedTimeRemaining: briefingData.readTime,
-    currentSection: 'Introduction',
+    estimatedTimeRemaining: briefingData?.readTime || 5,
+    currentSection: "Introduction",
   });
 
   const [isSticky, setIsSticky] = useState(false);
 
   // Update reading progress based on scroll
   useEffect(() => {
-    const percentage = Math.round(scrollPosition * 100);
-    const timeRemaining = Math.max(0, briefingData.readTime * (1 - scrollPosition));
-    
+    const percentage = Math.round((scrollPosition || 0) * 100);
+    const timeRemaining = Math.max(
+      0,
+      (briefingData?.readTime || 5) * (1 - (scrollPosition || 0)),
+    );
+
     // Determine current section based on scroll position
-    let currentSection = 'Introduction';
-    if (scrollPosition > 0.8) currentSection = 'Bullshit Corner';
-    else if (scrollPosition > 0.6) currentSection = 'Analysis';
-    else if (scrollPosition > 0.3) currentSection = 'Context & Stories';
-    else if (scrollPosition > 0.1) currentSection = 'Main News';
+    let currentSection = "Introduction";
+    const scroll = scrollPosition || 0;
+    if (scroll > 0.8) currentSection = "Bullshit Corner";
+    else if (scroll > 0.6) currentSection = "Analysis";
+    else if (scroll > 0.3) currentSection = "Context & Stories";
+    else if (scroll > 0.1) currentSection = "Main News";
 
     setReadingProgress({
       percentage,
@@ -57,26 +61,26 @@ export function BriefingSidebar({
     });
 
     // Update sticky state
-    setIsSticky(scrollPosition > 0.1);
-  }, [scrollPosition, briefingData.readTime]);
+    setIsSticky(scroll > 0.1);
+  }, [scrollPosition, briefingData?.readTime]);
 
   const getTerryScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-400';
-    if (score >= 75) return 'text-yellow-400';
-    if (score >= 60) return 'text-orange-400';
-    return 'text-red-400';
+    if (score >= 90) return "text-green-400";
+    if (score >= 75) return "text-yellow-400";
+    if (score >= 60) return "text-orange-400";
+    return "text-red-400";
   };
 
   const getTerryScoreLabel = (score: number) => {
-    if (score >= 90) return 'Peak Terry';
-    if (score >= 75) return 'Proper Terry';
-    if (score >= 60) return 'Terry-ish';
-    return 'Not Terry';
+    if (score >= 90) return "Peak Terry";
+    if (score >= 75) return "Proper Terry";
+    if (score >= 60) return "Terry-ish";
+    return "Not Terry";
   };
 
   return (
-    <aside 
-      className={`briefing-sidebar space-y-6 ${className} ${isSticky ? 'sidebar-sticky' : ''}`}
+    <aside
+      className={`briefing-sidebar space-y-6 ${className} ${isSticky ? "sidebar-sticky" : ""}`}
       data-testid="briefing-sidebar"
     >
       {/* Reading Progress */}
@@ -85,7 +89,7 @@ export function BriefingSidebar({
           <span className="mr-2">📖</span>
           Reading Progress
         </h3>
-        
+
         <div className="space-y-3">
           {/* Progress bar */}
           <div className="progress-bar-container">
@@ -94,7 +98,7 @@ export function BriefingSidebar({
               <span>{readingProgress.estimatedTimeRemaining}m left</span>
             </div>
             <div className="progress-bar bg-muted rounded-full h-2 overflow-hidden">
-              <div 
+              <div
                 className="progress-fill bg-orange-500 h-full transition-all duration-300 ease-out"
                 style={{ width: `${readingProgress.percentage}%` }}
               />
@@ -104,7 +108,9 @@ export function BriefingSidebar({
           {/* Current section */}
           <div className="current-section">
             <p className="text-xs text-muted-foreground">Currently reading:</p>
-            <p className="text-sm font-medium text-foreground">{readingProgress.currentSection}</p>
+            <p className="text-sm font-medium text-foreground">
+              {readingProgress.currentSection}
+            </p>
           </div>
         </div>
       </div>
@@ -115,27 +121,36 @@ export function BriefingSidebar({
           <span className="mr-2">📊</span>
           Briefing Stats
         </h3>
-        
+
         <div className="space-y-3">
           <div className="stat-item flex justify-between">
             <span className="text-xs text-muted-foreground">Read Time:</span>
-            <span className="text-sm font-medium">{briefingData.readTime}m</span>
+            <span className="text-sm font-medium">
+              {briefingData?.readTime || 5}m
+            </span>
           </div>
-          
+
           <div className="stat-item flex justify-between">
             <span className="text-xs text-muted-foreground">Word Count:</span>
-            <span className="text-sm font-medium">{briefingData.wordCount.toLocaleString()}</span>
+            <span className="text-sm font-medium">
+              {(briefingData?.wordCount || 1200).toLocaleString()}
+            </span>
           </div>
-          
+
           <div className="stat-item flex justify-between">
             <span className="text-xs text-muted-foreground">Shares:</span>
-            <span className="text-sm font-medium">{briefingData.shareCount}</span>
+            <span className="text-sm font-medium">
+              {briefingData?.shareCount || 0}
+            </span>
           </div>
-          
+
           <div className="stat-item flex justify-between">
             <span className="text-xs text-muted-foreground">Terry Score:</span>
-            <span className={`text-sm font-bold ${getTerryScoreColor(briefingData.terryScore)}`}>
-              {briefingData.terryScore}% {getTerryScoreLabel(briefingData.terryScore)}
+            <span
+              className={`text-sm font-bold ${getTerryScoreColor(briefingData?.terryScore || 85)}`}
+            >
+              {briefingData?.terryScore || 85}%{" "}
+              {getTerryScoreLabel(briefingData?.terryScore || 85)}
             </span>
           </div>
         </div>
@@ -145,17 +160,21 @@ export function BriefingSidebar({
       <div className="terry-corner card p-4 bg-gradient-to-br from-orange-600/10 to-orange-600/5 border-orange-600/20">
         <h3 className="text-sm font-bold text-orange-400 mb-3 flex items-center">
           <span className="mr-2">🎭</span>
-          Terry's Corner
+          {"Terry's Corner"}
         </h3>
-        
+
         <div className="space-y-3">
           <blockquote className="text-sm italic text-foreground leading-relaxed">
-            "Transfer deadline day is just Black Friday for billionaires with too much money and not enough sense."
+            {
+              "Transfer deadline day is just Black Friday for billionaires with too much money and not enough sense."
+            }
           </blockquote>
-          
+
           <div className="terry-status flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-xs text-muted-foreground">Terry is currently: Magnificently Annoyed</span>
+            <span className="text-xs text-muted-foreground">
+              Terry is currently: Magnificently Annoyed
+            </span>
           </div>
         </div>
       </div>
@@ -166,23 +185,23 @@ export function BriefingSidebar({
           <span className="mr-2">⚡</span>
           Quick Actions
         </h3>
-        
+
         <div className="space-y-2">
           <button className="action-button w-full text-left p-2 rounded hover:bg-muted transition-colors text-sm">
             <span className="mr-2">🔗</span>
             Copy Link to Briefing
           </button>
-          
+
           <button className="action-button w-full text-left p-2 rounded hover:bg-muted transition-colors text-sm">
             <span className="mr-2">🐦</span>
             Share on Twitter
           </button>
-          
+
           <button className="action-button w-full text-left p-2 rounded hover:bg-muted transition-colors text-sm">
             <span className="mr-2">📧</span>
             Email This Briefing
           </button>
-          
+
           <button className="action-button w-full text-left p-2 rounded hover:bg-muted transition-colors text-sm">
             <span className="mr-2">🖨️</span>
             Print Version
@@ -192,12 +211,7 @@ export function BriefingSidebar({
 
       {/* Newsletter Signup */}
       <div className="newsletter-card">
-        <NewsletterSignup 
-          variant="sidebar" 
-          compact={true}
-          headline="Get Tomorrow's Briefing"
-          description="Never miss Terry's take on the transfer chaos"
-        />
+        <NewsletterSignup variant="compact" className="compact" />
       </div>
 
       {/* Archive Navigation */}
@@ -206,26 +220,46 @@ export function BriefingSidebar({
           <span className="mr-2">📚</span>
           Recent Briefings
         </h3>
-        
+
         <div className="space-y-2">
-          <a href="#" className="archive-link block p-2 rounded hover:bg-muted transition-colors">
+          <a
+            href="#"
+            className="archive-link block p-2 rounded hover:bg-muted transition-colors"
+          >
             <div className="text-xs text-muted-foreground">Yesterday 18:00</div>
-            <div className="text-sm text-foreground leading-tight">Chelsea's £200m Masterclass in How Not to Build a Squad</div>
+            <div className="text-sm text-foreground leading-tight">
+              {"Chelsea's £200m Masterclass in How Not to Build a Squad"}
+            </div>
           </a>
-          
-          <a href="#" className="archive-link block p-2 rounded hover:bg-muted transition-colors">
+
+          <a
+            href="#"
+            className="archive-link block p-2 rounded hover:bg-muted transition-colors"
+          >
             <div className="text-xs text-muted-foreground">Yesterday 14:00</div>
-            <div className="text-sm text-foreground leading-tight">Arsenal's Transfer Strategy: Expensive Excellence or Lucky Guesswork?</div>
+            <div className="text-sm text-foreground leading-tight">
+              {
+                "Arsenal's Transfer Strategy: Expensive Excellence or Lucky Guesswork?"
+              }
+            </div>
           </a>
-          
-          <a href="#" className="archive-link block p-2 rounded hover:bg-muted transition-colors">
+
+          <a
+            href="#"
+            className="archive-link block p-2 rounded hover:bg-muted transition-colors"
+          >
             <div className="text-xs text-muted-foreground">Yesterday 09:00</div>
-            <div className="text-sm text-foreground leading-tight">Morning Briefing: Why Every Club Thinks They're Barcelona</div>
+            <div className="text-sm text-foreground leading-tight">
+              {"Morning Briefing: Why Every Club Thinks They're Barcelona"}
+            </div>
           </a>
         </div>
-        
+
         <div className="mt-3 pt-3 border-t border-border">
-          <a href="/archive" className="text-sm text-orange-500 hover:text-orange-400 font-medium">
+          <a
+            href="/archive"
+            className="text-sm text-orange-500 hover:text-orange-400 font-medium"
+          >
             View All Briefings →
           </a>
         </div>
@@ -237,10 +271,16 @@ export function BriefingSidebar({
           <span className="mr-2">🔥</span>
           Trending Now
         </h3>
-        
+
         <div className="flex flex-wrap gap-1">
-          {['Arsenal', 'Haaland', 'Transfer Deadline', 'Terry Approved', 'Shit Tier Sources'].map((tag) => (
-            <span 
+          {[
+            "Arsenal",
+            "Haaland",
+            "Transfer Deadline",
+            "Terry Approved",
+            "Shit Tier Sources",
+          ].map((tag) => (
+            <span
               key={tag}
               className="tag-pill text-xs px-2 py-1 bg-muted text-muted-foreground rounded hover:bg-orange-600 hover:text-white cursor-pointer transition-colors"
             >

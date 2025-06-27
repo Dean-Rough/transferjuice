@@ -18,6 +18,57 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Testing
+
+This project includes comprehensive testing infrastructure:
+
+### Unit & Integration Testing (Jest)
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+### End-to-End Testing (Playwright)
+
+```bash
+# Run E2E tests headless
+npm run test:e2e
+
+# Run E2E tests with browser UI
+npm run test:e2e:ui
+
+# Run E2E tests in headed mode (visible browser)
+npm run test:e2e:headed
+```
+
+### Testing Tools Available
+
+- **Jest Extended**: Additional matchers for comprehensive testing
+- **MSW (Mock Service Worker)**: API mocking for integration tests (Node.js 18+ required)
+- **Why Did You Render**: React re-render debugging in development
+- **Testing Library**: React component testing utilities
+
+### Viewing Test Results
+
+**Playwright Traces**: After running E2E tests, open the trace viewer:
+
+```bash
+npx playwright show-trace test-results/traces/trace.zip
+```
+
+**Coverage Reports**: After running `npm run test:coverage`, open:
+
+```bash
+open coverage/lcov-report/index.html
+```
+
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
 ## Learn More

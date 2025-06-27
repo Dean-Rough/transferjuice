@@ -1,7 +1,7 @@
 // Transfermarkt API integration
 // Documentation: https://transfermarkt-api.fly.dev/docs
 
-const API_BASE_URL = 'https://transfermarkt-api.fly.dev';
+const API_BASE_URL = "https://transfermarkt-api.fly.dev";
 
 // Rate limiting: 2 calls per 3 seconds as per documentation
 class RateLimiter {
@@ -112,7 +112,7 @@ class TransfermarktAPI {
 
       if (!response.ok) {
         throw new Error(
-          `API request failed: ${response.status} ${response.statusText}`
+          `API request failed: ${response.status} ${response.statusText}`,
         );
       }
 
@@ -161,7 +161,7 @@ class TransfermarktAPI {
   // Search competitions (e.g., Premier League)
   async searchCompetitions(competitionName: string): Promise<any[]> {
     return this.request(
-      `/competitions/search/${encodeURIComponent(competitionName)}`
+      `/competitions/search/${encodeURIComponent(competitionName)}`,
     );
   }
 
@@ -174,7 +174,7 @@ class TransfermarktAPI {
   async getPremierLeagueClubs(): Promise<ClubProfile[]> {
     try {
       // Search for Premier League
-      const competitions = await this.searchCompetitions('Premier League');
+      const competitions = await this.searchCompetitions("Premier League");
 
       if (competitions.length > 0) {
         const premierLeague = competitions[0];
@@ -183,7 +183,7 @@ class TransfermarktAPI {
 
       return [];
     } catch (error) {
-      console.error('Error fetching Premier League clubs:', error);
+      console.error("Error fetching Premier League clubs:", error);
       return [];
     }
   }
@@ -192,7 +192,7 @@ class TransfermarktAPI {
   async getEnrichedTransfer(
     playerName: string,
     fromClub: string,
-    toClub: string
+    toClub: string,
   ): Promise<{
     player: PlayerProfile | null;
     fromClubData: ClubProfile | null;
@@ -237,7 +237,7 @@ class TransfermarktAPI {
         transfers,
       };
     } catch (error) {
-      console.error('Error enriching transfer data:', error);
+      console.error("Error enriching transfer data:", error);
       return {
         player: null,
         fromClubData: null,

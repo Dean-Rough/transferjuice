@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { FeedItem } from './FeedItem';
+import { useEffect, useState } from "react";
+import { FeedItem } from "./FeedItem";
 
 export function SimpleFeedContainer() {
   const [items, setItems] = useState<any[]>([]);
@@ -9,24 +9,24 @@ export function SimpleFeedContainer() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('SimpleFeedContainer: Fetching feed...');
-    
-    fetch('/api/feed?limit=20')
-      .then(res => {
+    console.log("SimpleFeedContainer: Fetching feed...");
+
+    fetch("/api/feed?limit=20")
+      .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
-      .then(data => {
-        console.log('SimpleFeedContainer: Data received', data);
+      .then((data) => {
+        console.log("SimpleFeedContainer: Data received", data);
         if (data.success && data.data) {
           setItems(data.data);
         } else {
-          throw new Error(data.error || 'Invalid response');
+          throw new Error(data.error || "Invalid response");
         }
         setLoading(false);
       })
-      .catch(err => {
-        console.error('SimpleFeedContainer: Error', err);
+      .catch((err) => {
+        console.error("SimpleFeedContainer: Error", err);
         setError(err.message);
         setLoading(false);
       });

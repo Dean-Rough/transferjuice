@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * API Contract Schemas
@@ -16,7 +16,7 @@ export const PaginationSchema = z.object({
 
 export const SortSchema = z.object({
   field: z.string(),
-  order: z.enum(['asc', 'desc']).default('desc'),
+  order: z.enum(["asc", "desc"]).default("desc"),
 });
 
 export const DateRangeSchema = z.object({
@@ -36,7 +36,7 @@ export const ApiResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
           field: z.string().optional(),
           message: z.string(),
           code: z.string().optional(),
-        })
+        }),
       )
       .optional(),
     meta: z.object({
@@ -65,29 +65,29 @@ export const ApiErrorSchema = z.object({
 
 // Health check schema
 export const HealthCheckSchema = z.object({
-  status: z.enum(['healthy', 'degraded', 'unhealthy']),
+  status: z.enum(["healthy", "degraded", "unhealthy"]),
   timestamp: z.string().datetime(),
   version: z.string(),
   uptime: z.number().min(0), // seconds
   services: z.object({
     database: z.object({
-      status: z.enum(['up', 'down', 'degraded']),
+      status: z.enum(["up", "down", "degraded"]),
       responseTime: z.number().min(0).optional(),
       lastCheck: z.string().datetime(),
     }),
     twitter: z.object({
-      status: z.enum(['up', 'down', 'degraded']),
+      status: z.enum(["up", "down", "degraded"]),
       responseTime: z.number().min(0).optional(),
       rateLimitRemaining: z.number().min(0).optional(),
       lastCheck: z.string().datetime(),
     }),
     ai: z.object({
-      status: z.enum(['up', 'down', 'degraded']),
+      status: z.enum(["up", "down", "degraded"]),
       responseTime: z.number().min(0).optional(),
       lastCheck: z.string().datetime(),
     }),
     email: z.object({
-      status: z.enum(['up', 'down', 'degraded']),
+      status: z.enum(["up", "down", "degraded"]),
       responseTime: z.number().min(0).optional(),
       lastCheck: z.string().datetime(),
     }),
@@ -96,13 +96,13 @@ export const HealthCheckSchema = z.object({
 
 // Twitter API endpoints
 export const TwitterUserLookupQuerySchema = z.object({
-  usernames: z.string().transform((val) => val.split(',').map((u) => u.trim())),
+  usernames: z.string().transform((val) => val.split(",").map((u) => u.trim())),
   user_fields: z.string().optional(),
   expansions: z.string().optional(),
 });
 
 export const TwitterTweetsQuerySchema = z.object({
-  ids: z.string().transform((val) => val.split(',').map((id) => id.trim())),
+  ids: z.string().transform((val) => val.split(",").map((id) => id.trim())),
   tweet_fields: z.string().optional(),
   user_fields: z.string().optional(),
   media_fields: z.string().optional(),
@@ -127,7 +127,7 @@ export const TwitterUserTimelineQuerySchema = z.object({
 export const CreateArticleRequestSchema = z.object({
   title: z.string().min(10).max(255),
   subtitle: z.string().min(10).max(500).optional(),
-  briefingType: z.enum(['morning', 'afternoon', 'evening']),
+  briefingType: z.enum(["morning", "afternoon", "evening"]),
   sourceTweetIds: z.array(z.string()).min(1).max(50),
   autoPublish: z.boolean().default(false),
   scheduledFor: z.string().datetime().optional(),
@@ -138,22 +138,22 @@ export const UpdateArticleRequestSchema = z.object({
   title: z.string().min(10).max(255).optional(),
   subtitle: z.string().min(10).max(500).optional(),
   status: z
-    .enum(['draft', 'under_review', 'approved', 'published', 'archived'])
+    .enum(["draft", "under_review", "approved", "published", "archived"])
     .optional(),
   scheduledFor: z.string().datetime().optional(),
   reviewNotes: z.string().max(1000).optional(),
 });
 
 export const ArticlesQuerySchema = z.object({
-  briefingType: z.enum(['morning', 'afternoon', 'evening']).optional(),
+  briefingType: z.enum(["morning", "afternoon", "evening"]).optional(),
   status: z
     .enum([
-      'draft',
-      'ai_generated',
-      'under_review',
-      'approved',
-      'published',
-      'archived',
+      "draft",
+      "ai_generated",
+      "under_review",
+      "approved",
+      "published",
+      "archived",
     ])
     .optional(),
   publishedAfter: z.string().datetime().optional(),
@@ -161,7 +161,7 @@ export const ArticlesQuerySchema = z.object({
   search: z.string().min(3).max(100).optional(),
   tags: z
     .string()
-    .transform((val) => val.split(',').map((t) => t.trim()))
+    .transform((val) => val.split(",").map((t) => t.trim()))
     .optional(),
   ...PaginationSchema.shape,
   sort: SortSchema.optional(),
@@ -173,32 +173,32 @@ export const SubscribeRequestSchema = z.object({
   preferences: z
     .object({
       emailFrequency: z
-        .enum(['all', 'daily', 'weekly', 'major_only'])
-        .default('all'),
+        .enum(["all", "daily", "weekly", "major_only"])
+        .default("all"),
       preferredTeams: z
         .array(
           z.enum([
-            'arsenal',
-            'aston_villa',
-            'bournemouth',
-            'brentford',
-            'brighton',
-            'burnley',
-            'chelsea',
-            'crystal_palace',
-            'everton',
-            'fulham',
-            'liverpool',
-            'luton',
-            'manchester_city',
-            'manchester_united',
-            'newcastle',
-            'nottingham_forest',
-            'sheffield_united',
-            'tottenham',
-            'west_ham',
-            'wolves',
-          ])
+            "arsenal",
+            "aston_villa",
+            "bournemouth",
+            "brentford",
+            "brighton",
+            "burnley",
+            "chelsea",
+            "crystal_palace",
+            "everton",
+            "fulham",
+            "liverpool",
+            "luton",
+            "manchester_city",
+            "manchester_united",
+            "newcastle",
+            "nottingham_forest",
+            "sheffield_united",
+            "tottenham",
+            "west_ham",
+            "wolves",
+          ]),
         )
         .max(5)
         .default([]),
@@ -206,18 +206,18 @@ export const SubscribeRequestSchema = z.object({
     })
     .optional(),
   gdprConsent: z.boolean().refine((val) => val === true, {
-    message: 'GDPR consent is required',
+    message: "GDPR consent is required",
   }),
   subscriptionSource: z
     .enum([
-      'website',
-      'social_media',
-      'referral',
-      'organic',
-      'paid_ad',
-      'other',
+      "website",
+      "social_media",
+      "referral",
+      "organic",
+      "paid_ad",
+      "other",
     ])
-    .default('website'),
+    .default("website"),
   utmParameters: z
     .object({
       source: z.string().optional(),
@@ -233,37 +233,37 @@ export const UpdateSubscriberRequestSchema = z.object({
   preferences: z
     .object({
       emailFrequency: z
-        .enum(['all', 'daily', 'weekly', 'major_only'])
+        .enum(["all", "daily", "weekly", "major_only"])
         .optional(),
       preferredTeams: z
         .array(
           z.enum([
-            'arsenal',
-            'aston_villa',
-            'bournemouth',
-            'brentford',
-            'brighton',
-            'burnley',
-            'chelsea',
-            'crystal_palace',
-            'everton',
-            'fulham',
-            'liverpool',
-            'luton',
-            'manchester_city',
-            'manchester_united',
-            'newcastle',
-            'nottingham_forest',
-            'sheffield_united',
-            'tottenham',
-            'west_ham',
-            'wolves',
-          ])
+            "arsenal",
+            "aston_villa",
+            "bournemouth",
+            "brentford",
+            "brighton",
+            "burnley",
+            "chelsea",
+            "crystal_palace",
+            "everton",
+            "fulham",
+            "liverpool",
+            "luton",
+            "manchester_city",
+            "manchester_united",
+            "newcastle",
+            "nottingham_forest",
+            "sheffield_united",
+            "tottenham",
+            "west_ham",
+            "wolves",
+          ]),
         )
         .max(5)
         .optional(),
       receiveBreakingNews: z.boolean().optional(),
-      emailFormat: z.enum(['html', 'text']).optional(),
+      emailFormat: z.enum(["html", "text"]).optional(),
       timezone: z.string().optional(),
     })
     .optional(),
@@ -273,12 +273,12 @@ export const UnsubscribeRequestSchema = z.object({
   token: z.string().min(32), // Unsubscribe token
   reason: z
     .enum([
-      'too_frequent',
-      'not_relevant',
-      'poor_quality',
-      'changed_email',
-      'privacy_concerns',
-      'other',
+      "too_frequent",
+      "not_relevant",
+      "poor_quality",
+      "changed_email",
+      "privacy_concerns",
+      "other",
     ])
     .optional(),
   feedback: z.string().max(500).optional(),
@@ -287,12 +287,12 @@ export const UnsubscribeRequestSchema = z.object({
 export const SubscribersQuerySchema = z.object({
   status: z
     .enum([
-      'pending',
-      'active',
-      'paused',
-      'unsubscribed',
-      'bounced',
-      'complained',
+      "pending",
+      "active",
+      "paused",
+      "unsubscribed",
+      "bounced",
+      "complained",
     ])
     .optional(),
   subscribedAfter: z.string().datetime().optional(),
@@ -301,36 +301,36 @@ export const SubscribersQuerySchema = z.object({
   lastEngagementBefore: z.string().datetime().optional(),
   source: z
     .enum([
-      'website',
-      'social_media',
-      'referral',
-      'organic',
-      'paid_ad',
-      'other',
+      "website",
+      "social_media",
+      "referral",
+      "organic",
+      "paid_ad",
+      "other",
     ])
     .optional(),
   preferredTeam: z
     .enum([
-      'arsenal',
-      'aston_villa',
-      'bournemouth',
-      'brentford',
-      'brighton',
-      'burnley',
-      'chelsea',
-      'crystal_palace',
-      'everton',
-      'fulham',
-      'liverpool',
-      'luton',
-      'manchester_city',
-      'manchester_united',
-      'newcastle',
-      'nottingham_forest',
-      'sheffield_united',
-      'tottenham',
-      'west_ham',
-      'wolves',
+      "arsenal",
+      "aston_villa",
+      "bournemouth",
+      "brentford",
+      "brighton",
+      "burnley",
+      "chelsea",
+      "crystal_palace",
+      "everton",
+      "fulham",
+      "liverpool",
+      "luton",
+      "manchester_city",
+      "manchester_united",
+      "newcastle",
+      "nottingham_forest",
+      "sheffield_united",
+      "tottenham",
+      "west_ham",
+      "wolves",
     ])
     .optional(),
   ...PaginationSchema.shape,
@@ -340,38 +340,38 @@ export const SubscribersQuerySchema = z.object({
 // Analytics API endpoints
 export const AnalyticsQuerySchema = z.object({
   metrics: z.array(
-    z.enum(['content', 'audience', 'engagement', 'technical', 'business'])
+    z.enum(["content", "audience", "engagement", "technical", "business"]),
   ),
   dateRange: DateRangeSchema,
-  granularity: z.enum(['hour', 'day', 'week', 'month']).default('day'),
+  granularity: z.enum(["hour", "day", "week", "month"]).default("day"),
   filters: z
     .object({
       articleIds: z.array(z.string()).optional(),
       briefingTypes: z
-        .array(z.enum(['morning', 'afternoon', 'evening']))
+        .array(z.enum(["morning", "afternoon", "evening"]))
         .optional(),
       countries: z.array(z.string().length(2)).optional(),
-      devices: z.array(z.enum(['mobile', 'tablet', 'desktop'])).optional(),
+      devices: z.array(z.enum(["mobile", "tablet", "desktop"])).optional(),
     })
     .optional(),
-  compare: z.enum(['previous_period', 'same_period_last_year']).optional(),
+  compare: z.enum(["previous_period", "same_period_last_year"]).optional(),
 });
 
 export const TrackEventRequestSchema = z.object({
   event: z.enum([
-    'page_view',
-    'article_view',
-    'newsletter_signup',
-    'email_click',
-    'search',
-    'share',
-    'download',
+    "page_view",
+    "article_view",
+    "newsletter_signup",
+    "email_click",
+    "search",
+    "share",
+    "download",
   ]),
   properties: z
     .object({
       url: z.string().url().optional(),
       articleId: z.string().optional(),
-      briefingType: z.enum(['morning', 'afternoon', 'evening']).optional(),
+      briefingType: z.enum(["morning", "afternoon", "evening"]).optional(),
       source: z.string().optional(),
       campaign: z.string().optional(),
       customProperties: z.record(z.string(), z.any()).optional(),
@@ -386,11 +386,11 @@ export const TrackEventRequestSchema = z.object({
 export const CreateCampaignRequestSchema = z.object({
   name: z.string().min(1).max(255),
   type: z.enum([
-    'briefing',
-    'breaking_news',
-    'weekly_digest',
-    'welcome',
-    'reengagement',
+    "briefing",
+    "breaking_news",
+    "weekly_digest",
+    "welcome",
+    "reengagement",
   ]),
   subject: z.string().min(5).max(100),
   preheader: z.string().min(10).max(200).optional(),
@@ -404,36 +404,36 @@ export const CreateCampaignRequestSchema = z.object({
   targeting: z
     .object({
       includeStatuses: z
-        .array(z.enum(['active', 'pending']))
-        .default(['active']),
+        .array(z.enum(["active", "pending"]))
+        .default(["active"]),
       preferredTeams: z
         .array(
           z.enum([
-            'arsenal',
-            'aston_villa',
-            'bournemouth',
-            'brentford',
-            'brighton',
-            'burnley',
-            'chelsea',
-            'crystal_palace',
-            'everton',
-            'fulham',
-            'liverpool',
-            'luton',
-            'manchester_city',
-            'manchester_united',
-            'newcastle',
-            'nottingham_forest',
-            'sheffield_united',
-            'tottenham',
-            'west_ham',
-            'wolves',
-          ])
+            "arsenal",
+            "aston_villa",
+            "bournemouth",
+            "brentford",
+            "brighton",
+            "burnley",
+            "chelsea",
+            "crystal_palace",
+            "everton",
+            "fulham",
+            "liverpool",
+            "luton",
+            "manchester_city",
+            "manchester_united",
+            "newcastle",
+            "nottingham_forest",
+            "sheffield_united",
+            "tottenham",
+            "west_ham",
+            "wolves",
+          ]),
         )
         .optional(),
       emailFrequency: z
-        .array(z.enum(['all', 'daily', 'weekly', 'major_only']))
+        .array(z.enum(["all", "daily", "weekly", "major_only"]))
         .optional(),
     })
     .optional(),
@@ -443,15 +443,15 @@ export const CreateCampaignRequestSchema = z.object({
 export const CampaignsQuerySchema = z.object({
   type: z
     .enum([
-      'briefing',
-      'breaking_news',
-      'weekly_digest',
-      'welcome',
-      'reengagement',
+      "briefing",
+      "breaking_news",
+      "weekly_digest",
+      "welcome",
+      "reengagement",
     ])
     .optional(),
   status: z
-    .enum(['draft', 'scheduled', 'sending', 'sent', 'cancelled'])
+    .enum(["draft", "scheduled", "sending", "sent", "cancelled"])
     .optional(),
   createdAfter: z.string().datetime().optional(),
   createdBefore: z.string().datetime().optional(),
@@ -461,12 +461,12 @@ export const CampaignsQuerySchema = z.object({
 
 // Content generation API endpoints
 export const GenerateContentRequestSchema = z.object({
-  briefingType: z.enum(['morning', 'afternoon', 'evening']),
+  briefingType: z.enum(["morning", "afternoon", "evening"]),
   sourceTweetIds: z.array(z.string()).min(1).max(50),
   targetWordCount: z.number().min(200).max(2000).default(800),
   tone: z
-    .enum(['witty', 'sarcastic', 'informative', 'humorous'])
-    .default('witty'),
+    .enum(["witty", "sarcastic", "informative", "humorous"])
+    .default("witty"),
   includeImages: z.boolean().default(true),
   customInstructions: z.string().max(1000).optional(),
   draftMode: z.boolean().default(false), // If true, saves as draft instead of processing
@@ -474,16 +474,16 @@ export const GenerateContentRequestSchema = z.object({
 
 export const ValidateContentRequestSchema = z.object({
   content: z.string().min(100),
-  type: z.enum(['article', 'email_subject', 'social_post']),
+  type: z.enum(["article", "email_subject", "social_post"]),
   checks: z
     .array(
       z.enum([
-        'grammar',
-        'brand_voice',
-        'fact_check',
-        'readability',
-        'sentiment',
-      ])
+        "grammar",
+        "brand_voice",
+        "fact_check",
+        "readability",
+        "sentiment",
+      ]),
     )
     .optional(),
 });
@@ -494,14 +494,14 @@ export const AdminStatsQuerySchema = z.object({
   metrics: z
     .array(
       z.enum([
-        'system_health',
-        'content_pipeline',
-        'user_growth',
-        'engagement',
-        'revenue',
-      ])
+        "system_health",
+        "content_pipeline",
+        "user_growth",
+        "engagement",
+        "revenue",
+      ]),
     )
-    .default(['system_health']),
+    .default(["system_health"]),
 });
 
 export const SystemConfigUpdateSchema = z.object({
@@ -522,7 +522,7 @@ export const SystemConfigUpdateSchema = z.object({
     .optional(),
   emailService: z
     .object({
-      provider: z.enum(['convertkit', 'mailerlite', 'postmark']).optional(),
+      provider: z.enum(["convertkit", "mailerlite", "postmark"]).optional(),
       sendTimeOptimization: z.boolean().optional(),
       frequencyCapping: z.boolean().optional(),
     })
@@ -533,11 +533,11 @@ export const SystemConfigUpdateSchema = z.object({
 export const WebhookEventSchema = z.object({
   id: z.string(),
   type: z.enum([
-    'article.published',
-    'subscriber.confirmed',
-    'subscriber.unsubscribed',
-    'campaign.sent',
-    'system.error',
+    "article.published",
+    "subscriber.confirmed",
+    "subscriber.unsubscribed",
+    "campaign.sent",
+    "system.error",
   ]),
   data: z.any(),
   timestamp: z.string().datetime(),

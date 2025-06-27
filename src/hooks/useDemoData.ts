@@ -3,9 +3,9 @@
  * Loads demo transfer feed data for development and demonstration
  */
 
-import { useEffect } from 'react';
-import { useFeedStore } from '@/lib/stores/feedStore';
-import { getDemoFeedData, getMoreDemoFeedData } from '@/lib/data/demoFeedData';
+import { useEffect } from "react";
+import { useFeedStore } from "@/lib/stores/feedStore";
+import { getDemoFeedData, getMoreDemoFeedData } from "@/lib/data/demoFeedData";
 
 export function useDemoData() {
   const { items, addItem } = useFeedStore();
@@ -14,7 +14,7 @@ export function useDemoData() {
   useEffect(() => {
     // Only load if store is empty
     if (items.length === 0) {
-      console.log('Loading demo transfer feed data...');
+      console.log("Loading demo transfer feed data...");
 
       // Simulate loading delay
       setTimeout(() => {
@@ -32,7 +32,7 @@ export function useDemoData() {
 
   // Function to load more demo data (for infinite scroll)
   const loadMoreDemoData = () => {
-    console.log('Loading more demo data...');
+    console.log("Loading more demo data...");
 
     setTimeout(() => {
       const moreData = getMoreDemoFeedData(Math.floor(items.length / 10));
@@ -48,7 +48,7 @@ export function useDemoData() {
   // Function to initialize demo feed
   const initializeDemoFeed = () => {
     if (items.length === 0) {
-      console.log('Initializing demo transfer feed...');
+      console.log("Initializing demo transfer feed...");
       const demoData = getDemoFeedData();
       demoData.forEach((item) => {
         addItem(item);

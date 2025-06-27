@@ -4,19 +4,19 @@
  */
 
 // Briefing operations
-export * from './briefings';
+export * from "./briefings";
 
 // Feed item operations
-export * from './feedItems';
+export * from "./feedItems";
 
 // Tag operations
-export * from './tags';
+export * from "./tags";
 
 // Source operations
-export * from './sources';
+export * from "./sources";
 
 // Subscriber operations
-export * from './subscribers';
+export * from "./subscribers";
 
 // Re-export prisma client
-export { prisma } from '@/lib/prisma';
+export { prisma } from "@/lib/prisma";

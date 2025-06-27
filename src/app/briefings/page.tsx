@@ -3,14 +3,15 @@
  * Browse all published briefings with filtering
  */
 
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { listBriefings } from '@/lib/database/briefings';
-import { BriefingStatus, type League } from '@/types/briefing';
+import { Metadata } from "next";
+import Link from "next/link";
+import { listBriefings } from "@/lib/database/briefings";
+import { BriefingStatus } from "@/types/briefing";
 
 export const metadata: Metadata = {
-  title: 'Transfer Briefings Archive | Transfer Juice',
-  description: 'Browse all hourly transfer briefings with The Terry\'s ascerbic commentary',
+  title: "Transfer Briefings Archive | Transfer Juice",
+  description:
+    "Browse all hourly transfer briefings with The Terry's ascerbic commentary",
 };
 
 interface BriefingArchiveProps {
@@ -21,10 +22,12 @@ interface BriefingArchiveProps {
   };
 }
 
-export default async function BriefingArchivePage({ searchParams }: BriefingArchiveProps) {
-  const page = parseInt(searchParams.page || '1');
-  const tags = searchParams.tags?.split(',').filter(Boolean);
-  const leagues = searchParams.leagues?.split(',').filter(Boolean) as League[];
+export default async function BriefingArchivePage({
+  searchParams,
+}: BriefingArchiveProps) {
+  const page = parseInt(searchParams.page || "1");
+  const tags = searchParams.tags?.split(",").filter(Boolean);
+  const leagues = searchParams.leagues?.split(",").filter(Boolean) as any;
 
   const { briefings, pagination } = await listBriefings({
     page,
@@ -59,18 +62,18 @@ export default async function BriefingArchivePage({ searchParams }: BriefingArch
             />
             <FilterButton
               label="Premier League"
-              active={leagues?.includes('PL')}
-              href={toggleLeagueFilter('PL', leagues)}
+              active={leagues?.includes("PL")}
+              href={toggleLeagueFilter("PL", leagues)}
             />
             <FilterButton
               label="La Liga"
-              active={leagues?.includes('LALIGA')}
-              href={toggleLeagueFilter('LALIGA', leagues)}
+              active={leagues?.includes("LALIGA")}
+              href={toggleLeagueFilter("LALIGA", leagues)}
             />
             <FilterButton
               label="Serie A"
-              active={leagues?.includes('SERIEA')}
-              href={toggleLeagueFilter('SERIEA', leagues)}
+              active={leagues?.includes("SERIEA")}
+              href={toggleLeagueFilter("SERIEA", leagues)}
             />
           </div>
         </div>
@@ -89,20 +92,20 @@ export default async function BriefingArchivePage({ searchParams }: BriefingArch
           <div className="mt-12 flex justify-center gap-2">
             {page > 1 && (
               <Link
-                href={`/briefings?page=${page - 1}${leagues ? `&leagues=${leagues.join(',')}` : ''}`}
+                href={`/briefings?page=${page - 1}${leagues ? `&leagues=${leagues.join(",")}` : ""}`}
                 className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded transition-colors"
               >
                 Previous
               </Link>
             )}
-            
+
             <span className="px-4 py-2 text-zinc-400">
               Page {page} of {pagination.pages}
             </span>
-            
+
             {page < pagination.pages && (
               <Link
-                href={`/briefings?page=${page + 1}${leagues ? `&leagues=${leagues.join(',')}` : ''}`}
+                href={`/briefings?page=${page + 1}${leagues ? `&leagues=${leagues.join(",")}` : ""}`}
                 className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded transition-colors"
               >
                 Next
@@ -118,33 +121,33 @@ export default async function BriefingArchivePage({ searchParams }: BriefingArch
 function BriefingCard({ briefing }: { briefing: any }) {
   const date = new Date(briefing.timestamp);
   const title = briefing.title as any;
-  
+
   return (
-    <Link 
+    <Link
       href={`/briefings/${briefing.slug}`}
       className="group block bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition-all hover:scale-[1.02]"
     >
       <div className="p-6">
         <time className="text-xs text-zinc-500 uppercase tracking-wider">
-          {date.toLocaleDateString('en-GB', {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
+          {date.toLocaleDateString("en-GB", {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
           })}
         </time>
-        
+
         <h2 className="mt-2 text-xl font-bold group-hover:text-tj-orange transition-colors">
           {title.main}
         </h2>
-        
+
         {title.subtitle && (
           <p className="mt-1 text-sm text-zinc-400 line-clamp-2">
             {title.subtitle}
           </p>
         )}
-        
+
         <div className="mt-4 flex items-center gap-4 text-xs text-zinc-500">
           <span>{briefing.readTime} min</span>
           <span>•</span>
@@ -156,12 +159,12 @@ function BriefingCard({ briefing }: { briefing: any }) {
             </>
           )}
         </div>
-        
+
         {/* Tags */}
         {briefing.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1">
             {briefing.tags.slice(0, 3).map((bt: any) => (
-              <span 
+              <span
                 key={bt.tag.id}
                 className="text-xs px-2 py-1 bg-zinc-800 rounded"
               >
@@ -175,22 +178,22 @@ function BriefingCard({ briefing }: { briefing: any }) {
   );
 }
 
-function FilterButton({ 
-  label, 
-  active, 
-  href 
-}: { 
-  label: string; 
-  active: boolean; 
+function FilterButton({
+  label,
+  active,
+  href,
+}: {
+  label: string;
+  active: boolean;
   href: string;
 }) {
   return (
     <Link
       href={href}
       className={`px-4 py-2 rounded transition-colors ${
-        active 
-          ? 'bg-tj-orange text-black font-bold' 
-          : 'bg-zinc-800 hover:bg-zinc-700'
+        active
+          ? "bg-tj-orange text-black font-bold"
+          : "bg-zinc-800 hover:bg-zinc-700"
       }`}
     >
       {label}
@@ -198,11 +201,11 @@ function FilterButton({
   );
 }
 
-function toggleLeagueFilter(league: League, current?: League[]): string {
+function toggleLeagueFilter(league: any, current?: any[]): string {
   const leagues = current || [];
   const newLeagues = leagues.includes(league)
-    ? leagues.filter(l => l !== league)
+    ? leagues.filter((l) => l !== league)
     : [...leagues, league];
-  
-  return `/briefings${newLeagues.length > 0 ? `?leagues=${newLeagues.join(',')}` : ''}`;
+
+  return `/briefings${newLeagues.length > 0 ? `?leagues=${newLeagues.join(",")}` : ""}`;
 }

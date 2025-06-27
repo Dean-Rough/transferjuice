@@ -3,8 +3,8 @@
  * Types for magazine-style briefing system
  */
 
-import type { 
-  Briefing, 
+import type {
+  Briefing,
   BriefingFeedItem,
   BriefingTag,
   BriefingMedia,
@@ -13,16 +13,16 @@ import type {
   ITKSource,
   League,
   TransferType,
-  Priority
-} from '@prisma/client';
+  Priority,
+} from "@prisma/client";
 
 /**
  * Briefing status enum
  */
 export enum BriefingStatus {
-  Draft = 'draft',
-  Published = 'published',
-  All = 'all',
+  Draft = "draft",
+  Published = "published",
+  All = "all",
 }
 
 /**
@@ -43,7 +43,7 @@ export interface BriefingContent {
  */
 export interface BriefingSection {
   id: string;
-  type: 'intro' | 'transfer' | 'analysis' | 'partner' | 'outro';
+  type: "intro" | "transfer" | "analysis" | "partner" | "outro";
   title?: string;
   content: string;
   feedItemIds?: string[];
@@ -62,7 +62,7 @@ export interface BriefingSection {
 export interface TimelineItem {
   id: string;
   time: string;
-  type: 'transfer' | 'rumour' | 'update' | 'partner';
+  type: "transfer" | "rumour" | "update" | "partner";
   title: string;
   description: string;
   polaroid?: {
@@ -79,7 +79,7 @@ export interface TimelineItem {
  */
 export interface SidebarSection {
   id: string;
-  type: 'stats' | 'trending' | 'terry-take' | 'quick-hits';
+  type: "stats" | "trending" | "terry-take" | "quick-hits";
   title: string;
   content: any; // JSON structure varies by type
 }
@@ -177,10 +177,10 @@ export interface BriefingEmailStats {
  * Terry commentary options
  */
 export interface TerryCommentaryOptions {
-  style: 'witty' | 'sarcastic' | 'excited' | 'analytical';
-  length: 'short' | 'medium' | 'long';
+  style: "witty" | "sarcastic" | "excited" | "analytical";
+  length: "short" | "medium" | "long";
   includeEmoji?: boolean;
-  targetAudience?: 'casual' | 'hardcore' | 'mixed';
+  targetAudience?: "casual" | "hardcore" | "mixed";
 }
 
 /**
@@ -190,6 +190,6 @@ export interface PolaroidOptions {
   playerName: string;
   clubName?: string;
   frameColor?: string;
-  style?: 'vintage' | 'modern' | 'club-themed';
+  style?: "vintage" | "modern" | "club-themed";
   includeStats?: boolean;
 }

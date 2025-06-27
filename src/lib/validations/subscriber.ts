@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Subscriber and Email Management Schemas
@@ -7,54 +7,54 @@ import { z } from 'zod';
 
 // Subscription status
 export const SubscriptionStatusSchema = z.enum([
-  'pending', // Waiting for email confirmation
-  'active', // Confirmed and receiving emails
-  'paused', // Temporarily paused by user
-  'unsubscribed', // Permanently unsubscribed
-  'bounced', // Email bounced
-  'complained', // Marked as spam
+  "pending", // Waiting for email confirmation
+  "active", // Confirmed and receiving emails
+  "paused", // Temporarily paused by user
+  "unsubscribed", // Permanently unsubscribed
+  "bounced", // Email bounced
+  "complained", // Marked as spam
 ]);
 
 // Email frequency preferences
 export const EmailFrequencySchema = z.enum([
-  'all', // All briefings (3x daily)
-  'daily', // Once daily (evening summary)
-  'weekly', // Weekly digest
-  'major_only', // Only major transfer news
+  "all", // All briefings (3x daily)
+  "daily", // Once daily (evening summary)
+  "weekly", // Weekly digest
+  "major_only", // Only major transfer news
 ]);
 
 // Preferred teams (for personalization)
 export const PreferredTeamSchema = z.enum([
-  'arsenal',
-  'aston_villa',
-  'bournemouth',
-  'brentford',
-  'brighton',
-  'burnley',
-  'chelsea',
-  'crystal_palace',
-  'everton',
-  'fulham',
-  'liverpool',
-  'luton',
-  'manchester_city',
-  'manchester_united',
-  'newcastle',
-  'nottingham_forest',
-  'sheffield_united',
-  'tottenham',
-  'west_ham',
-  'wolves',
+  "arsenal",
+  "aston_villa",
+  "bournemouth",
+  "brentford",
+  "brighton",
+  "burnley",
+  "chelsea",
+  "crystal_palace",
+  "everton",
+  "fulham",
+  "liverpool",
+  "luton",
+  "manchester_city",
+  "manchester_united",
+  "newcastle",
+  "nottingham_forest",
+  "sheffield_united",
+  "tottenham",
+  "west_ham",
+  "wolves",
 ]);
 
 // Subscriber preferences
 export const SubscriberPreferencesSchema = z.object({
-  emailFrequency: EmailFrequencySchema.default('all'),
+  emailFrequency: EmailFrequencySchema.default("all"),
   preferredTeams: z.array(PreferredTeamSchema).max(5).default([]),
   receiveBreakingNews: z.boolean().default(true),
-  emailFormat: z.enum(['html', 'text']).default('html'),
-  timezone: z.string().default('Europe/London'),
-  language: z.enum(['en']).default('en'), // Future expansion
+  emailFormat: z.enum(["html", "text"]).default("html"),
+  timezone: z.string().default("Europe/London"),
+  language: z.enum(["en"]).default("en"), // Future expansion
 
   // Content preferences
   includeRumours: z.boolean().default(true),
@@ -71,9 +71,9 @@ export const SubscriberPreferencesSchema = z.object({
 // Email validation with comprehensive checks
 export const EmailSchema = z
   .string()
-  .email({ message: 'Please enter a valid email address' })
-  .min(5, { message: 'Email must be at least 5 characters long' })
-  .max(254, { message: 'Email must be no more than 254 characters long' })
+  .email({ message: "Please enter a valid email address" })
+  .min(5, { message: "Email must be at least 5 characters long" })
+  .max(254, { message: "Email must be no more than 254 characters long" })
   .refine(
     (email) => {
       // Check for common invalid patterns
@@ -86,20 +86,20 @@ export const EmailSchema = z
       ];
       return !invalidPatterns.some((pattern) => pattern.test(email));
     },
-    { message: 'Email format is invalid' }
+    { message: "Email format is invalid" },
   )
   .refine(
     (email) => {
       // Check for valid domain structure
-      const domainPart = email.split('@')[1];
+      const domainPart = email.split("@")[1];
       return (
         domainPart &&
-        domainPart.includes('.') &&
-        !domainPart.startsWith('.') &&
-        !domainPart.endsWith('.')
+        domainPart.includes(".") &&
+        !domainPart.startsWith(".") &&
+        !domainPart.endsWith(".")
       );
     },
-    { message: 'Email domain is invalid' }
+    { message: "Email domain is invalid" },
   );
 
 // Main subscriber schema
@@ -118,14 +118,14 @@ export const SubscriberSchema = z.object({
   // Source tracking
   subscriptionSource: z
     .enum([
-      'website',
-      'social_media',
-      'referral',
-      'organic',
-      'paid_ad',
-      'other',
+      "website",
+      "social_media",
+      "referral",
+      "organic",
+      "paid_ad",
+      "other",
     ])
-    .default('website'),
+    .default("website"),
   referrerUrl: z.string().url().optional(),
   utmParameters: z
     .object({
@@ -154,7 +154,7 @@ export const SubscriberSchema = z.object({
     .optional(),
   deviceInfo: z
     .object({
-      platform: z.enum(['mobile', 'tablet', 'desktop', 'unknown']).optional(),
+      platform: z.enum(["mobile", "tablet", "desktop", "unknown"]).optional(),
       emailClient: z.string().optional(),
     })
     .optional(),
@@ -163,12 +163,12 @@ export const SubscriberSchema = z.object({
   unsubscribedAt: z.date().optional(),
   unsubscribeReason: z
     .enum([
-      'too_frequent',
-      'not_relevant',
-      'poor_quality',
-      'changed_email',
-      'privacy_concerns',
-      'other',
+      "too_frequent",
+      "not_relevant",
+      "poor_quality",
+      "changed_email",
+      "privacy_concerns",
+      "other",
     ])
     .optional(),
   unsubscribeFeedback: z.string().max(500).optional(),
@@ -190,11 +190,11 @@ export const EmailCampaignSchema = z.object({
   id: z.string(),
   name: z.string().min(1).max(255),
   type: z.enum([
-    'briefing',
-    'breaking_news',
-    'weekly_digest',
-    'welcome',
-    'reengagement',
+    "briefing",
+    "breaking_news",
+    "weekly_digest",
+    "welcome",
+    "reengagement",
   ]),
 
   // Content
@@ -205,10 +205,10 @@ export const EmailCampaignSchema = z.object({
 
   // Targeting
   targetAudience: z.object({
-    includeStatuses: z.array(SubscriptionStatusSchema).default(['active']),
+    includeStatuses: z.array(SubscriptionStatusSchema).default(["active"]),
     excludeStatuses: z
       .array(SubscriptionStatusSchema)
-      .default(['unsubscribed', 'bounced', 'complained']),
+      .default(["unsubscribed", "bounced", "complained"]),
     preferredTeams: z.array(PreferredTeamSchema).optional(),
     emailFrequency: z.array(EmailFrequencySchema).optional(),
     lastEngagementBefore: z.date().optional(),
@@ -218,7 +218,7 @@ export const EmailCampaignSchema = z.object({
   // Scheduling
   scheduledAt: z.date().optional(),
   sentAt: z.date().optional(),
-  status: z.enum(['draft', 'scheduled', 'sending', 'sent', 'cancelled']),
+  status: z.enum(["draft", "scheduled", "sending", "sent", "cancelled"]),
 
   // Performance metrics
   metrics: z
@@ -265,18 +265,18 @@ export const SubscribeRequestSchema = z.object({
   email: EmailSchema,
   preferences: SubscriberPreferencesSchema.partial().optional(),
   gdprConsent: z.boolean().refine((val) => val === true, {
-    message: 'GDPR consent is required',
+    message: "GDPR consent is required",
   }),
   subscriptionSource: z
     .enum([
-      'website',
-      'social_media',
-      'referral',
-      'organic',
-      'paid_ad',
-      'other',
+      "website",
+      "social_media",
+      "referral",
+      "organic",
+      "paid_ad",
+      "other",
     ])
-    .default('website'),
+    .default("website"),
   referrerUrl: z.string().url().optional(),
   utmParameters: z
     .object({
@@ -295,12 +295,12 @@ export const UnsubscribeRequestSchema = z.object({
   email: EmailSchema,
   reason: z
     .enum([
-      'too_frequent',
-      'not_relevant',
-      'poor_quality',
-      'changed_email',
-      'privacy_concerns',
-      'other',
+      "too_frequent",
+      "not_relevant",
+      "poor_quality",
+      "changed_email",
+      "privacy_concerns",
+      "other",
     ])
     .optional(),
   feedback: z.string().max(500).optional(),
@@ -336,10 +336,10 @@ export const EmailClickEventSchema = z.object({
 export const SubscriberAnalyticsQuerySchema = z.object({
   dateFrom: z.date().optional(),
   dateTo: z.date().optional(),
-  segmentBy: z.enum(['status', 'source', 'team', 'frequency']).optional(),
+  segmentBy: z.enum(["status", "source", "team", "frequency"]).optional(),
   metrics: z
-    .array(z.enum(['growth', 'engagement', 'churn', 'ltv']))
-    .default(['growth']),
+    .array(z.enum(["growth", "engagement", "churn", "ltv"]))
+    .default(["growth"]),
 });
 
 // Export types

@@ -4,8 +4,8 @@
  */
 
 // Core AI components (temporarily limited exports due to circular dependencies)
-export { TerryCommentaryGenerator } from './terry-pipeline';
-export { TerryCommentarySystem } from './terryCommentarySystem';
+export { TerryCommentaryGenerator } from "./terry-pipeline";
+export { TerryCommentarySystem } from "./terryCommentarySystem";
 
 // Temporarily disabled due to circular dependencies - will be re-enabled after architecture fix
 // export { TerryIntegration } from './terryIntegration';
@@ -18,10 +18,10 @@ export { TerryCommentarySystem } from './terryCommentarySystem';
 export type {
   TerryCommentaryResult,
   TerryVoiceMetrics,
-} from './terryCommentarySystem';
+} from "./terryCommentarySystem";
 
 // Utility functions
-export { terryPrompts } from './terry-prompts';
+export { terryPrompts } from "./terry-prompts";
 
 /**
  * Initialize AI system with dependency injection to avoid circular imports
@@ -31,17 +31,17 @@ export function initializeAISystem(config?: {
   enableQualityValidation?: boolean;
   enableContentAnalysis?: boolean;
 }) {
-  console.log('🤖 Initializing AI System...');
-  console.log('AI system configuration:', config);
+  console.log("🤖 Initializing AI System...");
+  console.log("AI system configuration:", config);
   console.log(
-    'Some modules disabled temporarily due to circular dependency fixes'
+    "Some modules disabled temporarily due to circular dependency fixes",
   );
 
-  console.log('✅ AI System initialized (partial functionality)');
-  console.log('   - Terry commentary generation available');
-  console.log('   - Quality validation temporarily disabled');
-  console.log('   - Content analysis temporarily disabled');
-  console.log('   - Terry orchestration temporarily disabled');
+  console.log("✅ AI System initialized (partial functionality)");
+  console.log("   - Terry commentary generation available");
+  console.log("   - Quality validation temporarily disabled");
+  console.log("   - Content analysis temporarily disabled");
+  console.log("   - Terry orchestration temporarily disabled");
 
   return {
     terry: null, // TODO: Re-enable after circular dependency fix
@@ -50,7 +50,7 @@ export function initializeAISystem(config?: {
     orchestrator: null, // TODO: Re-enable after circular dependency fix
     status: {
       isActive: true,
-      warning: 'Partial functionality due to dependency fixes',
+      warning: "Partial functionality due to dependency fixes",
     },
   };
 }
@@ -60,15 +60,15 @@ export function initializeAISystem(config?: {
  */
 export function getAISystemStatus() {
   return {
-    terry: { isActive: true, warning: 'Basic functionality only' },
+    terry: { isActive: true, warning: "Basic functionality only" },
     validator: {
       isActive: false,
-      error: 'Disabled due to circular dependency',
+      error: "Disabled due to circular dependency",
     },
-    analyzer: { isActive: false, error: 'Disabled due to circular dependency' },
+    analyzer: { isActive: false, error: "Disabled due to circular dependency" },
     orchestrator: {
       isActive: false,
-      error: 'Disabled due to circular dependency',
+      error: "Disabled due to circular dependency",
     },
     timestamp: new Date().toISOString(),
   };

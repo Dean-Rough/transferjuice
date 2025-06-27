@@ -3,8 +3,8 @@ export default function InlineTestPage() {
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">Inline JavaScript Test</h1>
       <div id="test-output">JavaScript not loaded</div>
-      
-      <script 
+
+      <script
         dangerouslySetInnerHTML={{
           __html: `
             document.addEventListener('DOMContentLoaded', function() {
@@ -32,7 +32,7 @@ export default function InlineTestPage() {
                   console.error('API Error:', err);
                 });
             });
-          `
+          `,
         }}
       />
     </div>

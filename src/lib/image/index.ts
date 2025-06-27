@@ -3,15 +3,15 @@
  * Main orchestrator for the complete image pipeline
  */
 
-import { ImageSourcingService, type ImageSource } from './sourcing';
-import { ImageProcessor, type ProcessedImage } from './processor';
+import { ImageSourcingService, type ImageSource } from "./sourcing";
+import { ImageProcessor, type ProcessedImage } from "./processor";
 import {
   ImagePlacementService,
   type ArticleLayout,
   type ImagePlacement,
-} from './placement';
-import type { ArticleSection } from '@/lib/ai/article-generator';
-import type { ContentAnalysis } from '@/lib/ai/content-analyzer';
+} from "./placement";
+import type { ArticleSection } from "@/lib/ai/article-generator";
+import type { ContentAnalysis } from "@/lib/ai/content-analyzer";
 // Define TweetMediaInfo type based on Twitter API structure
 type TweetMediaInfo = {
   media_key: string;
@@ -22,7 +22,7 @@ type TweetMediaInfo = {
   width?: number;
   height?: number;
 };
-import { z } from 'zod';
+import { z } from "zod";
 
 // Main pipeline schemas
 export const ImagePipelineConfigSchema = z.object({
@@ -99,7 +99,7 @@ export class ImagePipeline {
       tweetId: string;
       media: TweetMediaInfo[];
       authorHandle: string;
-    }> = []
+    }> = [],
   ): Promise<ImagePipelineResult> {
     const startTime = Date.now();
     const errors: string[] = [];
@@ -111,18 +111,18 @@ export class ImagePipeline {
         contentAnalyses,
         twitterMedia,
         errors,
-        warnings
+        warnings,
       );
 
       if (sourcedImages.length === 0) {
-        warnings.push('No images sourced - article will have no images');
+        warnings.push("No images sourced - article will have no images");
       }
 
       // Step 2: Process images (resize, optimize, generate alt text)
       const processedImages = await this.processImages(
         sourcedImages,
         errors,
-        warnings
+        warnings,
       );
 
       // Step 3: Create optimal layout and placements
@@ -133,7 +133,7 @@ export class ImagePipeline {
               processedImages,
               contentAnalyses,
               errors,
-              warnings
+              warnings,
             )
           : undefined;
 
@@ -142,7 +142,7 @@ export class ImagePipeline {
         sourcedImages,
         processedImages,
         articleLayout,
-        Date.now() - startTime
+        Date.now() - startTime,
       );
 
       return ImagePipelineResultSchema.parse({
@@ -156,7 +156,7 @@ export class ImagePipeline {
       });
     } catch (error) {
       errors.push(
-        `Pipeline failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Pipeline failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
 
       return ImagePipelineResultSchema.parse({
@@ -186,7 +186,7 @@ export class ImagePipeline {
     tweetMedia: TweetMediaInfo[],
     tweetId: string,
     authorHandle: string,
-    contentAnalysis?: ContentAnalysis
+    contentAnalysis?: ContentAnalysis,
   ): Promise<{
     processedImages: ProcessedImage[];
     errors: string[];
@@ -198,7 +198,7 @@ export class ImagePipeline {
       const twitterImages = await this.sourcingService.extractTwitterImages(
         tweetMedia,
         tweetId,
-        authorHandle
+        authorHandle,
       );
 
       if (twitterImages.length === 0) {
@@ -208,7 +208,7 @@ export class ImagePipeline {
       // Process images
       const processedImages = await this.processor.processImages(
         twitterImages,
-        2
+        2,
       );
 
       return {
@@ -217,7 +217,7 @@ export class ImagePipeline {
       };
     } catch (error) {
       errors.push(
-        `Tweet image processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Tweet image processing failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
       return {
         processedImages: [],
@@ -232,7 +232,7 @@ export class ImagePipeline {
   async findContextualImages(
     playerNames: string[],
     clubNames: string[],
-    transferType: string = 'signing'
+    transferType: string = "signing",
   ): Promise<{
     images: ImageSource[];
     errors: string[];
@@ -243,7 +243,7 @@ export class ImagePipeline {
       const contextualImages = await this.sourcingService.findContextualImages(
         playerNames,
         clubNames,
-        transferType
+        transferType,
       );
 
       return {
@@ -256,7 +256,7 @@ export class ImagePipeline {
       };
     } catch (error) {
       errors.push(
-        `Contextual image search failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Contextual image search failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
       return {
         images: [],
@@ -276,7 +276,7 @@ export class ImagePipeline {
       authorHandle: string;
     }>,
     errors: string[],
-    warnings: string[]
+    warnings: string[],
   ): Promise<ImageSource[]> {
     const allImages: ImageSource[] = [];
 
@@ -286,22 +286,22 @@ export class ImagePipeline {
         const twitterImages = await this.sourcingService.extractTwitterImages(
           media,
           tweetId,
-          authorHandle
+          authorHandle,
         );
         allImages.push(...twitterImages);
       } catch (error) {
         warnings.push(
-          `Failed to extract Twitter images for tweet ${tweetId}: ${error}`
+          `Failed to extract Twitter images for tweet ${tweetId}: ${error}`,
         );
       }
     }
 
     // Search Wikipedia for relevant images
     const allPlayerNames = contentAnalyses.flatMap((analysis) =>
-      analysis.entities.players.map((p) => p.name)
+      analysis.entities.players.map((p) => p.name),
     );
     const allClubNames = contentAnalyses.flatMap((analysis) =>
-      analysis.entities.clubs.map((c) => c.name)
+      analysis.entities.clubs.map((c) => c.name),
     );
 
     if (allPlayerNames.length > 0 || allClubNames.length > 0) {
@@ -310,13 +310,13 @@ export class ImagePipeline {
           await this.sourcingService.findContextualImages(
             [...new Set(allPlayerNames)], // Deduplicate
             [...new Set(allClubNames)],
-            'signing'
+            "signing",
           );
 
         allImages.push(
           ...contextualImages.players,
           ...contextualImages.clubs,
-          ...contextualImages.contextual
+          ...contextualImages.contextual,
         );
       } catch (error) {
         warnings.push(`Wikipedia image search failed: ${error}`);
@@ -326,7 +326,7 @@ export class ImagePipeline {
     // Filter and deduplicate
     const filteredImages = allImages
       .filter(
-        (img) => img.metadata.relevanceScore >= this.config.minRelevanceScore
+        (img) => img.metadata.relevanceScore >= this.config.minRelevanceScore,
       )
       .slice(0, this.config.maxImagesPerArticle);
 
@@ -339,14 +339,14 @@ export class ImagePipeline {
   private async processImages(
     sourcedImages: ImageSource[],
     errors: string[],
-    warnings: string[]
+    warnings: string[],
   ): Promise<ProcessedImage[]> {
     if (sourcedImages.length === 0) return [];
 
     try {
       const processedImages = await this.processor.processImages(
         sourcedImages,
-        3
+        3,
       );
 
       // Validate processed images
@@ -354,7 +354,7 @@ export class ImagePipeline {
         const validation = this.processor.validateProcessedImage(image);
         if (!validation.valid) {
           warnings.push(
-            `Image ${image.id} validation issues: ${validation.issues.join(', ')}`
+            `Image ${image.id} validation issues: ${validation.issues.join(", ")}`,
           );
         }
       }
@@ -362,7 +362,7 @@ export class ImagePipeline {
       return processedImages;
     } catch (error) {
       errors.push(
-        `Image processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Image processing failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
       return [];
     }
@@ -376,29 +376,29 @@ export class ImagePipeline {
     processedImages: ProcessedImage[],
     contentAnalyses: ContentAnalysis[],
     errors: string[],
-    warnings: string[]
+    warnings: string[],
   ): Promise<ArticleLayout | undefined> {
     try {
       const layout = await this.placementService.createArticleLayout(
         sections,
         processedImages,
-        contentAnalyses
+        contentAnalyses,
       );
 
       // Validate layout
       if (layout.metadata.averageRelevance < 50) {
-        warnings.push('Low average image relevance in layout');
+        warnings.push("Low average image relevance in layout");
       }
 
       if (layout.performance.totalImageSize > 5000000) {
         // 5MB
-        warnings.push('Large total image size may impact loading performance');
+        warnings.push("Large total image size may impact loading performance");
       }
 
       return layout;
     } catch (error) {
       errors.push(
-        `Layout creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Layout creation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
       return undefined;
     }
@@ -411,24 +411,24 @@ export class ImagePipeline {
     sourcedImages: ImageSource[],
     processedImages: ProcessedImage[],
     articleLayout: ArticleLayout | undefined,
-    totalProcessingTime: number
-  ): ImagePipelineResult['metrics'] {
+    totalProcessingTime: number,
+  ): ImagePipelineResult["metrics"] {
     const averageRelevance =
       sourcedImages.length > 0
         ? sourcedImages.reduce(
             (sum, img) => sum + img.metadata.relevanceScore,
-            0
+            0,
           ) / sourcedImages.length
         : 0;
 
     const totalImageSize = processedImages.reduce(
       (sum, img) => sum + img.variants.large.fileSize,
-      0
+      0,
     );
 
     const totalOriginalSize = processedImages.reduce(
       (sum, img) => sum + img.optimization.originalSize,
-      0
+      0,
     );
 
     const compressionRatio =
@@ -439,7 +439,7 @@ export class ImagePipeline {
     const imagesPlaced =
       articleLayout?.sections.reduce(
         (sum, section) => sum + section.placements.length,
-        0
+        0,
       ) || 0;
 
     return {
@@ -465,8 +465,8 @@ export class ImagePipeline {
    * Get service statistics
    */
   async getServiceStats(): Promise<{
-    sourcing: ReturnType<ImageSourcingService['getCacheStats']>;
-    processing: ReturnType<ImageProcessor['getProcessingStats']>;
+    sourcing: ReturnType<ImageSourcingService["getCacheStats"]>;
+    processing: ReturnType<ImageProcessor["getProcessingStats"]>;
   }> {
     return {
       sourcing: this.sourcingService.getCacheStats(),

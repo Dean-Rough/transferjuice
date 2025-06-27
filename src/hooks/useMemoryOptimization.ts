@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from "react";
 import {
   MemoryMonitor,
   getMemoryMetrics,
@@ -6,8 +6,8 @@ import {
   DEFAULT_THRESHOLDS,
   type MemoryMetrics,
   type MemoryThresholds,
-} from '@/lib/performance/memoryMonitor';
-import { useFeedStore } from '@/lib/stores/feedStore';
+} from "@/lib/performance/memoryMonitor";
+import { useFeedStore } from "@/lib/stores/feedStore";
 
 interface UseMemoryOptimizationOptions {
   thresholds?: MemoryThresholds;
@@ -25,7 +25,7 @@ interface MemoryOptimizationState {
 }
 
 export function useMemoryOptimization(
-  options: UseMemoryOptimizationOptions = {}
+  options: UseMemoryOptimizationOptions = {},
 ) {
   const {
     thresholds = DEFAULT_THRESHOLDS,
@@ -70,9 +70,9 @@ export function useMemoryOptimization(
 
       if (
         enableLogging &&
-        (status.level === 'warning' ||
-          status.level === 'critical' ||
-          status.level === 'exceeded')
+        (status.level === "warning" ||
+          status.level === "critical" ||
+          status.level === "exceeded")
       ) {
         console.log(`Memory Monitor: ${status.message}`, {
           usedMB: metrics.usedMB,
@@ -135,11 +135,11 @@ export function useMemoryOptimization(
             after: `${afterMetrics.usedMB}MB`,
             freed: `${memoryFreed.toFixed(2)}MB`,
             optimizationCount: state.optimizationCount,
-          }
+          },
         );
       }
     } catch (error) {
-      console.error('Memory optimization failed:', error);
+      console.error("Memory optimization failed:", error);
     } finally {
       state.isOptimizing = false;
     }
@@ -164,7 +164,7 @@ export function useMemoryOptimization(
       recommendations: generateRecommendations(
         state.currentUsage,
         thresholds,
-        feedStats
+        feedStats,
       ),
     };
   }, [getMemoryStats, thresholds]);
@@ -174,19 +174,19 @@ export function useMemoryOptimization(
     if (!metrics) return true;
 
     const status = checkMemoryThresholds(metrics, thresholds);
-    return status.level === 'safe';
+    return status.level === "safe";
   }, [thresholds]);
 
   const getMemoryTrend = useCallback(() => {
     const history = stateRef.current.memoryHistory;
-    if (history.length < 2) return 'stable';
+    if (history.length < 2) return "stable";
 
     const recent = history.slice(-5);
     const trend = recent[recent.length - 1].usageMB - recent[0].usageMB;
 
-    if (trend > 5) return 'increasing';
-    if (trend < -5) return 'decreasing';
-    return 'stable';
+    if (trend > 5) return "increasing";
+    if (trend < -5) return "decreasing";
+    return "stable";
   }, []);
 
   // Cleanup on unmount
@@ -220,42 +220,42 @@ export function useMemoryOptimization(
 function generateRecommendations(
   metrics: MemoryMetrics | null,
   thresholds: MemoryThresholds,
-  feedStats: { usageMB: number; itemCount: number; avgItemSize: number }
+  feedStats: { usageMB: number; itemCount: number; avgItemSize: number },
 ): string[] {
   const recommendations: string[] = [];
 
   if (!metrics) {
-    recommendations.push('Memory monitoring not available in this browser');
+    recommendations.push("Memory monitoring not available in this browser");
     return recommendations;
   }
 
   const status = checkMemoryThresholds(metrics, thresholds);
 
-  if (status.level === 'exceeded' || status.level === 'critical') {
-    recommendations.push('Consider reducing the number of feed items loaded');
-    recommendations.push('Clear filters to reduce memory usage');
-    recommendations.push('Refresh the page to reset memory state');
+  if (status.level === "exceeded" || status.level === "critical") {
+    recommendations.push("Consider reducing the number of feed items loaded");
+    recommendations.push("Clear filters to reduce memory usage");
+    recommendations.push("Refresh the page to reset memory state");
   }
 
-  if (status.level === 'warning') {
-    recommendations.push('Monitor memory usage closely');
-    recommendations.push('Avoid opening many browser tabs');
+  if (status.level === "warning") {
+    recommendations.push("Monitor memory usage closely");
+    recommendations.push("Avoid opening many browser tabs");
   }
 
   if (feedStats.itemCount > 800) {
     recommendations.push(
-      `High item count (${feedStats.itemCount}). Consider pagination.`
+      `High item count (${feedStats.itemCount}). Consider pagination.`,
     );
   }
 
   if (feedStats.avgItemSize > 2000) {
     recommendations.push(
-      `Large average item size (${feedStats.avgItemSize} bytes). Consider data compression.`
+      `Large average item size (${feedStats.avgItemSize} bytes). Consider data compression.`,
     );
   }
 
   if (recommendations.length === 0) {
-    recommendations.push('Memory usage is healthy');
+    recommendations.push("Memory usage is healthy");
   }
 
   return recommendations;

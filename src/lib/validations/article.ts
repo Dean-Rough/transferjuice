@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Article and Content Schemas
@@ -6,16 +6,16 @@ import { z } from 'zod';
  */
 
 // Briefing types
-export const BriefingTypeSchema = z.enum(['morning', 'afternoon', 'evening']);
+export const BriefingTypeSchema = z.enum(["morning", "afternoon", "evening"]);
 
 // Article status
 export const ArticleStatusSchema = z.enum([
-  'draft',
-  'ai_generated',
-  'under_review',
-  'approved',
-  'published',
-  'archived',
+  "draft",
+  "ai_generated",
+  "under_review",
+  "approved",
+  "published",
+  "archived",
 ]);
 
 // Content quality metrics (The Terry Standard)
@@ -31,16 +31,16 @@ export const ContentQualitySchema = z.object({
   overallScore: z.number().min(0).max(100),
   flags: z.array(
     z.enum([
-      'grammar_issues',
-      'readability_low',
-      'off_brand', // Not Terry enough
-      'too_corporate', // Sounds like a press release
-      'lacks_snark', // Insufficiently weaponised irritation
-      'too_generic', // Needs more wet pasta and sad Babybels
-      'fact_check_needed',
-      'inappropriate_content',
-      'copyright_concern',
-    ])
+      "grammar_issues",
+      "readability_low",
+      "off_brand", // Not Terry enough
+      "too_corporate", // Sounds like a press release
+      "lacks_snark", // Insufficiently weaponised irritation
+      "too_generic", // Needs more wet pasta and sad Babybels
+      "fact_check_needed",
+      "inappropriate_content",
+      "copyright_concern",
+    ]),
   ),
   humanReviewRequired: z.boolean(),
 });
@@ -51,7 +51,7 @@ export const ArticleImageSchema = z.object({
   url: z.string().url(),
   altText: z.string().min(1).max(255),
   caption: z.string().optional(),
-  source: z.enum(['twitter', 'wikipedia', 'upload', 'stock']),
+  source: z.enum(["twitter", "wikipedia", "upload", "stock"]),
   sourceUrl: z.string().url().optional(),
   attribution: z.string().optional(),
   dimensions: z.object({
@@ -59,7 +59,7 @@ export const ArticleImageSchema = z.object({
     height: z.number().min(1),
   }),
   fileSize: z.number().min(1), // bytes
-  format: z.enum(['jpg', 'jpeg', 'png', 'webp', 'gif']),
+  format: z.enum(["jpg", "jpeg", "png", "webp", "gif"]),
   optimizedUrls: z
     .object({
       thumbnail: z.string().url(),
@@ -103,7 +103,7 @@ export const SourceTweetRefSchema = z.object({
 // Article section schema
 export const ArticleSectionSchema = z.object({
   id: z.string(),
-  type: z.enum(['intro', 'news_item', 'analysis', 'roundup', 'conclusion']),
+  type: z.enum(["intro", "news_item", "analysis", "roundup", "conclusion"]),
   title: z.string().min(1).max(200).optional(),
   content: z.string().min(1),
   sourceTweets: z.array(SourceTweetRefSchema),
@@ -198,9 +198,9 @@ export const ArticleQueryFiltersSchema = z.object({
   limit: z.number().min(1).max(100).default(10),
   offset: z.number().min(0).default(0),
   orderBy: z
-    .enum(['publishedAt', 'lastModified', 'title', 'quality'])
-    .default('publishedAt'),
-  orderDirection: z.enum(['asc', 'desc']).default('desc'),
+    .enum(["publishedAt", "lastModified", "title", "quality"])
+    .default("publishedAt"),
+  orderDirection: z.enum(["asc", "desc"]).default("desc"),
 });
 
 // Content generation request schema
@@ -209,8 +209,8 @@ export const ContentGenerationRequestSchema = z.object({
   sourceTweetIds: z.array(z.string()).min(1).max(50),
   targetWordCount: z.number().min(200).max(2000).default(800),
   tone: z
-    .enum(['witty', 'sarcastic', 'informative', 'humorous'])
-    .default('witty'),
+    .enum(["witty", "sarcastic", "informative", "humorous"])
+    .default("witty"),
   includeImages: z.boolean().default(true),
   priorityTopics: z.array(z.string()).optional(),
   excludeTopics: z.array(z.string()).optional(),
@@ -224,17 +224,17 @@ export const ContentValidationResultSchema = z.object({
   recommendations: z.array(
     z.object({
       type: z.enum([
-        'grammar',
-        'style',
-        'fact_check',
-        'brand_voice',
-        'readability',
+        "grammar",
+        "style",
+        "fact_check",
+        "brand_voice",
+        "readability",
       ]),
-      severity: z.enum(['low', 'medium', 'high', 'critical']),
+      severity: z.enum(["low", "medium", "high", "critical"]),
       message: z.string(),
       suggestion: z.string().optional(),
       affectedText: z.string().optional(),
-    })
+    }),
   ),
   requiresHumanReview: z.boolean(),
   autoApprovalEligible: z.boolean(),

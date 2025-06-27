@@ -5,15 +5,14 @@
 
 // TODO: Fix circular dependency with terry-style
 // import { applyTerryStyle } from '@/lib/terry-style';
-import type { FeedType } from '@prisma/client';
-import OpenAI from 'openai';
-import { z } from 'zod';
-import type { ContentAnalysis } from './content-analyzer';
+import OpenAI from "openai";
+import { z } from "zod";
+import type { ContentAnalysis } from "./content-analyzer";
 
 // Article generation schemas
 export const ArticleSectionSchema = z.object({
   id: z.string(),
-  type: z.enum(['intro', 'main', 'context', 'analysis', 'conclusion']),
+  type: z.enum(["intro", "main", "context", "analysis", "conclusion"]),
   title: z.string(),
   content: z.string(),
   order: z.number(),
@@ -42,13 +41,13 @@ export const ArticleGenerationSchema = z.object({
   metaDescription: z.string(),
   tags: z.array(z.string()),
   briefingType: z.enum([
-    'MORNING',
-    'AFTERNOON',
-    'EVENING',
-    'WEEKEND',
-    'SPECIAL',
+    "MORNING",
+    "AFTERNOON",
+    "EVENING",
+    "WEEKEND",
+    "SPECIAL",
   ]),
-  status: z.enum(['DRAFT', 'REVIEW', 'PUBLISHED']),
+  status: z.enum(["DRAFT", "REVIEW", "PUBLISHED"]),
   qualityScore: z.number().min(0).max(100),
   aiModel: z.string(),
   generationTime: z.number(),
@@ -63,11 +62,11 @@ interface GeneratorConfig {
   model?: string;
   maxTokens?: number;
   temperature?: number;
-  terryIntensity?: 'mild' | 'medium' | 'nuclear';
+  terryIntensity?: "mild" | "medium" | "nuclear";
 }
 
 export interface GenerationInput {
-  feedType: FeedType;
+  briefingType: "MORNING" | "AFTERNOON" | "EVENING" | "WEEKEND" | "SPECIAL";
   tweetAnalyses: ContentAnalysis[];
   briefingDate: Date;
   previousArticles?: string[]; // To avoid repetition
@@ -81,10 +80,10 @@ export class TerryArticleGenerator {
 
   constructor(config: GeneratorConfig) {
     this.config = {
-      model: 'gpt-4.1',
+      model: "gpt-4.1",
       maxTokens: 4000,
       temperature: 0.7,
-      terryIntensity: 'medium',
+      terryIntensity: "medium",
       ...config,
     };
 
@@ -106,14 +105,14 @@ export class TerryArticleGenerator {
       // Generate article structure
       const articleStructure = this.planArticleStructure(
         prioritizedTweets,
-        input
+        input,
       );
 
       // Generate content for each section
       const sections = await this.generateSections(
         articleStructure,
         prioritizedTweets,
-        input
+        input,
       );
 
       // Generate title and metadata
@@ -125,12 +124,12 @@ export class TerryArticleGenerator {
       const terryScore = this.calculateTerryScore(sections);
       const qualityScore = this.calculateOverallQuality(
         qualityMetrics,
-        terryScore
+        terryScore,
       );
 
       const wordCount = sections.reduce(
-        (total, section) => total + section.content.split(' ').length,
-        0
+        (total, section) => total + section.content.split(" ").length,
+        0,
       );
       const estimatedReadTime = Math.ceil(wordCount / 200); // 200 WPM reading speed
 
@@ -147,8 +146,8 @@ export class TerryArticleGenerator {
         summary,
         metaDescription,
         tags,
-        briefingType: 'SPECIAL', // Default briefing type for feed content
-        status: qualityScore >= 85 ? 'REVIEW' : 'DRAFT',
+        briefingType: "SPECIAL", // Default briefing type for feed content
+        status: qualityScore >= 85 ? "REVIEW" : "DRAFT",
         qualityScore,
         aiModel: this.config.model,
         generationTime: Date.now() - startTime,
@@ -157,7 +156,7 @@ export class TerryArticleGenerator {
       return ArticleGenerationSchema.parse(article);
     } catch (error) {
       throw new Error(
-        `Article generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Article generation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -174,17 +173,17 @@ export class TerryArticleGenerator {
         let scoreB = b.qualityScore;
 
         // Boost chaotic/dramatic content
-        if (a.sentiment.emotions.includes('excitement')) scoreA += 15;
-        if (a.sentiment.emotions.includes('skepticism')) scoreA += 20;
-        if (b.sentiment.emotions.includes('excitement')) scoreB += 15;
-        if (b.sentiment.emotions.includes('skepticism')) scoreB += 20;
+        if (a.sentiment.emotions.includes("excitement")) scoreA += 15;
+        if (a.sentiment.emotions.includes("skepticism")) scoreA += 20;
+        if (b.sentiment.emotions.includes("excitement")) scoreB += 15;
+        if (b.sentiment.emotions.includes("skepticism")) scoreB += 20;
 
         // Boost specific financial details
         const aHasFee = a.entities.transferDetails.some(
-          (d) => d.type === 'fee'
+          (d) => d.type === "fee",
         );
         const bHasFee = b.entities.transferDetails.some(
-          (d) => d.type === 'fee'
+          (d) => d.type === "fee",
         );
         if (aHasFee) scoreA += 10;
         if (bHasFee) scoreB += 10;
@@ -203,30 +202,30 @@ export class TerryArticleGenerator {
    */
   private planArticleStructure(
     analyses: ContentAnalysis[],
-    input: GenerationInput
+    input: GenerationInput,
   ): Array<{
-    type: ArticleSection['type'];
+    type: ArticleSection["type"];
     priority: number;
     content: ContentAnalysis[];
   }> {
     const structure = [
       {
-        type: 'intro' as const,
+        type: "intro" as const,
         priority: 1,
         content: analyses.slice(0, 2), // Most important stories
       },
       {
-        type: 'main' as const,
+        type: "main" as const,
         priority: 2,
         content: analyses.slice(2, 6), // Main body content
       },
       {
-        type: 'context' as const,
+        type: "context" as const,
         priority: 3,
         content: analyses.slice(6, 8), // Supporting stories
       },
       {
-        type: 'analysis' as const,
+        type: "analysis" as const,
         priority: 4,
         content: analyses.slice(8, 10), // Terry's take
       },
@@ -235,7 +234,7 @@ export class TerryArticleGenerator {
     // Add conclusion if enough content
     if (analyses.length >= 5) {
       structure.push({
-        type: 'analysis' as const,
+        type: "analysis" as const,
         priority: 5,
         content: analyses.slice(-2), // Wrap up with interesting bits
       });
@@ -249,12 +248,12 @@ export class TerryArticleGenerator {
    */
   private async generateSections(
     structure: Array<{
-      type: ArticleSection['type'];
+      type: ArticleSection["type"];
       priority: number;
       content: ContentAnalysis[];
     }>,
     allAnalyses: ContentAnalysis[],
-    input: GenerationInput
+    input: GenerationInput,
   ): Promise<ArticleSection[]> {
     const sections: ArticleSection[] = [];
 
@@ -263,7 +262,7 @@ export class TerryArticleGenerator {
         sectionPlan.type,
         sectionPlan.content,
         index + 1,
-        input
+        input,
       );
       sections.push(section);
     }
@@ -275,10 +274,10 @@ export class TerryArticleGenerator {
    * Generate individual section content
    */
   private async generateSection(
-    type: ArticleSection['type'],
+    type: ArticleSection["type"],
     analyses: ContentAnalysis[],
     order: number,
-    input: GenerationInput
+    input: GenerationInput,
   ): Promise<ArticleSection> {
     const sectionPrompt = this.buildSectionPrompt(type, analyses, input);
 
@@ -286,11 +285,11 @@ export class TerryArticleGenerator {
       model: this.config.model,
       messages: [
         {
-          role: 'system',
+          role: "system",
           content: this.getTerrySystemPrompt(type),
         },
         {
-          role: 'user',
+          role: "user",
           content: sectionPrompt,
         },
       ],
@@ -320,7 +319,7 @@ export class TerryArticleGenerator {
   /**
    * Get Terry-specific system prompt for different section types
    */
-  private getTerrySystemPrompt(type: ArticleSection['type']): string {
+  private getTerrySystemPrompt(type: ArticleSection["type"]): string {
     const basePrompt = `You are The Terry, a brilliantly acerbic football journalist with a gift for weaponised irritation and emotional intelligence. Write in Joel Golby's distinctive style.
 
 VOICE CHARACTERISTICS:
@@ -338,12 +337,12 @@ TRANSFER JUICE STYLE:
 
     const sectionSpecific = {
       intro:
-        'INTRO SECTION: Hook readers immediately with the most dramatic/absurd transfer story. Set the tone for controlled chaos.',
+        "INTRO SECTION: Hook readers immediately with the most dramatic/absurd transfer story. Set the tone for controlled chaos.",
       main: "MAIN SECTION: Deep dive into the key stories with Terry's mix of expertise and exasperation.",
       context:
         "CONTEXT SECTION: Provide background with Terry's trademark ability to connect dots others miss.",
       analysis:
-        'ANALYSIS SECTION: This is pure Terry - deep insights wrapped in withering observations.',
+        "ANALYSIS SECTION: This is pure Terry - deep insights wrapped in withering observations.",
       conclusion:
         "CONCLUSION SECTION: Wrap up with Terry's signature mix of resignation and hope.",
     };
@@ -355,9 +354,9 @@ TRANSFER JUICE STYLE:
    * Build section-specific prompt
    */
   private buildSectionPrompt(
-    type: ArticleSection['type'],
+    type: ArticleSection["type"],
     analyses: ContentAnalysis[],
-    input: GenerationInput
+    input: GenerationInput,
   ): string {
     const tweetSummaries = analyses
       .map((analysis, i) => {
@@ -365,17 +364,17 @@ TRANSFER JUICE STYLE:
         const entities = analysis.entities;
 
         return `Tweet ${i + 1}:
-- Content: ${classification.keyPoints.join(', ')}
+- Content: ${classification.keyPoints.join(", ")}
 - Type: ${classification.transferType}
-- Players: ${entities.players.map((p) => p.name).join(', ') || 'None'}
-- Clubs: ${entities.clubs.map((c) => c.name).join(', ') || 'None'}
+- Players: ${entities.players.map((p) => p.name).join(", ") || "None"}
+- Clubs: ${entities.clubs.map((c) => c.name).join(", ") || "None"}
 - Sentiment: ${analysis.sentiment.sentiment}
 - Quality: ${analysis.qualityScore}/100`;
       })
-      .join('\n\n');
+      .join("\n\n");
 
     return `
-Write a ${type} section for a ${input.feedType.toLowerCase()} Transfer Juice briefing dated ${input.briefingDate.toDateString()}.
+Write a ${type} section for a ${input.briefingType.toLowerCase()} Transfer Juice briefing dated ${input.briefingDate.toDateString()}.
 
 CONTENT TO WORK WITH:
 ${tweetSummaries}
@@ -394,10 +393,10 @@ Write engaging, Terry-style content that transforms these transfer updates into 
   /**
    * Get section-specific requirements
    */
-  private getSectionRequirements(type: ArticleSection['type']): string {
+  private getSectionRequirements(type: ArticleSection["type"]): string {
     const requirements = {
       intro:
-        '150-200 words. Hook readers with the biggest story. Set comedic tone while delivering news.',
+        "150-200 words. Hook readers with the biggest story. Set comedic tone while delivering news.",
       main: "300-400 words. Deep dive into key transfers. Balance reporting with Terry's observations.",
       context:
         "200-250 words. Background and connections. Terry's ability to see bigger picture.",
@@ -413,7 +412,7 @@ Write engaging, Terry-style content that transforms these transfer updates into 
   /**
    * Get token limits per section type
    */
-  private getSectionTokenLimit(type: ArticleSection['type']): number {
+  private getSectionTokenLimit(type: ArticleSection["type"]): number {
     const limits = {
       intro: 300,
       main: 500,
@@ -430,7 +429,7 @@ Write engaging, Terry-style content that transforms these transfer updates into 
    */
   private async generateMetadata(
     sections: ArticleSection[],
-    input: GenerationInput
+    input: GenerationInput,
   ): Promise<{
     title: string;
     slug: string;
@@ -440,13 +439,13 @@ Write engaging, Terry-style content that transforms these transfer updates into 
   }> {
     const contentSummary = sections
       .map((s) => `${s.type}: ${s.content.substring(0, 100)}...`)
-      .join('\n');
+      .join("\n");
 
     const response = await this.openai.chat.completions.create({
       model: this.config.model,
       messages: [
         {
-          role: 'system',
+          role: "system",
           content: `Generate metadata for a Terry-style Transfer Juice article. Return JSON with:
 - title: Witty, specific headline (max 60 chars)
 - slug: URL-friendly version
@@ -455,18 +454,18 @@ Write engaging, Terry-style content that transforms these transfer updates into 
 - tags: Array of relevant tags`,
         },
         {
-          role: 'user',
-          content: `Generate metadata for this ${input.feedType.toLowerCase()} briefing:\n\n${contentSummary}`,
+          role: "user",
+          content: `Generate metadata for this ${input.briefingType.toLowerCase()} briefing:\n\n${contentSummary}`,
         },
       ],
       max_tokens: 300,
       temperature: 0.5,
-      response_format: { type: 'json_object' },
+      response_format: { type: "json_object" },
     });
 
     const content = response.choices[0]?.message?.content;
     if (!content) {
-      throw new Error('No metadata generated');
+      throw new Error("No metadata generated");
     }
 
     const metadata = JSON.parse(content);
@@ -474,7 +473,7 @@ Write engaging, Terry-style content that transforms these transfer updates into 
       title: metadata.title,
       slug:
         metadata.slug ||
-        metadata.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        metadata.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       summary: metadata.summary,
       metaDescription: metadata.metaDescription,
       tags: metadata.tags || [],
@@ -495,13 +494,13 @@ Write engaging, Terry-style content that transforms these transfer updates into 
 
     // Look for specific Terry phrases
     const terryPhrases = [
-      'of course',
-      'apparently',
-      'somehow',
-      'brilliant',
-      'properly mental',
-      'exactly the sort of',
-      'which is',
+      "of course",
+      "apparently",
+      "somehow",
+      "brilliant",
+      "properly mental",
+      "exactly the sort of",
+      "which is",
     ];
 
     for (const phrase of terryPhrases) {
@@ -517,15 +516,15 @@ Write engaging, Terry-style content that transforms these transfer updates into 
    * Generate section title
    */
   private generateSectionTitle(
-    type: ArticleSection['type'],
-    analyses: ContentAnalysis[]
+    type: ArticleSection["type"],
+    analyses: ContentAnalysis[],
   ): string {
     const titleMap = {
-      intro: 'The Latest Chaos',
-      main: 'The Main Event',
+      intro: "The Latest Chaos",
+      main: "The Main Event",
       context: "What's Actually Happening",
-      analysis: 'The Terry Take',
-      conclusion: 'Right Then',
+      analysis: "The Terry Take",
+      conclusion: "Right Then",
     };
 
     return titleMap[type];
@@ -535,12 +534,12 @@ Write engaging, Terry-style content that transforms these transfer updates into 
    * Calculate quality metrics
    */
   private calculateQualityMetrics(
-    sections: ArticleSection[]
-  ): ArticleContent['qualityMetrics'] {
+    sections: ArticleSection[],
+  ): ArticleContent["qualityMetrics"] {
     // Simplified quality calculation - would use more sophisticated NLP in production
     const totalWords = sections.reduce(
-      (total, section) => total + section.content.split(' ').length,
-      0
+      (total, section) => total + section.content.split(" ").length,
+      0,
     );
 
     return {
@@ -562,10 +561,10 @@ Write engaging, Terry-style content that transforms these transfer updates into 
       score += section.terryisms.length * 5;
 
       // Check for specific Terry patterns
-      if (section.content.includes('(')) score += 10; // Parenthetical asides
-      if (section.content.includes('brilliant')) score += 5;
-      if (section.content.includes('of course')) score += 5;
-      if (section.content.includes('properly')) score += 5;
+      if (section.content.includes("(")) score += 10; // Parenthetical asides
+      if (section.content.includes("brilliant")) score += 5;
+      if (section.content.includes("of course")) score += 5;
+      if (section.content.includes("properly")) score += 5;
     });
 
     return Math.min(score, 100);
@@ -575,14 +574,14 @@ Write engaging, Terry-style content that transforms these transfer updates into 
    * Calculate overall quality
    */
   private calculateOverallQuality(
-    metrics: ArticleContent['qualityMetrics'],
-    terryScore: number
+    metrics: ArticleContent["qualityMetrics"],
+    terryScore: number,
   ): number {
     return Math.round(
       metrics.coherence * 0.25 +
         metrics.factualAccuracy * 0.3 +
         metrics.brandVoice * 0.25 +
-        metrics.readability * 0.2
+        metrics.readability * 0.2,
     );
   }
 
@@ -593,7 +592,7 @@ Write engaging, Terry-style content that transforms these transfer updates into 
     try {
       const response = await this.openai.chat.completions.create({
         model: this.config.model,
-        messages: [{ role: 'user', content: 'Test' }],
+        messages: [{ role: "user", content: "Test" }],
         max_tokens: 5,
       });
 
@@ -601,7 +600,7 @@ Write engaging, Terry-style content that transforms these transfer updates into 
     } catch (error) {
       return {
         valid: false,
-        error: `Article generator validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error: `Article generator validation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       };
     }
   }

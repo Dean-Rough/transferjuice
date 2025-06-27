@@ -1,14 +1,14 @@
-import { create } from 'zustand';
-import { devtools, subscribeWithSelector } from 'zustand/middleware';
+import { create } from "zustand";
+import { devtools, subscribeWithSelector } from "zustand/middleware";
 import {
   MemoryOptimizer,
   getMemoryMetrics,
   checkMemoryThresholds,
-} from '@/lib/performance/memoryMonitor';
+} from "@/lib/performance/memoryMonitor";
 
 export interface FeedItem {
   id: string;
-  type: 'itk' | 'terry' | 'partner' | 'breaking';
+  type: "itk" | "terry" | "partner" | "breaking";
   timestamp: Date;
   content: string;
   terryCommentary?: string;
@@ -17,7 +17,7 @@ export interface FeedItem {
     handle?: string;
     tier: 1 | 2 | 3;
     reliability: number;
-    region?: 'UK' | 'ES' | 'IT' | 'FR' | 'DE' | 'BR' | 'GLOBAL';
+    region?: "UK" | "ES" | "IT" | "FR" | "DE" | "BR" | "GLOBAL";
   };
   tags: {
     clubs: string[];
@@ -25,7 +25,7 @@ export interface FeedItem {
     sources: string[];
   };
   media?: {
-    type: 'image' | 'video';
+    type: "image" | "video";
     url: string;
     altText?: string;
     thumbnailUrl?: string;
@@ -37,15 +37,15 @@ export interface FeedItem {
   };
   metadata: {
     transferType?:
-      | 'signing'
-      | 'rumour'
-      | 'medical'
-      | 'confirmed'
-      | 'bid'
-      | 'personal_terms';
-    priority: 'low' | 'medium' | 'high' | 'breaking';
+      | "signing"
+      | "rumour"
+      | "medical"
+      | "confirmed"
+      | "bid"
+      | "personal_terms";
+    priority: "low" | "medium" | "high" | "breaking";
     relevanceScore: number;
-    league?: 'PL' | 'LaLiga' | 'SerieA' | 'Bundesliga' | 'Ligue1' | 'Other';
+    league?: "PL" | "LaLiga" | "SerieA" | "Bundesliga" | "Ligue1" | "Other";
     originalUrl?: string;
     attribution?: string; // For partner content
   };
@@ -55,11 +55,11 @@ export interface FeedItem {
 
 export interface FeedFilters {
   tags: string[];
-  timeRange?: 'today' | 'week' | 'month' | 'transfer_window';
-  contentType?: FeedItem['type'][];
+  timeRange?: "today" | "week" | "month" | "transfer_window";
+  contentType?: FeedItem["type"][];
   sources?: string[];
   leagues?: string[];
-  priority?: FeedItem['metadata']['priority'][];
+  priority?: FeedItem["metadata"]["priority"][];
   clubs?: string[];
   players?: string[];
 }
@@ -86,7 +86,7 @@ export interface FeedState {
   // UI state
   scrollPosition: number;
   selectedItemId: string | null;
-  viewMode: 'infinite' | 'paginated';
+  viewMode: "infinite" | "paginated";
 
   // Memory management
   memoryUsageMB: number;
@@ -112,21 +112,21 @@ export interface FeedActions {
   setFilter: (tag: string) => void;
   setActiveFilters: (filters: Partial<FeedFilters>) => void;
   clearFilters: () => void;
-  addTagFilter: (tag: string, type?: 'club' | 'player' | 'source') => void;
+  addTagFilter: (tag: string, type?: "club" | "player" | "source") => void;
   removeTagFilter: (tag: string) => void;
   applyFilters: () => void;
 
   // UI interactions
   setScrollPosition: (position: number) => void;
   setSelectedItem: (itemId: string | null) => void;
-  setViewMode: (mode: 'infinite' | 'paginated') => void;
+  setViewMode: (mode: "infinite" | "paginated") => void;
 
   // Analytics and discovery
   getTrendingTags: (limit: number) => string[];
   getRelatedTags: (tag: string) => string[];
   trackEngagement: (
     itemId: string,
-    action: 'click' | 'share' | 'react'
+    action: "click" | "share" | "react",
   ) => void;
 
   // Memory and performance
@@ -145,129 +145,129 @@ export interface FeedActions {
 
 // Enhanced mock data generator for global feed development
 const generateMockItem = (index: number): FeedItem => {
-  const types: FeedItem['type'][] = ['itk', 'terry', 'partner', 'breaking'];
+  const types: FeedItem["type"][] = ["itk", "terry", "partner", "breaking"];
 
   // Global sources with tier and region
   const sources = [
     {
-      name: 'Fabrizio Romano',
-      handle: '@FabrizioRomano',
+      name: "Fabrizio Romano",
+      handle: "@FabrizioRomano",
       tier: 1 as const,
       reliability: 0.95,
-      region: 'GLOBAL' as const,
+      region: "GLOBAL" as const,
     },
     {
-      name: 'David Ornstein',
-      handle: '@David_Ornstein',
+      name: "David Ornstein",
+      handle: "@David_Ornstein",
       tier: 1 as const,
       reliability: 0.93,
-      region: 'UK' as const,
+      region: "UK" as const,
     },
     {
-      name: 'Gianluca Di Marzio',
-      handle: '@DiMarzio',
+      name: "Gianluca Di Marzio",
+      handle: "@DiMarzio",
       tier: 1 as const,
       reliability: 0.9,
-      region: 'IT' as const,
+      region: "IT" as const,
     },
     {
-      name: 'Marca',
-      handle: '@marca',
+      name: "Marca",
+      handle: "@marca",
       tier: 2 as const,
       reliability: 0.82,
-      region: 'ES' as const,
+      region: "ES" as const,
     },
     {
       name: "L'Équipe",
-      handle: '@lequipe',
+      handle: "@lequipe",
       tier: 2 as const,
       reliability: 0.85,
-      region: 'FR' as const,
+      region: "FR" as const,
     },
     {
-      name: 'Sky Sports',
-      handle: '@SkySports',
+      name: "Sky Sports",
+      handle: "@SkySports",
       tier: 2 as const,
       reliability: 0.8,
-      region: 'UK' as const,
+      region: "UK" as const,
     },
     {
-      name: 'ESPN Brasil',
-      handle: '@ESPNBrasil',
+      name: "ESPN Brasil",
+      handle: "@ESPNBrasil",
       tier: 2 as const,
       reliability: 0.78,
-      region: 'BR' as const,
+      region: "BR" as const,
     },
     {
-      name: 'Bild',
-      handle: '@BILD',
+      name: "Bild",
+      handle: "@BILD",
       tier: 3 as const,
       reliability: 0.75,
-      region: 'DE' as const,
+      region: "DE" as const,
     },
   ];
 
   // Global club coverage
   const clubs = [
-    'Arsenal',
-    'Chelsea',
-    'Manchester United',
-    'Liverpool',
-    'Manchester City',
-    'Tottenham',
-    'Real Madrid',
-    'Barcelona',
-    'Atletico Madrid',
-    'Sevilla',
-    'Juventus',
-    'AC Milan',
-    'Inter Milan',
-    'Napoli',
-    'AS Roma',
-    'Bayern Munich',
-    'Borussia Dortmund',
-    'RB Leipzig',
-    'Bayer Leverkusen',
-    'PSG',
-    'Lyon',
-    'Marseille',
-    'Monaco',
-    'Ajax',
-    'PSV',
-    'Feyenoord',
+    "Arsenal",
+    "Chelsea",
+    "Manchester United",
+    "Liverpool",
+    "Manchester City",
+    "Tottenham",
+    "Real Madrid",
+    "Barcelona",
+    "Atletico Madrid",
+    "Sevilla",
+    "Juventus",
+    "AC Milan",
+    "Inter Milan",
+    "Napoli",
+    "AS Roma",
+    "Bayern Munich",
+    "Borussia Dortmund",
+    "RB Leipzig",
+    "Bayer Leverkusen",
+    "PSG",
+    "Lyon",
+    "Marseille",
+    "Monaco",
+    "Ajax",
+    "PSV",
+    "Feyenoord",
   ];
 
   const players = [
-    'Erling Haaland',
-    'Kylian Mbappe',
-    'Jude Bellingham',
-    'Harry Kane',
-    'Mohamed Salah',
-    'Vinicius Jr',
-    'Pedri',
-    'Gavi',
-    'Jamal Musiala',
-    'Eduardo Camavinga',
-    'Victor Osimhen',
-    'Rafael Leao',
-    'Khvicha Kvaratskhelia',
-    'Dusan Vlahovic',
-    'Bukayo Saka',
-    'Phil Foden',
-    'Florian Wirtz',
-    'Youssoufa Moukoko',
+    "Erling Haaland",
+    "Kylian Mbappe",
+    "Jude Bellingham",
+    "Harry Kane",
+    "Mohamed Salah",
+    "Vinicius Jr",
+    "Pedri",
+    "Gavi",
+    "Jamal Musiala",
+    "Eduardo Camavinga",
+    "Victor Osimhen",
+    "Rafael Leao",
+    "Khvicha Kvaratskhelia",
+    "Dusan Vlahovic",
+    "Bukayo Saka",
+    "Phil Foden",
+    "Florian Wirtz",
+    "Youssoufa Moukoko",
   ];
 
-  const leagues = ['PL', 'LaLiga', 'SerieA', 'Bundesliga', 'Ligue1', 'Other'];
+  const leagues = ["PL", "LaLiga", "SerieA", "Bundesliga", "Ligue1", "Other"];
   const transferTypes = [
-    'signing',
-    'rumour',
-    'medical',
-    'confirmed',
-    'bid',
-    'personal_terms',
+    "signing",
+    "rumour",
+    "medical",
+    "confirmed",
+    "bid",
+    "personal_terms",
   ];
-  const priorities = ['low', 'medium', 'high', 'breaking'];
+  const priorities = ["low", "medium", "high", "breaking"];
 
   const type = types[index % types.length];
   const source = sources[index % sources.length];
@@ -304,9 +304,9 @@ const generateMockItem = (index: number): FeedItem => {
 
   const attributions = [
     "The Upshot - Football's finest chaos documented",
-    'FourFourTwo - Where football history lives',
-    'Football Ramble - Weekly mishaps and comedy gold',
-    'The Athletic - Deep dives into transfer madness',
+    "FourFourTwo - Where football history lives",
+    "Football Ramble - Weekly mishaps and comedy gold",
+    "The Athletic - Deep dives into transfer madness",
   ];
 
   return {
@@ -315,7 +315,7 @@ const generateMockItem = (index: number): FeedItem => {
     timestamp: new Date(Date.now() - Math.random() * 86400000 * 2), // Random time in last 48h
     content: contents[index % contents.length],
     terryCommentary:
-      type === 'terry' || Math.random() > 0.6
+      type === "terry" || Math.random() > 0.6
         ? terryCommentaries[index % terryCommentaries.length]
         : undefined,
     source,
@@ -327,7 +327,7 @@ const generateMockItem = (index: number): FeedItem => {
     media:
       Math.random() > 0.7
         ? {
-            type: 'image',
+            type: "image",
             url: `https://picsum.photos/800/400?random=${index}`,
             altText: `${player} during training`,
             thumbnailUrl: `https://picsum.photos/200/120?random=${index}`,
@@ -348,9 +348,9 @@ const generateMockItem = (index: number): FeedItem => {
       relevanceScore: Math.random() * 0.4 + 0.6, // 0.6-1.0 range
       league: league as any,
       originalUrl:
-        type === 'partner' ? `https://example.com/article/${index}` : undefined,
+        type === "partner" ? `https://example.com/article/${index}` : undefined,
       attribution:
-        type === 'partner'
+        type === "partner"
           ? attributions[index % attributions.length]
           : undefined,
     },
@@ -371,7 +371,7 @@ const applyFilters = (items: FeedItem[], filters: FeedFilters): FeedItem[] => {
       ];
 
       const hasMatchingTag = filters.tags.some((filterTag) =>
-        allItemTags.includes(filterTag.toLowerCase())
+        allItemTags.includes(filterTag.toLowerCase()),
       );
 
       if (!hasMatchingTag) return false;
@@ -381,8 +381,8 @@ const applyFilters = (items: FeedItem[], filters: FeedFilters): FeedItem[] => {
     if (filters.clubs && filters.clubs.length > 0) {
       const hasMatchingClub = filters.clubs.some((club) =>
         item.tags.clubs.some((itemClub) =>
-          itemClub.toLowerCase().includes(club.toLowerCase())
-        )
+          itemClub.toLowerCase().includes(club.toLowerCase()),
+        ),
       );
       if (!hasMatchingClub) return false;
     }
@@ -391,8 +391,8 @@ const applyFilters = (items: FeedItem[], filters: FeedFilters): FeedItem[] => {
     if (filters.players && filters.players.length > 0) {
       const hasMatchingPlayer = filters.players.some((player) =>
         item.tags.players.some((itemPlayer) =>
-          itemPlayer.toLowerCase().includes(player.toLowerCase())
-        )
+          itemPlayer.toLowerCase().includes(player.toLowerCase()),
+        ),
       );
       if (!hasMatchingPlayer) return false;
     }
@@ -406,8 +406,8 @@ const applyFilters = (items: FeedItem[], filters: FeedFilters): FeedItem[] => {
     if (filters.sources && filters.sources.length > 0) {
       const hasMatchingSource = filters.sources.some((source) =>
         item.tags.sources.some((itemSource) =>
-          itemSource.toLowerCase().includes(source.toLowerCase())
-        )
+          itemSource.toLowerCase().includes(source.toLowerCase()),
+        ),
       );
       if (!hasMatchingSource) return false;
     }
@@ -428,18 +428,18 @@ const applyFilters = (items: FeedItem[], filters: FeedFilters): FeedItem[] => {
       const itemDate = new Date(item.timestamp);
 
       switch (filters.timeRange) {
-        case 'today':
+        case "today":
           if (itemDate.toDateString() !== now.toDateString()) return false;
           break;
-        case 'week':
+        case "week":
           const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
           if (itemDate < weekAgo) return false;
           break;
-        case 'month':
+        case "month":
           const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
           if (itemDate < monthAgo) return false;
           break;
-        case 'transfer_window':
+        case "transfer_window":
           // Transfer windows: July 1 - Aug 31, Jan 1 - Jan 31
           const month = now.getMonth() + 1;
           const itemMonth = itemDate.getMonth() + 1;
@@ -484,7 +484,7 @@ export const useFeedStore = create<FeedState & FeedActions>()(
       // UI state
       scrollPosition: 0,
       selectedItemId: null,
-      viewMode: 'infinite',
+      viewMode: "infinite",
 
       // Memory management
       memoryUsageMB: 0,
@@ -504,7 +504,9 @@ export const useFeedStore = create<FeedState & FeedActions>()(
           const { items, activeFilters } = get();
 
           // Fetch from real API
-          console.log(`[feedStore] Fetching from /api/feed?limit=${count}&offset=0`);
+          console.log(
+            `[feedStore] Fetching from /api/feed?limit=${count}&offset=0`,
+          );
           const response = await fetch(`/api/feed?limit=${count}&offset=0`);
 
           if (!response.ok) {
@@ -514,7 +516,7 @@ export const useFeedStore = create<FeedState & FeedActions>()(
           const data = await response.json();
 
           if (!data.success) {
-            throw new Error(data.error || 'Failed to fetch feed data');
+            throw new Error(data.error || "Failed to fetch feed data");
           }
 
           const newItems = data.data || [];
@@ -547,13 +549,13 @@ export const useFeedStore = create<FeedState & FeedActions>()(
 
           const loadTime = performance.now() - startTime;
           console.log(
-            `Loaded ${newItems.length} items from API in ${loadTime.toFixed(2)}ms`
+            `Loaded ${newItems.length} items from API in ${loadTime.toFixed(2)}ms`,
           );
         } catch (error) {
-          console.error('Failed to load feed items:', error);
+          console.error("Failed to load feed items:", error);
           set({
             error:
-              error instanceof Error ? error.message : 'Failed to load items',
+              error instanceof Error ? error.message : "Failed to load items",
             isLoading: false,
           });
         }
@@ -577,17 +579,17 @@ export const useFeedStore = create<FeedState & FeedActions>()(
           const data = await response.json();
 
           if (!data.success) {
-            throw new Error(data.error || 'Failed to fetch more feed data');
+            throw new Error(data.error || "Failed to fetch more feed data");
           }
 
           const newItems = data.data || [];
-          
+
           // Ensure items have proper date objects
           const processedNewItems = newItems.map((item: any) => ({
             ...item,
             timestamp: new Date(item.timestamp),
           }));
-          
+
           const allItems = [...items, ...processedNewItems];
 
           set({
@@ -601,12 +603,12 @@ export const useFeedStore = create<FeedState & FeedActions>()(
 
           console.log(`Loaded ${newItems.length} more items from API`);
         } catch (error) {
-          console.error('Failed to load more feed items:', error);
+          console.error("Failed to load more feed items:", error);
           set({
             error:
               error instanceof Error
                 ? error.message
-                : 'Failed to load more items',
+                : "Failed to load more items",
             isLoadingMore: false,
           });
         }
@@ -683,7 +685,7 @@ export const useFeedStore = create<FeedState & FeedActions>()(
           activeFilters: updatedFilters,
           filteredItems: applyFilters(items, updatedFilters),
           isFiltering: Object.values(updatedFilters).some((value) =>
-            Array.isArray(value) ? value.length > 0 : value !== undefined
+            Array.isArray(value) ? value.length > 0 : value !== undefined,
           ),
         });
       },
@@ -696,7 +698,7 @@ export const useFeedStore = create<FeedState & FeedActions>()(
           activeFilters: updatedFilters,
           filteredItems: applyFilters(items, updatedFilters),
           isFiltering: Object.values(updatedFilters).some((value) =>
-            Array.isArray(value) ? value.length > 0 : value !== undefined
+            Array.isArray(value) ? value.length > 0 : value !== undefined,
           ),
         });
       },
@@ -712,22 +714,22 @@ export const useFeedStore = create<FeedState & FeedActions>()(
         });
       },
 
-      addTagFilter: (tag: string, type?: 'club' | 'player' | 'source') => {
+      addTagFilter: (tag: string, type?: "club" | "player" | "source") => {
         const { activeFilters } = get();
 
-        if (type === 'club') {
+        if (type === "club") {
           const updatedFilters = {
             ...activeFilters,
             clubs: [...(activeFilters.clubs || []), tag],
           };
           get().setActiveFilters(updatedFilters);
-        } else if (type === 'player') {
+        } else if (type === "player") {
           const updatedFilters = {
             ...activeFilters,
             players: [...(activeFilters.players || []), tag],
           };
           get().setActiveFilters(updatedFilters);
-        } else if (type === 'source') {
+        } else if (type === "source") {
           const updatedFilters = {
             ...activeFilters,
             sources: [...(activeFilters.sources || []), tag],
@@ -763,7 +765,7 @@ export const useFeedStore = create<FeedState & FeedActions>()(
         set({
           filteredItems: applyFilters(items, activeFilters),
           isFiltering: Object.values(activeFilters).some((value) =>
-            Array.isArray(value) ? value.length > 0 : value !== undefined
+            Array.isArray(value) ? value.length > 0 : value !== undefined,
           ),
         });
       },
@@ -777,7 +779,7 @@ export const useFeedStore = create<FeedState & FeedActions>()(
         set({ selectedItemId: itemId });
       },
 
-      setViewMode: (mode: 'infinite' | 'paginated') => {
+      setViewMode: (mode: "infinite" | "paginated") => {
         set({ viewMode: mode });
       },
 
@@ -809,8 +811,8 @@ export const useFeedStore = create<FeedState & FeedActions>()(
         // Find items that contain the given tag
         const relatedItems = items.filter((item) =>
           [...item.tags.clubs, ...item.tags.players, ...item.tags.sources].some(
-            (itemTag) => itemTag.toLowerCase().includes(tag.toLowerCase())
-          )
+            (itemTag) => itemTag.toLowerCase().includes(tag.toLowerCase()),
+          ),
         );
 
         // Count other tags that appear with the given tag
@@ -823,7 +825,7 @@ export const useFeedStore = create<FeedState & FeedActions>()(
             if (relatedTag.toLowerCase() !== tag.toLowerCase()) {
               relatedTags.set(
                 relatedTag,
-                (relatedTags.get(relatedTag) || 0) + 1
+                (relatedTags.get(relatedTag) || 0) + 1,
               );
             }
           });
@@ -837,7 +839,7 @@ export const useFeedStore = create<FeedState & FeedActions>()(
 
       trackEngagement: (
         itemId: string,
-        action: 'click' | 'share' | 'react'
+        action: "click" | "share" | "react",
       ) => {
         const { items } = get();
         const updatedItems = items.map((item) => {
@@ -845,13 +847,13 @@ export const useFeedStore = create<FeedState & FeedActions>()(
             const updatedEngagement = { ...item.engagement };
 
             switch (action) {
-              case 'click':
+              case "click":
                 updatedEngagement.clicks += 1;
                 break;
-              case 'share':
+              case "share":
                 updatedEngagement.shares += 1;
                 break;
-              case 'react':
+              case "react":
                 updatedEngagement.reactions += 1;
                 break;
             }
@@ -876,7 +878,7 @@ export const useFeedStore = create<FeedState & FeedActions>()(
         if (items.length > safeItemCount) {
           const optimizedItems = items.slice(0, safeItemCount);
 
-          if (typeof window !== 'undefined' && (window as any).gc) {
+          if (typeof window !== "undefined" && (window as any).gc) {
             try {
               (window as any).gc();
             } catch (e) {
@@ -894,7 +896,7 @@ export const useFeedStore = create<FeedState & FeedActions>()(
           });
 
           console.log(
-            `Memory optimization: Reduced items from ${items.length} to ${optimizedItems.length}`
+            `Memory optimization: Reduced items from ${items.length} to ${optimizedItems.length}`,
           );
         }
       },
@@ -903,7 +905,7 @@ export const useFeedStore = create<FeedState & FeedActions>()(
         const { items, memoryUsageMB } = get();
         const totalSize = items.reduce(
           (acc, item) => acc + MemoryOptimizer.estimateObjectSize(item),
-          0
+          0,
         );
         const avgItemSize = items.length > 0 ? totalSize / items.length : 0;
 
@@ -928,9 +930,9 @@ export const useFeedStore = create<FeedState & FeedActions>()(
       },
     })),
     {
-      name: 'transfer-juice-feed',
-    }
-  )
+      name: "transfer-juice-feed",
+    },
+  ),
 );
 
 // Performance-optimized selectors
@@ -981,11 +983,11 @@ export const selectRealtimeStatus = (state: FeedState) => ({
 
 // Partner content selectors
 export const selectPartnerContent = (state: FeedState) => ({
-  partnerItems: state.items.filter((item) => item.type === 'partner'),
-  partnerCount: state.items.filter((item) => item.type === 'partner').length,
+  partnerItems: state.items.filter((item) => item.type === "partner"),
+  partnerCount: state.items.filter((item) => item.type === "partner").length,
   partnerRatio:
     state.items.length > 0
-      ? state.items.filter((item) => item.type === 'partner').length /
+      ? state.items.filter((item) => item.type === "partner").length /
         state.items.length
       : 0,
 });
@@ -1005,21 +1007,21 @@ export function usePartnerContentIntegration() {
   const { items, addItem } = useFeedStore();
 
   const getPartnerContentRatio = () => {
-    const partnerCount = items.filter((item) => item.type === 'partner').length;
+    const partnerCount = items.filter((item) => item.type === "partner").length;
     return items.length > 0 ? partnerCount / items.length : 0;
   };
 
   const getRecentPartnerContent = (hours: number = 24) => {
     const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
     return items.filter(
-      (item) => item.type === 'partner' && new Date(item.timestamp) >= cutoff
+      (item) => item.type === "partner" && new Date(item.timestamp) >= cutoff,
     );
   };
 
   const addPartnerContent = (partnerItem: FeedItem) => {
-    if (partnerItem.type !== 'partner') {
+    if (partnerItem.type !== "partner") {
       console.warn(
-        'Attempted to add non-partner content via partner integration'
+        "Attempted to add non-partner content via partner integration",
       );
       return;
     }
@@ -1030,6 +1032,6 @@ export function usePartnerContentIntegration() {
     getPartnerContentRatio,
     getRecentPartnerContent,
     addPartnerContent,
-    partnerContentCount: items.filter((item) => item.type === 'partner').length,
+    partnerContentCount: items.filter((item) => item.type === "partner").length,
   };
 }

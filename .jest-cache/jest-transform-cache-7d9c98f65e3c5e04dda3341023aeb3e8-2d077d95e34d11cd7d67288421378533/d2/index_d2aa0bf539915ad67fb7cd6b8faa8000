@@ -1,0 +1,292 @@
+374766f1659b1f27e353e4f4205f069e
+/* istanbul ignore next */
+function cov_1p1xfuovbu() {
+  var path = "/Users/deannewton/Documents/TransferJuice/src/lib/ai/index.ts";
+  var hash = "038afcb8c0e2dc7f0923ff1da7e8f5ca9672928f";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/Users/deannewton/Documents/TransferJuice/src/lib/ai/index.ts",
+    statementMap: {
+      "0": {
+        start: {
+          line: 34,
+          column: 2
+        },
+        end: {
+          line: 34,
+          column: 46
+        }
+      },
+      "1": {
+        start: {
+          line: 35,
+          column: 2
+        },
+        end: {
+          line: 35,
+          column: 50
+        }
+      },
+      "2": {
+        start: {
+          line: 36,
+          column: 2
+        },
+        end: {
+          line: 38,
+          column: 4
+        }
+      },
+      "3": {
+        start: {
+          line: 40,
+          column: 2
+        },
+        end: {
+          line: 40,
+          column: 65
+        }
+      },
+      "4": {
+        start: {
+          line: 41,
+          column: 2
+        },
+        end: {
+          line: 41,
+          column: 60
+        }
+      },
+      "5": {
+        start: {
+          line: 42,
+          column: 2
+        },
+        end: {
+          line: 42,
+          column: 62
+        }
+      },
+      "6": {
+        start: {
+          line: 43,
+          column: 2
+        },
+        end: {
+          line: 43,
+          column: 60
+        }
+      },
+      "7": {
+        start: {
+          line: 44,
+          column: 2
+        },
+        end: {
+          line: 44,
+          column: 63
+        }
+      },
+      "8": {
+        start: {
+          line: 46,
+          column: 2
+        },
+        end: {
+          line: 55,
+          column: 4
+        }
+      },
+      "9": {
+        start: {
+          line: 62,
+          column: 2
+        },
+        end: {
+          line: 74,
+          column: 4
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "initializeAISystem",
+        decl: {
+          start: {
+            line: 29,
+            column: 16
+          },
+          end: {
+            line: 29,
+            column: 34
+          }
+        },
+        loc: {
+          start: {
+            line: 33,
+            column: 3
+          },
+          end: {
+            line: 56,
+            column: 1
+          }
+        },
+        line: 33
+      },
+      "1": {
+        name: "getAISystemStatus",
+        decl: {
+          start: {
+            line: 61,
+            column: 16
+          },
+          end: {
+            line: 61,
+            column: 33
+          }
+        },
+        loc: {
+          start: {
+            line: 61,
+            column: 36
+          },
+          end: {
+            line: 75,
+            column: 1
+          }
+        },
+        line: 61
+      }
+    },
+    branchMap: {},
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0
+    },
+    b: {},
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "038afcb8c0e2dc7f0923ff1da7e8f5ca9672928f"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_1p1xfuovbu = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_1p1xfuovbu();
+/**
+ * AI Module Index
+ * Main exports for the AI system with circular dependency fixes
+ */
+
+// Core AI components (temporarily limited exports due to circular dependencies)
+export { TerryCommentaryGenerator } from "./terry-pipeline";
+export { TerryCommentarySystem } from "./terryCommentarySystem";
+
+// Temporarily disabled due to circular dependencies - will be re-enabled after architecture fix
+// export { TerryIntegration } from './terryIntegration';
+// export { TerryOrchestrator } from './terryOrchestrator';
+// export { ContentQualityValidator } from './quality-validator';
+// export { AIContentAnalyzer } from './content-analyzer';
+// export { TerryArticleGenerator } from './article-generator';
+
+// Types that are safe to export
+
+// Utility functions
+export { terryPrompts } from "./terry-prompts";
+
+/**
+ * Initialize AI system with dependency injection to avoid circular imports
+ */
+export function initializeAISystem(config) {
+  /* istanbul ignore next */
+  cov_1p1xfuovbu().f[0]++;
+  cov_1p1xfuovbu().s[0]++;
+  console.log("🤖 Initializing AI System...");
+  /* istanbul ignore next */
+  cov_1p1xfuovbu().s[1]++;
+  console.log("AI system configuration:", config);
+  /* istanbul ignore next */
+  cov_1p1xfuovbu().s[2]++;
+  console.log("Some modules disabled temporarily due to circular dependency fixes");
+  /* istanbul ignore next */
+  cov_1p1xfuovbu().s[3]++;
+  console.log("✅ AI System initialized (partial functionality)");
+  /* istanbul ignore next */
+  cov_1p1xfuovbu().s[4]++;
+  console.log("   - Terry commentary generation available");
+  /* istanbul ignore next */
+  cov_1p1xfuovbu().s[5]++;
+  console.log("   - Quality validation temporarily disabled");
+  /* istanbul ignore next */
+  cov_1p1xfuovbu().s[6]++;
+  console.log("   - Content analysis temporarily disabled");
+  /* istanbul ignore next */
+  cov_1p1xfuovbu().s[7]++;
+  console.log("   - Terry orchestration temporarily disabled");
+  /* istanbul ignore next */
+  cov_1p1xfuovbu().s[8]++;
+  return {
+    terry: null,
+    // TODO: Re-enable after circular dependency fix
+    validator: null,
+    // TODO: Re-enable after circular dependency fix
+    analyzer: null,
+    // TODO: Re-enable after circular dependency fix
+    orchestrator: null,
+    // TODO: Re-enable after circular dependency fix
+    status: {
+      isActive: true,
+      warning: "Partial functionality due to dependency fixes"
+    }
+  };
+}
+
+/**
+ * Get AI system status
+ */
+export function getAISystemStatus() {
+  /* istanbul ignore next */
+  cov_1p1xfuovbu().f[1]++;
+  cov_1p1xfuovbu().s[9]++;
+  return {
+    terry: {
+      isActive: true,
+      warning: "Basic functionality only"
+    },
+    validator: {
+      isActive: false,
+      error: "Disabled due to circular dependency"
+    },
+    analyzer: {
+      isActive: false,
+      error: "Disabled due to circular dependency"
+    },
+    orchestrator: {
+      isActive: false,
+      error: "Disabled due to circular dependency"
+    },
+    timestamp: new Date().toISOString()
+  };
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMXAxeGZ1b3ZidSIsImFjdHVhbENvdmVyYWdlIiwiVGVycnlDb21tZW50YXJ5R2VuZXJhdG9yIiwiVGVycnlDb21tZW50YXJ5U3lzdGVtIiwidGVycnlQcm9tcHRzIiwiaW5pdGlhbGl6ZUFJU3lzdGVtIiwiY29uZmlnIiwiZiIsInMiLCJjb25zb2xlIiwibG9nIiwidGVycnkiLCJ2YWxpZGF0b3IiLCJhbmFseXplciIsIm9yY2hlc3RyYXRvciIsInN0YXR1cyIsImlzQWN0aXZlIiwid2FybmluZyIsImdldEFJU3lzdGVtU3RhdHVzIiwiZXJyb3IiLCJ0aW1lc3RhbXAiLCJEYXRlIiwidG9JU09TdHJpbmciXSwic291cmNlcyI6WyJpbmRleC50cyJdLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEFJIE1vZHVsZSBJbmRleFxuICogTWFpbiBleHBvcnRzIGZvciB0aGUgQUkgc3lzdGVtIHdpdGggY2lyY3VsYXIgZGVwZW5kZW5jeSBmaXhlc1xuICovXG5cbi8vIENvcmUgQUkgY29tcG9uZW50cyAodGVtcG9yYXJpbHkgbGltaXRlZCBleHBvcnRzIGR1ZSB0byBjaXJjdWxhciBkZXBlbmRlbmNpZXMpXG5leHBvcnQgeyBUZXJyeUNvbW1lbnRhcnlHZW5lcmF0b3IgfSBmcm9tIFwiLi90ZXJyeS1waXBlbGluZVwiO1xuZXhwb3J0IHsgVGVycnlDb21tZW50YXJ5U3lzdGVtIH0gZnJvbSBcIi4vdGVycnlDb21tZW50YXJ5U3lzdGVtXCI7XG5cbi8vIFRlbXBvcmFyaWx5IGRpc2FibGVkIGR1ZSB0byBjaXJjdWxhciBkZXBlbmRlbmNpZXMgLSB3aWxsIGJlIHJlLWVuYWJsZWQgYWZ0ZXIgYXJjaGl0ZWN0dXJlIGZpeFxuLy8gZXhwb3J0IHsgVGVycnlJbnRlZ3JhdGlvbiB9IGZyb20gJy4vdGVycnlJbnRlZ3JhdGlvbic7XG4vLyBleHBvcnQgeyBUZXJyeU9yY2hlc3RyYXRvciB9IGZyb20gJy4vdGVycnlPcmNoZXN0cmF0b3InO1xuLy8gZXhwb3J0IHsgQ29udGVudFF1YWxpdHlWYWxpZGF0b3IgfSBmcm9tICcuL3F1YWxpdHktdmFsaWRhdG9yJztcbi8vIGV4cG9ydCB7IEFJQ29udGVudEFuYWx5emVyIH0gZnJvbSAnLi9jb250ZW50LWFuYWx5emVyJztcbi8vIGV4cG9ydCB7IFRlcnJ5QXJ0aWNsZUdlbmVyYXRvciB9IGZyb20gJy4vYXJ0aWNsZS1nZW5lcmF0b3InO1xuXG4vLyBUeXBlcyB0aGF0IGFyZSBzYWZlIHRvIGV4cG9ydFxuZXhwb3J0IHR5cGUge1xuICBUZXJyeUNvbW1lbnRhcnlSZXN1bHQsXG4gIFRlcnJ5Vm9pY2VNZXRyaWNzLFxufSBmcm9tIFwiLi90ZXJyeUNvbW1lbnRhcnlTeXN0ZW1cIjtcblxuLy8gVXRpbGl0eSBmdW5jdGlvbnNcbmV4cG9ydCB7IHRlcnJ5UHJvbXB0cyB9IGZyb20gXCIuL3RlcnJ5LXByb21wdHNcIjtcblxuLyoqXG4gKiBJbml0aWFsaXplIEFJIHN5c3RlbSB3aXRoIGRlcGVuZGVuY3kgaW5qZWN0aW9uIHRvIGF2b2lkIGNpcmN1bGFyIGltcG9ydHNcbiAqL1xuZXhwb3J0IGZ1bmN0aW9uIGluaXRpYWxpemVBSVN5c3RlbShjb25maWc/OiB7XG4gIGVuYWJsZVRlcnJ5Q29tbWVudGFyeT86IGJvb2xlYW47XG4gIGVuYWJsZVF1YWxpdHlWYWxpZGF0aW9uPzogYm9vbGVhbjtcbiAgZW5hYmxlQ29udGVudEFuYWx5c2lzPzogYm9vbGVhbjtcbn0pIHtcbiAgY29uc29sZS5sb2coXCLwn6SWIEluaXRpYWxpemluZyBBSSBTeXN0ZW0uLi5cIik7XG4gIGNvbnNvbGUubG9nKFwiQUkgc3lzdGVtIGNvbmZpZ3VyYXRpb246XCIsIGNvbmZpZyk7XG4gIGNvbnNvbGUubG9nKFxuICAgIFwiU29tZSBtb2R1bGVzIGRpc2FibGVkIHRlbXBvcmFyaWx5IGR1ZSB0byBjaXJjdWxhciBkZXBlbmRlbmN5IGZpeGVzXCJcbiAgKTtcblxuICBjb25zb2xlLmxvZyhcIuKchSBBSSBTeXN0ZW0gaW5pdGlhbGl6ZWQgKHBhcnRpYWwgZnVuY3Rpb25hbGl0eSlcIik7XG4gIGNvbnNvbGUubG9nKFwiICAgLSBUZXJyeSBjb21tZW50YXJ5IGdlbmVyYXRpb24gYXZhaWxhYmxlXCIpO1xuICBjb25zb2xlLmxvZyhcIiAgIC0gUXVhbGl0eSB2YWxpZGF0aW9uIHRlbXBvcmFyaWx5IGRpc2FibGVkXCIpO1xuICBjb25zb2xlLmxvZyhcIiAgIC0gQ29udGVudCBhbmFseXNpcyB0ZW1wb3JhcmlseSBkaXNhYmxlZFwiKTtcbiAgY29uc29sZS5sb2coXCIgICAtIFRlcnJ5IG9yY2hlc3RyYXRpb24gdGVtcG9yYXJpbHkgZGlzYWJsZWRcIik7XG5cbiAgcmV0dXJuIHtcbiAgICB0ZXJyeTogbnVsbCwgLy8gVE9ETzogUmUtZW5hYmxlIGFmdGVyIGNpcmN1bGFyIGRlcGVuZGVuY3kgZml4XG4gICAgdmFsaWRhdG9yOiBudWxsLCAvLyBUT0RPOiBSZS1lbmFibGUgYWZ0ZXIgY2lyY3VsYXIgZGVwZW5kZW5jeSBmaXhcbiAgICBhbmFseXplcjogbnVsbCwgLy8gVE9ETzogUmUtZW5hYmxlIGFmdGVyIGNpcmN1bGFyIGRlcGVuZGVuY3kgZml4XG4gICAgb3JjaGVzdHJhdG9yOiBudWxsLCAvLyBUT0RPOiBSZS1lbmFibGUgYWZ0ZXIgY2lyY3VsYXIgZGVwZW5kZW5jeSBmaXhcbiAgICBzdGF0dXM6IHtcbiAgICAgIGlzQWN0aXZlOiB0cnVlLFxuICAgICAgd2FybmluZzogXCJQYXJ0aWFsIGZ1bmN0aW9uYWxpdHkgZHVlIHRvIGRlcGVuZGVuY3kgZml4ZXNcIixcbiAgICB9LFxuICB9O1xufVxuXG4vKipcbiAqIEdldCBBSSBzeXN0ZW0gc3RhdHVzXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBnZXRBSVN5c3RlbVN0YXR1cygpIHtcbiAgcmV0dXJuIHtcbiAgICB0ZXJyeTogeyBpc0FjdGl2ZTogdHJ1ZSwgd2FybmluZzogXCJCYXNpYyBmdW5jdGlvbmFsaXR5IG9ubHlcIiB9LFxuICAgIHZhbGlkYXRvcjoge1xuICAgICAgaXNBY3RpdmU6IGZhbHNlLFxuICAgICAgZXJyb3I6IFwiRGlzYWJsZWQgZHVlIHRvIGNpcmN1bGFyIGRlcGVuZGVuY3lcIixcbiAgICB9LFxuICAgIGFuYWx5emVyOiB7IGlzQWN0aXZlOiBmYWxzZSwgZXJyb3I6IFwiRGlzYWJsZWQgZHVlIHRvIGNpcmN1bGFyIGRlcGVuZGVuY3lcIiB9LFxuICAgIG9yY2hlc3RyYXRvcjoge1xuICAgICAgaXNBY3RpdmU6IGZhbHNlLFxuICAgICAgZXJyb3I6IFwiRGlzYWJsZWQgZHVlIHRvIGNpcmN1bGFyIGRlcGVuZGVuY3lcIixcbiAgICB9LFxuICAgIHRpbWVzdGFtcDogbmV3IERhdGUoKS50b0lTT1N0cmluZygpLFxuICB9O1xufVxuIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0lBZVk7SUFBQUEsY0FBQSxZQUFBQSxDQUFBO01BQUEsT0FBQUMsY0FBQTtJQUFBO0VBQUE7RUFBQSxPQUFBQSxjQUFBO0FBQUE7QUFBQUQsY0FBQTtBQWZaO0FBQ0E7QUFDQTtBQUNBOztBQUVBO0FBQ0EsU0FBU0Usd0JBQXdCLFFBQVEsa0JBQWtCO0FBQzNELFNBQVNDLHFCQUFxQixRQUFRLHlCQUF5Qjs7QUFFL0Q7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOztBQUVBOztBQU1BO0FBQ0EsU0FBU0MsWUFBWSxRQUFRLGlCQUFpQjs7QUFFOUM7QUFDQTtBQUNBO0FBQ0EsT0FBTyxTQUFTQyxrQkFBa0JBLENBQUNDLE1BSWxDLEVBQUU7RUFBQTtFQUFBTixjQUFBLEdBQUFPLENBQUE7RUFBQVAsY0FBQSxHQUFBUSxDQUFBO0VBQ0RDLE9BQU8sQ0FBQ0MsR0FBRyxDQUFDLDhCQUE4QixDQUFDO0VBQUM7RUFBQVYsY0FBQSxHQUFBUSxDQUFBO0VBQzVDQyxPQUFPLENBQUNDLEdBQUcsQ0FBQywwQkFBMEIsRUFBRUosTUFBTSxDQUFDO0VBQUM7RUFBQU4sY0FBQSxHQUFBUSxDQUFBO0VBQ2hEQyxPQUFPLENBQUNDLEdBQUcsQ0FDVCxvRUFDRixDQUFDO0VBQUM7RUFBQVYsY0FBQSxHQUFBUSxDQUFBO0VBRUZDLE9BQU8sQ0FBQ0MsR0FBRyxDQUFDLGlEQUFpRCxDQUFDO0VBQUM7RUFBQVYsY0FBQSxHQUFBUSxDQUFBO0VBQy9EQyxPQUFPLENBQUNDLEdBQUcsQ0FBQyw0Q0FBNEMsQ0FBQztFQUFDO0VBQUFWLGNBQUEsR0FBQVEsQ0FBQTtFQUMxREMsT0FBTyxDQUFDQyxHQUFHLENBQUMsOENBQThDLENBQUM7RUFBQztFQUFBVixjQUFBLEdBQUFRLENBQUE7RUFDNURDLE9BQU8sQ0FBQ0MsR0FBRyxDQUFDLDRDQUE0QyxDQUFDO0VBQUM7RUFBQVYsY0FBQSxHQUFBUSxDQUFBO0VBQzFEQyxPQUFPLENBQUNDLEdBQUcsQ0FBQywrQ0FBK0MsQ0FBQztFQUFDO0VBQUFWLGNBQUEsR0FBQVEsQ0FBQTtFQUU3RCxPQUFPO0lBQ0xHLEtBQUssRUFBRSxJQUFJO0lBQUU7SUFDYkMsU0FBUyxFQUFFLElBQUk7SUFBRTtJQUNqQkMsUUFBUSxFQUFFLElBQUk7SUFBRTtJQUNoQkMsWUFBWSxFQUFFLElBQUk7SUFBRTtJQUNwQkMsTUFBTSxFQUFFO01BQ05DLFFBQVEsRUFBRSxJQUFJO01BQ2RDLE9BQU8sRUFBRTtJQUNYO0VBQ0YsQ0FBQztBQUNIOztBQUVBO0FBQ0E7QUFDQTtBQUNBLE9BQU8sU0FBU0MsaUJBQWlCQSxDQUFBLEVBQUc7RUFBQTtFQUFBbEIsY0FBQSxHQUFBTyxDQUFBO0VBQUFQLGNBQUEsR0FBQVEsQ0FBQTtFQUNsQyxPQUFPO0lBQ0xHLEtBQUssRUFBRTtNQUFFSyxRQUFRLEVBQUUsSUFBSTtNQUFFQyxPQUFPLEVBQUU7SUFBMkIsQ0FBQztJQUM5REwsU0FBUyxFQUFFO01BQ1RJLFFBQVEsRUFBRSxLQUFLO01BQ2ZHLEtBQUssRUFBRTtJQUNULENBQUM7SUFDRE4sUUFBUSxFQUFFO01BQUVHLFFBQVEsRUFBRSxLQUFLO01BQUVHLEtBQUssRUFBRTtJQUFzQyxDQUFDO0lBQzNFTCxZQUFZLEVBQUU7TUFDWkUsUUFBUSxFQUFFLEtBQUs7TUFDZkcsS0FBSyxFQUFFO0lBQ1QsQ0FBQztJQUNEQyxTQUFTLEVBQUUsSUFBSUMsSUFBSSxDQUFDLENBQUMsQ0FBQ0MsV0FBVyxDQUFDO0VBQ3BDLENBQUM7QUFDSCIsImlnbm9yZUxpc3QiOltdfQ==

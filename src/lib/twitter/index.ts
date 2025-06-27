@@ -4,15 +4,15 @@
  */
 
 // Core types and interfaces
-export type { ITKSource } from './globalSources';
+export type { ITKSource } from "./globalSources";
 
-export type { TweetData, ClassificationResult } from './transferClassifier';
+export type { TweetData, ClassificationResult } from "./transferClassifier";
 
 export type {
   MonitoringConfig,
   MonitoringResult,
   GlobalMonitoringStats,
-} from './globalMonitor';
+} from "./globalMonitor";
 
 // Source management
 export {
@@ -31,7 +31,7 @@ export {
   isSourceRateLimited,
   getAvailableSources,
   getMonitoringPriority,
-} from './globalSources';
+} from "./globalSources";
 
 // Classification and detection
 export {
@@ -43,14 +43,14 @@ export {
   classifyBatchTransferContent,
   filterByConfidence,
   getClassificationStats,
-} from './transferClassifier';
+} from "./transferClassifier";
 
 // Global monitoring
 export {
   GlobalITKMonitor,
   globalMonitor,
   DEFAULT_CONFIG,
-} from './globalMonitor';
+} from "./globalMonitor";
 
 // Feed integration
 export {
@@ -59,13 +59,21 @@ export {
   integrateClassifiedTweets,
   filterDuplicateTweets,
   mergeSimilarTweets,
-} from './feedIntegration';
+} from "./feedIntegration";
 
 // Import types needed for convenience functions
-import { type MonitoringConfig, type GlobalMonitoringStats } from './globalMonitor';
-import { globalMonitor } from './globalMonitor';
-import { type ITKSource, getSourcesByRegion, ALL_ITK_SOURCES, getActiveSources } from './globalSources';
-import { type TweetData, classifyTransferContent } from './transferClassifier';
+import {
+  type MonitoringConfig,
+  type GlobalMonitoringStats,
+} from "./globalMonitor";
+import { globalMonitor } from "./globalMonitor";
+import {
+  type ITKSource,
+  getSourcesByRegion,
+  ALL_ITK_SOURCES,
+  getActiveSources,
+} from "./globalSources";
+import { type TweetData, classifyTransferContent } from "./transferClassifier";
 
 // Convenience functions for common use cases
 
@@ -104,7 +112,7 @@ export const runSingleMonitoringCycle = () => {
 /**
  * Get all available sources for a specific region
  */
-export const getRegionalSources = (region: ITKSource['region']) => {
+export const getRegionalSources = (region: ITKSource["region"]) => {
   return getSourcesByRegion(region).filter((source) => source.isActive);
 };
 
@@ -115,7 +123,7 @@ export const getHighReliabilitySources = () => {
   return ALL_ITK_SOURCES.filter(
     (source) =>
       source.isActive &&
-      (source.tier === 1 || (source.tier === 2 && source.reliability >= 0.85))
+      (source.tier === 1 || (source.tier === 2 && source.reliability >= 0.85)),
   );
 };
 
@@ -124,10 +132,10 @@ export const getHighReliabilitySources = () => {
  */
 export const quickClassifyTweet = (tweetText: string, authorHandle: string) => {
   const mockTweet: TweetData = {
-    id: 'temp-id',
+    id: "temp-id",
     text: tweetText,
     author: {
-      username: authorHandle.replace('@', ''),
+      username: authorHandle.replace("@", ""),
       displayName: authorHandle,
     },
     createdAt: new Date().toISOString(),
@@ -177,16 +185,16 @@ export const developmentUtils = {
   testClassification: () => {
     const sampleTweets = [
       {
-        text: '🚨 BREAKING: Arsenal agree €50M fee for Declan Rice! Medical scheduled for tomorrow. Here we go! ✅',
-        handle: '@FabrizioRomano',
+        text: "🚨 BREAKING: Arsenal agree €50M fee for Declan Rice! Medical scheduled for tomorrow. Here we go! ✅",
+        handle: "@FabrizioRomano",
       },
       {
-        text: 'Personal terms agreed between Mbappe and Real Madrid. Club-to-club negotiations ongoing.',
-        handle: '@David_Ornstein',
+        text: "Personal terms agreed between Mbappe and Real Madrid. Club-to-club negotiations ongoing.",
+        handle: "@David_Ornstein",
       },
       {
-        text: 'Beautiful weather today in London! Perfect for a walk in the park.',
-        handle: '@randomuser',
+        text: "Beautiful weather today in London! Perfect for a walk in the park.",
+        handle: "@randomuser",
       },
     ];
 

@@ -3,9 +3,9 @@
  * Real-time performance tracking for the Transfer Juice data pipeline
  */
 
-import { prisma } from '@/lib/prisma';
-import { CONFIG } from '@/config/pipeline';
-import { z } from 'zod';
+import { prisma } from "@/lib/prisma";
+import { CONFIG } from "@/config/pipeline";
+import { z } from "zod";
 
 // Metrics schemas
 export const PipelineExecutionMetricsSchema = z.object({
@@ -14,34 +14,41 @@ export const PipelineExecutionMetricsSchema = z.object({
   startTime: z.date(),
   endTime: z.date().optional(),
   duration: z.number().optional(),
-  status: z.enum(['running', 'completed', 'failed', 'timeout']),
-  stage: z.enum(['source_monitoring', 'classification', 'processing', 'quality', 'mixing', 'broadcasting']),
-  
+  status: z.enum(["running", "completed", "failed", "timeout"]),
+  stage: z.enum([
+    "source_monitoring",
+    "classification",
+    "processing",
+    "quality",
+    "mixing",
+    "broadcasting",
+  ]),
+
   // Performance metrics
   itemsProcessed: z.number().default(0),
   itemsSuccessful: z.number().default(0),
   itemsFailed: z.number().default(0),
-  
+
   // Resource usage
   memoryUsed: z.number().optional(),
   cpuUsage: z.number().optional(),
-  
+
   // Quality metrics
   averageQualityScore: z.number().optional(),
   terryCompatibilityScore: z.number().optional(),
   humanReviewRequired: z.number().default(0),
-  
+
   // Error information
   errorType: z.string().optional(),
   errorMessage: z.string().optional(),
   stackTrace: z.string().optional(),
-  
+
   metadata: z.record(z.any()).optional(),
 });
 
 export const HealthCheckResultSchema = z.object({
-  service: z.enum(['database', 'ai', 'twitter', 'websocket', 'cache']),
-  status: z.enum(['healthy', 'degraded', 'unhealthy']),
+  service: z.enum(["database", "ai", "twitter", "websocket", "cache"]),
+  status: z.enum(["healthy", "degraded", "unhealthy"]),
   responseTime: z.number(),
   timestamp: z.date(),
   details: z.record(z.any()).optional(),
@@ -50,39 +57,41 @@ export const HealthCheckResultSchema = z.object({
 
 export const PerformanceMetricsSchema = z.object({
   timestamp: z.date(),
-  
+
   // Pipeline performance
   averageProcessingTime: z.number(),
   successRate: z.number(),
   errorRate: z.number(),
   throughput: z.number(), // items per hour
-  
+
   // Quality metrics
   averageQualityScore: z.number(),
   qualityPassRate: z.number(),
   humanReviewRate: z.number(),
-  
+
   // Resource metrics
   memoryUsage: z.number(),
   cpuUsage: z.number(),
   cacheHitRate: z.number(),
-  
+
   // External service metrics
   databaseResponseTime: z.number(),
   aiServiceResponseTime: z.number(),
   twitterApiResponseTime: z.number(),
-  
+
   // User experience metrics
   websocketConnections: z.number(),
   feedUpdateLatency: z.number(),
-  
+
   // Content metrics
   totalFeedItems: z.number(),
   partnerContentRatio: z.number(),
   uniqueTagsUsed: z.number(),
 });
 
-export type PipelineExecutionMetrics = z.infer<typeof PipelineExecutionMetricsSchema>;
+export type PipelineExecutionMetrics = z.infer<
+  typeof PipelineExecutionMetricsSchema
+>;
 export type HealthCheckResult = z.infer<typeof HealthCheckResultSchema>;
 export type PerformanceMetrics = z.infer<typeof PerformanceMetricsSchema>;
 
@@ -116,14 +125,17 @@ export class PipelineMetricsCollector {
   /**
    * Track pipeline execution start
    */
-  async startExecution(stage: PipelineExecutionMetrics['stage'], metadata?: Record<string, any>): Promise<string> {
+  async startExecution(
+    stage: PipelineExecutionMetrics["stage"],
+    metadata?: Record<string, any>,
+  ): Promise<string> {
     const executionId = `exec_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const execution: PipelineExecutionMetrics = {
       id: `metrics_${executionId}`,
       executionId,
       startTime: new Date(),
-      status: 'running',
+      status: "running",
       stage,
       itemsProcessed: 0,
       itemsSuccessful: 0,
@@ -133,10 +145,10 @@ export class PipelineMetricsCollector {
     };
 
     this.currentExecution.set(executionId, execution);
-    
+
     // Log execution start
     console.log(`📊 Pipeline execution started: ${executionId} (${stage})`);
-    
+
     return executionId;
   }
 
@@ -145,7 +157,7 @@ export class PipelineMetricsCollector {
    */
   updateExecution(
     executionId: string,
-    updates: Partial<PipelineExecutionMetrics>
+    updates: Partial<PipelineExecutionMetrics>,
   ): void {
     const execution = this.currentExecution.get(executionId);
     if (!execution) {
@@ -155,7 +167,7 @@ export class PipelineMetricsCollector {
 
     // Update execution metrics
     Object.assign(execution, updates);
-    
+
     // Calculate duration if not provided
     if (!execution.duration && execution.startTime) {
       execution.duration = Date.now() - execution.startTime.getTime();
@@ -169,8 +181,8 @@ export class PipelineMetricsCollector {
    */
   async completeExecution(
     executionId: string,
-    status: 'completed' | 'failed' | 'timeout',
-    error?: { type: string; message: string; stack?: string }
+    status: "completed" | "failed" | "timeout",
+    error?: { type: string; message: string; stack?: string },
   ): Promise<void> {
     const execution = this.currentExecution.get(executionId);
     if (!execution) {
@@ -180,7 +192,8 @@ export class PipelineMetricsCollector {
 
     // Finalize execution metrics
     execution.endTime = new Date();
-    execution.duration = execution.endTime.getTime() - execution.startTime.getTime();
+    execution.duration =
+      execution.endTime.getTime() - execution.startTime.getTime();
     execution.status = status;
 
     if (error) {
@@ -206,46 +219,50 @@ export class PipelineMetricsCollector {
       await this.checkAlerts(execution);
     }
 
-    console.log(`📊 Pipeline execution completed: ${executionId} (${status}) - ${execution.duration}ms`);
+    console.log(
+      `📊 Pipeline execution completed: ${executionId} (${status}) - ${execution.duration}ms`,
+    );
   }
 
   /**
    * Perform health check on a service
    */
-  async checkServiceHealth(service: HealthCheckResult['service']): Promise<HealthCheckResult> {
+  async checkServiceHealth(
+    service: HealthCheckResult["service"],
+  ): Promise<HealthCheckResult> {
     const startTime = Date.now();
-    let status: HealthCheckResult['status'] = 'healthy';
+    let status: HealthCheckResult["status"] = "healthy";
     let details: Record<string, any> = {};
     let error: string | undefined;
 
     try {
       switch (service) {
-        case 'database':
+        case "database":
           await this.checkDatabaseHealth();
           details = { connectionCount: await this.getDatabaseConnections() };
           break;
 
-        case 'ai':
+        case "ai":
           await this.checkAIHealth();
           details = { modelVersion: CONFIG.ai.openai.model };
           break;
 
-        case 'twitter':
+        case "twitter":
           await this.checkTwitterHealth();
           details = { rateLimitRemaining: await this.getTwitterRateLimit() };
           break;
 
-        case 'websocket':
+        case "websocket":
           details = await this.checkWebSocketHealth();
           break;
 
-        case 'cache':
+        case "cache":
           details = await this.checkCacheHealth();
           break;
       }
     } catch (err) {
-      status = 'unhealthy';
-      error = err instanceof Error ? err.message : 'Unknown error';
+      status = "unhealthy";
+      error = err instanceof Error ? err.message : "Unknown error";
     }
 
     const result: HealthCheckResult = {
@@ -268,38 +285,40 @@ export class PipelineMetricsCollector {
    */
   async getCurrentMetrics(): Promise<PerformanceMetrics> {
     const now = new Date();
-    
+
     // Calculate metrics from recent executions
     const recentExecutions = await this.getRecentExecutions(60 * 60 * 1000); // Last hour
-    
+
     const metrics: PerformanceMetrics = {
       timestamp: now,
-      
+
       // Pipeline performance
-      averageProcessingTime: this.calculateAverageProcessingTime(recentExecutions),
+      averageProcessingTime:
+        this.calculateAverageProcessingTime(recentExecutions),
       successRate: this.calculateSuccessRate(recentExecutions),
       errorRate: this.calculateErrorRate(recentExecutions),
       throughput: this.calculateThroughput(recentExecutions),
-      
+
       // Quality metrics
       averageQualityScore: this.calculateAverageQualityScore(recentExecutions),
       qualityPassRate: this.calculateQualityPassRate(recentExecutions),
       humanReviewRate: this.calculateHumanReviewRate(recentExecutions),
-      
+
       // Resource metrics
       memoryUsage: this.getCurrentMemoryUsage(),
       cpuUsage: this.getCurrentCPUUsage(),
       cacheHitRate: await this.getCacheHitRate(),
-      
+
       // External service metrics
-      databaseResponseTime: this.healthCache.get('database')?.responseTime || 0,
-      aiServiceResponseTime: this.healthCache.get('ai')?.responseTime || 0,
-      twitterApiResponseTime: this.healthCache.get('twitter')?.responseTime || 0,
-      
+      databaseResponseTime: this.healthCache.get("database")?.responseTime || 0,
+      aiServiceResponseTime: this.healthCache.get("ai")?.responseTime || 0,
+      twitterApiResponseTime:
+        this.healthCache.get("twitter")?.responseTime || 0,
+
       // User experience metrics
       websocketConnections: await this.getWebSocketConnections(),
       feedUpdateLatency: await this.getFeedUpdateLatency(),
-      
+
       // Content metrics
       totalFeedItems: await this.getTotalFeedItems(),
       partnerContentRatio: await this.getPartnerContentRatio(),
@@ -351,37 +370,53 @@ export class PipelineMetricsCollector {
         await this.performAllHealthChecks();
         await this.cleanupOldMetrics();
       } catch (error) {
-        console.error('Error collecting metrics:', error);
+        console.error("Error collecting metrics:", error);
       }
     }, this.config.aggregationInterval);
 
-    console.log('📊 Pipeline metrics collection started');
+    console.log("📊 Pipeline metrics collection started");
   }
 
   /**
    * Perform all health checks
    */
   private async performAllHealthChecks(): Promise<HealthCheckResult[]> {
-    const services: HealthCheckResult['service'][] = ['database', 'ai', 'twitter', 'websocket', 'cache'];
-    
+    const services: HealthCheckResult["service"][] = [
+      "database",
+      "ai",
+      "twitter",
+      "websocket",
+      "cache",
+    ];
+
     const results = await Promise.allSettled(
-      services.map(service => this.checkServiceHealth(service))
+      services.map((service) => this.checkServiceHealth(service)),
     );
 
     return results
-      .filter((result): result is PromiseFulfilledResult<HealthCheckResult> => result.status === 'fulfilled')
-      .map(result => result.value);
+      .filter(
+        (result): result is PromiseFulfilledResult<HealthCheckResult> =>
+          result.status === "fulfilled",
+      )
+      .map((result) => result.value);
   }
 
   /**
    * Check for alert conditions
    */
-  private async checkAlerts(execution: PipelineExecutionMetrics): Promise<void> {
+  private async checkAlerts(
+    execution: PipelineExecutionMetrics,
+  ): Promise<void> {
     const alerts: string[] = [];
 
     // Check processing time
-    if (execution.duration && execution.duration > CONFIG.monitoring.alerts.performanceThreshold) {
-      alerts.push(`Pipeline execution exceeded performance threshold: ${execution.duration}ms`);
+    if (
+      execution.duration &&
+      execution.duration > CONFIG.monitoring.alerts.performanceThreshold
+    ) {
+      alerts.push(
+        `Pipeline execution exceeded performance threshold: ${execution.duration}ms`,
+      );
     }
 
     // Check error rate
@@ -391,8 +426,14 @@ export class PipelineMetricsCollector {
     }
 
     // Check quality score
-    if (execution.averageQualityScore && execution.averageQualityScore < CONFIG.monitoring.alerts.qualityDegradationThreshold * 100) {
-      alerts.push(`Quality score below threshold: ${execution.averageQualityScore}`);
+    if (
+      execution.averageQualityScore &&
+      execution.averageQualityScore <
+        CONFIG.monitoring.alerts.qualityDegradationThreshold * 100
+    ) {
+      alerts.push(
+        `Quality score below threshold: ${execution.averageQualityScore}`,
+      );
     }
 
     // Send alerts if any
@@ -404,18 +445,23 @@ export class PipelineMetricsCollector {
   /**
    * Send alert notification
    */
-  private async sendAlert(message: string, execution: PipelineExecutionMetrics): Promise<void> {
+  private async sendAlert(
+    message: string,
+    execution: PipelineExecutionMetrics,
+  ): Promise<void> {
     console.warn(`🚨 ALERT: ${message}`);
-    
+
     // Here you would integrate with your alerting system (Slack, email, etc.)
     // For now, we'll just log and store in database
-    
+
     try {
       // Store alert in database for tracking
       // This would be implemented based on your alerting schema
-      console.log(`Alert stored for execution ${execution.executionId}: ${message}`);
+      console.log(
+        `Alert stored for execution ${execution.executionId}: ${message}`,
+      );
     } catch (error) {
-      console.error('Failed to store alert:', error);
+      console.error("Failed to store alert:", error);
     }
   }
 
@@ -475,15 +521,22 @@ export class PipelineMetricsCollector {
   /**
    * Utility methods for metric calculations
    */
-  private calculateAverageProcessingTime(executions: PipelineExecutionMetrics[]): number {
+  private calculateAverageProcessingTime(
+    executions: PipelineExecutionMetrics[],
+  ): number {
     if (executions.length === 0) return 0;
-    const totalTime = executions.reduce((sum, exec) => sum + (exec.duration || 0), 0);
+    const totalTime = executions.reduce(
+      (sum, exec) => sum + (exec.duration || 0),
+      0,
+    );
     return totalTime / executions.length;
   }
 
   private calculateSuccessRate(executions: PipelineExecutionMetrics[]): number {
     if (executions.length === 0) return 1;
-    const successful = executions.filter(exec => exec.status === 'completed').length;
+    const successful = executions.filter(
+      (exec) => exec.status === "completed",
+    ).length;
     return successful / executions.length;
   }
 
@@ -492,27 +545,49 @@ export class PipelineMetricsCollector {
   }
 
   private calculateThroughput(executions: PipelineExecutionMetrics[]): number {
-    const totalItems = executions.reduce((sum, exec) => sum + exec.itemsProcessed, 0);
+    const totalItems = executions.reduce(
+      (sum, exec) => sum + exec.itemsProcessed,
+      0,
+    );
     return totalItems; // Items processed in the time period
   }
 
-  private calculateAverageQualityScore(executions: PipelineExecutionMetrics[]): number {
-    const withQuality = executions.filter(exec => exec.averageQualityScore);
+  private calculateAverageQualityScore(
+    executions: PipelineExecutionMetrics[],
+  ): number {
+    const withQuality = executions.filter((exec) => exec.averageQualityScore);
     if (withQuality.length === 0) return 0;
-    const totalQuality = withQuality.reduce((sum, exec) => sum + (exec.averageQualityScore || 0), 0);
+    const totalQuality = withQuality.reduce(
+      (sum, exec) => sum + (exec.averageQualityScore || 0),
+      0,
+    );
     return totalQuality / withQuality.length;
   }
 
-  private calculateQualityPassRate(executions: PipelineExecutionMetrics[]): number {
-    const withQuality = executions.filter(exec => exec.averageQualityScore);
+  private calculateQualityPassRate(
+    executions: PipelineExecutionMetrics[],
+  ): number {
+    const withQuality = executions.filter((exec) => exec.averageQualityScore);
     if (withQuality.length === 0) return 1;
-    const passing = withQuality.filter(exec => (exec.averageQualityScore || 0) >= CONFIG.quality.autoPublishThreshold * 100);
+    const passing = withQuality.filter(
+      (exec) =>
+        (exec.averageQualityScore || 0) >=
+        CONFIG.pipeline.quality.autoPublishThreshold * 100,
+    );
     return passing.length / withQuality.length;
   }
 
-  private calculateHumanReviewRate(executions: PipelineExecutionMetrics[]): number {
-    const totalItems = executions.reduce((sum, exec) => sum + exec.itemsProcessed, 0);
-    const reviewItems = executions.reduce((sum, exec) => sum + exec.humanReviewRequired, 0);
+  private calculateHumanReviewRate(
+    executions: PipelineExecutionMetrics[],
+  ): number {
+    const totalItems = executions.reduce(
+      (sum, exec) => sum + exec.itemsProcessed,
+      0,
+    );
+    const reviewItems = executions.reduce(
+      (sum, exec) => sum + exec.humanReviewRequired,
+      0,
+    );
     return totalItems > 0 ? reviewItems / totalItems : 0;
   }
 
@@ -551,7 +626,7 @@ export class PipelineMetricsCollector {
   private async getPartnerContentRatio(): Promise<number> {
     const total = await prisma.feedItem.count();
     const partner = await prisma.feedItem.count({
-      where: { type: 'PARTNER' }
+      where: { type: "PARTNER" },
     });
     return total > 0 ? partner / total : 0;
   }
@@ -564,17 +639,21 @@ export class PipelineMetricsCollector {
   /**
    * Database persistence methods
    */
-  private async persistExecution(execution: PipelineExecutionMetrics): Promise<void> {
+  private async persistExecution(
+    execution: PipelineExecutionMetrics,
+  ): Promise<void> {
     try {
       // Store execution metrics in database
       // This would use your actual metrics table schema
       console.log(`Persisting execution metrics for ${execution.executionId}`);
     } catch (error) {
-      console.error('Failed to persist execution metrics:', error);
+      console.error("Failed to persist execution metrics:", error);
     }
   }
 
-  private async getRecentExecutions(timeWindow: number): Promise<PipelineExecutionMetrics[]> {
+  private async getRecentExecutions(
+    timeWindow: number,
+  ): Promise<PipelineExecutionMetrics[]> {
     // This would query your metrics database
     return []; // Placeholder
   }
@@ -604,20 +683,21 @@ export const metricsCollector = new PipelineMetricsCollector({
 
 // Export utility functions for manual metric collection
 export async function trackPipelineExecution<T>(
-  stage: PipelineExecutionMetrics['stage'],
+  stage: PipelineExecutionMetrics["stage"],
   operation: () => Promise<T>,
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>,
 ): Promise<T> {
   const executionId = await metricsCollector.startExecution(stage, metadata);
-  
+
   try {
     const result = await operation();
-    await metricsCollector.completeExecution(executionId, 'completed');
+    await metricsCollector.completeExecution(executionId, "completed");
     return result;
   } catch (error) {
-    await metricsCollector.completeExecution(executionId, 'failed', {
-      type: error instanceof Error ? error.constructor.name : 'UnknownError',
-      message: error instanceof Error ? error.message : 'Unknown error occurred',
+    await metricsCollector.completeExecution(executionId, "failed", {
+      type: error instanceof Error ? error.constructor.name : "UnknownError",
+      message:
+        error instanceof Error ? error.message : "Unknown error occurred",
       stack: error instanceof Error ? error.stack : undefined,
     });
     throw error;

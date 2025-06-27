@@ -1,0 +1,23 @@
+
+> transferjuice-fresh@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.3
+  - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping linting
+   Checking validity of types ...
+Failed to compile.
+
+./src/lib/ai/terry-prompts-enhanced.ts:141:40
+Type error: Property 'author' does not exist on type 'EnrichedTweet'.
+
+[0m [90m 139 |[39m   parts[33m.[39mpush([32m"ORIGINAL SOURCES (USE THESE AS EMBEDS):"[39m)[33m;[39m[0m
+[0m [90m 140 |[39m   parts[33m.[39mpush([32m`Tweet: "${enrichedTweet.originalContent}"`[39m)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 141 |[39m   parts[33m.[39mpush([32m`Author: @${enrichedTweet.author || "TransferSource"}`[39m)[33m;[39m[0m
+[0m [90m     |[39m                                        [31m[1m^[22m[39m[0m
+[0m [90m 142 |[39m   parts[33m.[39mpush([0m
+[0m [90m 143 |[39m     [32m`Embed format: <blockquote class="twitter-tweet"><p>${enrichedTweet.originalContent}</p>&mdash; ${enrichedTweet.author || "Transfer Source"} (@${enrichedTweet.author || "TransferSource"}) <a href="https://twitter.com/${enrichedTweet.author}/status/${enrichedTweet.id}">June 25, 2025</a></blockquote>`[39m[33m,[39m[0m
+[0m [90m 144 |[39m   )[33m;[39m[0m

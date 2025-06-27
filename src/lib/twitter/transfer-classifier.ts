@@ -4,177 +4,177 @@
  */
 
 // Terry style functionality removed - handled by AI pipeline
-import type { TransferType } from '@prisma/client';
+import type { TransferType } from "@prisma/client";
 
 // Transfer keywords and patterns
 const TRANSFER_KEYWORDS = {
   // Definitive transfer language
   confirmed: [
-    'signed',
-    'signs',
-    'completed',
-    'official',
-    'announced',
-    'confirmed',
-    'done deal',
-    'here we go',
-    'welcome to',
-    'joins',
-    'joined',
+    "signed",
+    "signs",
+    "completed",
+    "official",
+    "announced",
+    "confirmed",
+    "done deal",
+    "here we go",
+    "welcome to",
+    "joins",
+    "joined",
   ],
 
   // Medical/final stages
   medical: [
-    'medical',
-    'medicals',
-    'undergo medical',
-    'passed medical',
-    'medical scheduled',
-    'medical tomorrow',
-    'medical today',
+    "medical",
+    "medicals",
+    "undergo medical",
+    "passed medical",
+    "medical scheduled",
+    "medical tomorrow",
+    "medical today",
   ],
 
   // Advanced negotiations
   advanced: [
-    'advanced talks',
-    'advanced negotiations',
-    'close to signing',
-    'final details',
-    'finalizing',
-    'agreement reached',
-    'verbal agreement',
-    'personal terms agreed',
-    'fee agreed',
+    "advanced talks",
+    "advanced negotiations",
+    "close to signing",
+    "final details",
+    "finalizing",
+    "agreement reached",
+    "verbal agreement",
+    "personal terms agreed",
+    "fee agreed",
   ],
 
   // Early stage talks
   talks: [
-    'interested in',
-    'monitoring',
-    'talks ongoing',
-    'negotiations',
-    'in talks',
-    'discussing',
-    'considering',
-    'exploring',
-    'approached',
-    'contact made',
+    "interested in",
+    "monitoring",
+    "talks ongoing",
+    "negotiations",
+    "in talks",
+    "discussing",
+    "considering",
+    "exploring",
+    "approached",
+    "contact made",
   ],
 
   // Rumours and speculation
   rumour: [
-    'could be',
-    'might be',
-    'potentially',
-    'reportedly',
-    'rumoured',
-    'according to',
-    'sources suggest',
-    'understood to be',
-    'believed to be',
-    'speculation',
+    "could be",
+    "might be",
+    "potentially",
+    "reportedly",
+    "rumoured",
+    "according to",
+    "sources suggest",
+    "understood to be",
+    "believed to be",
+    "speculation",
   ],
 
   // Contract and financial terms
   financial: [
-    'fee',
-    'transfer fee',
-    'price tag',
-    'valuation',
-    'bid',
-    'offer',
-    'contract',
-    'wage',
-    'salary',
-    'bonus',
-    'release clause',
-    'buy-out clause',
-    'add-ons',
+    "fee",
+    "transfer fee",
+    "price tag",
+    "valuation",
+    "bid",
+    "offer",
+    "contract",
+    "wage",
+    "salary",
+    "bonus",
+    "release clause",
+    "buy-out clause",
+    "add-ons",
   ],
 
   // Transfer window specific
   window: [
-    'january window',
-    'summer window',
-    'transfer window',
-    'deadline day',
-    'window closes',
-    'final hours',
+    "january window",
+    "summer window",
+    "transfer window",
+    "deadline day",
+    "window closes",
+    "final hours",
   ],
 };
 
 // Football clubs and common abbreviations
 const FOOTBALL_CLUBS = [
   // Premier League
-  'Arsenal',
-  'Chelsea',
-  'Liverpool',
-  'Manchester United',
-  'Manchester City',
-  'Tottenham',
-  'Newcastle',
-  'Brighton',
-  'Aston Villa',
-  'West Ham',
-  'Crystal Palace',
-  'Fulham',
-  'Brentford',
-  'Wolves',
-  'Everton',
-  'Nottingham Forest',
-  'Leeds United',
-  'Leicester',
-  'Southampton',
-  'Bournemouth',
+  "Arsenal",
+  "Chelsea",
+  "Liverpool",
+  "Manchester United",
+  "Manchester City",
+  "Tottenham",
+  "Newcastle",
+  "Brighton",
+  "Aston Villa",
+  "West Ham",
+  "Crystal Palace",
+  "Fulham",
+  "Brentford",
+  "Wolves",
+  "Everton",
+  "Nottingham Forest",
+  "Leeds United",
+  "Leicester",
+  "Southampton",
+  "Bournemouth",
 
   // Common abbreviations
-  'AFC',
-  'CFC',
-  'LFC',
-  'MUFC',
-  'MCFC',
-  'THFC',
-  'NUFC',
-  'WHUFC',
+  "AFC",
+  "CFC",
+  "LFC",
+  "MUFC",
+  "MCFC",
+  "THFC",
+  "NUFC",
+  "WHUFC",
 
   // European giants
-  'Real Madrid',
-  'Barcelona',
-  'Bayern Munich',
-  'PSG',
-  'Juventus',
-  'AC Milan',
-  'Inter Milan',
-  'Atletico Madrid',
-  'Borussia Dortmund',
+  "Real Madrid",
+  "Barcelona",
+  "Bayern Munich",
+  "PSG",
+  "Juventus",
+  "AC Milan",
+  "Inter Milan",
+  "Atletico Madrid",
+  "Borussia Dortmund",
 
   // Championship and others
-  'Leeds',
-  'Norwich',
-  'Watford',
-  'Sheffield United',
-  'Burnley',
+  "Leeds",
+  "Norwich",
+  "Watford",
+  "Sheffield United",
+  "Burnley",
 ];
 
 // Position-related keywords
 const POSITION_KEYWORDS = [
-  'striker',
-  'forward',
-  'winger',
-  'midfielder',
-  'defender',
-  'goalkeeper',
-  'centre-back',
-  'full-back',
-  'left-back',
-  'right-back',
-  'centre-forward',
-  'attacking midfielder',
-  'defensive midfielder',
-  'central midfielder',
-  'wing-back',
-  'sweeper',
-  'playmaker',
+  "striker",
+  "forward",
+  "winger",
+  "midfielder",
+  "defender",
+  "goalkeeper",
+  "centre-back",
+  "full-back",
+  "left-back",
+  "right-back",
+  "centre-forward",
+  "attacking midfielder",
+  "defensive midfielder",
+  "central midfielder",
+  "wing-back",
+  "sweeper",
+  "playmaker",
 ];
 
 interface ClassificationInput {
@@ -183,7 +183,7 @@ interface ClassificationInput {
     domain: { id: string; name: string };
     entity: { id: string; name: string };
   }>;
-  authorTier: 'tier1' | 'tier2' | 'tier3';
+  authorTier: "tier1" | "tier2" | "tier3";
   authorSpecialties: string[];
 }
 
@@ -209,14 +209,14 @@ class TransferClassifier {
    * Classify a tweet for transfer relevance
    */
   async classifyTweet(
-    input: ClassificationInput
+    input: ClassificationInput,
   ): Promise<ClassificationResult> {
     const text = input.text.toLowerCase();
     const keywords: string[] = [];
     let confidence = 0;
     let transferType: TransferType | undefined;
-    let reasonCode = '';
-    let explanation = '';
+    let reasonCode = "";
+    let explanation = "";
 
     // Check for transfer keywords
     const keywordMatches = this.findTransferKeywords(text);
@@ -227,7 +227,7 @@ class TransferClassifier {
     const clubMatches = this.findClubMentions(text);
     if (clubMatches.count > 1) {
       confidence += 0.3; // Multiple clubs suggest transfer
-      keywords.push('multiple_clubs');
+      keywords.push("multiple_clubs");
     } else if (clubMatches.count === 1) {
       confidence += 0.1;
     }
@@ -248,13 +248,13 @@ class TransferClassifier {
 
     // Author tier bonus
     switch (input.authorTier) {
-      case 'tier1':
+      case "tier1":
         confidence += 0.1;
         break;
-      case 'tier2':
+      case "tier2":
         confidence += 0.05;
         break;
-      case 'tier3':
+      case "tier3":
         break; // No bonus
     }
 
@@ -263,14 +263,14 @@ class TransferClassifier {
 
     // Generate explanation
     if (confidence >= 0.7) {
-      reasonCode = 'high_confidence';
-      explanation = `Strong transfer indicators detected: ${keywords.slice(0, 3).join(', ')}`;
+      reasonCode = "high_confidence";
+      explanation = `Strong transfer indicators detected: ${keywords.slice(0, 3).join(", ")}`;
     } else if (confidence >= 0.4) {
-      reasonCode = 'medium_confidence';
-      explanation = `Moderate transfer signals: ${keywords.slice(0, 2).join(', ')}`;
+      reasonCode = "medium_confidence";
+      explanation = `Moderate transfer signals: ${keywords.slice(0, 2).join(", ")}`;
     } else {
-      reasonCode = 'low_confidence';
-      explanation = 'Minimal transfer relevance detected';
+      reasonCode = "low_confidence";
+      explanation = "Minimal transfer relevance detected";
     }
 
     return {
@@ -323,11 +323,11 @@ class TransferClassifier {
   } {
     const keywords: string[] = [];
     let confidence = 0;
-    let type = 'rumour';
+    let type = "rumour";
 
     // Check each category
     for (const [category, categoryKeywords] of Object.entries(
-      TRANSFER_KEYWORDS
+      TRANSFER_KEYWORDS,
     )) {
       for (const keyword of categoryKeywords) {
         if (text.includes(keyword)) {
@@ -335,30 +335,30 @@ class TransferClassifier {
 
           // Assign confidence and type based on category
           switch (category) {
-            case 'confirmed':
+            case "confirmed":
               confidence += 0.4;
-              type = 'confirmed';
+              type = "confirmed";
               break;
-            case 'medical':
+            case "medical":
               confidence += 0.35;
-              type = 'medical';
+              type = "medical";
               break;
-            case 'advanced':
+            case "advanced":
               confidence += 0.25;
-              type = 'advanced';
+              type = "advanced";
               break;
-            case 'talks':
+            case "talks":
               confidence += 0.15;
-              type = 'talks';
+              type = "talks";
               break;
-            case 'rumour':
+            case "rumour":
               confidence += 0.1;
-              type = 'rumour';
+              type = "rumour";
               break;
-            case 'financial':
+            case "financial":
               confidence += 0.2;
               break;
-            case 'window':
+            case "window":
               confidence += 0.1;
               break;
           }
@@ -427,22 +427,22 @@ class TransferClassifier {
    */
   private determineTransferType(
     keywordType: string,
-    confidence: number
+    confidence: number,
   ): TransferType | undefined {
     if (confidence < 0.4) return undefined;
 
     switch (keywordType) {
-      case 'confirmed':
-        return 'CONFIRMED';
-      case 'medical':
-        return 'MEDICAL';
-      case 'advanced':
-        return 'PERSONAL_TERMS';
-      case 'talks':
-        return 'BID';
-      case 'rumour':
+      case "confirmed":
+        return "CONFIRMED";
+      case "medical":
+        return "MEDICAL";
+      case "advanced":
+        return "PERSONAL_TERMS";
+      case "talks":
+        return "BID";
+      case "rumour":
       default:
-        return 'RUMOUR';
+        return "RUMOUR";
     }
   }
 
@@ -515,7 +515,7 @@ class TransferClassifier {
         // Filter out obvious non-names (clubs, etc.)
         if (
           !FOOTBALL_CLUBS.some((club) =>
-            club.toLowerCase().includes(match.toLowerCase())
+            club.toLowerCase().includes(match.toLowerCase()),
           )
         ) {
           players.push(match);
@@ -533,7 +533,7 @@ class TransferClassifier {
     const agents: string[] = [];
 
     // Look for agent indicators
-    const agentKeywords = ['agent', 'representative', 'intermediary', 'broker'];
+    const agentKeywords = ["agent", "representative", "intermediary", "broker"];
 
     for (const keyword of agentKeywords) {
       if (text.toLowerCase().includes(keyword)) {

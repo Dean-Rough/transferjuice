@@ -3,9 +3,9 @@
  * Handles resizing, optimization, alt text generation, and CDN integration
  */
 
-import type { ImageSource } from './sourcing';
-import { z } from 'zod';
-import OpenAI from 'openai';
+import type { ImageSource } from "./sourcing";
+import { z } from "zod";
+import OpenAI from "openai";
 
 // Processing schemas
 export const ProcessedImageSchema = z.object({
@@ -13,8 +13,8 @@ export const ProcessedImageSchema = z.object({
   originalUrl: z.string().url(),
   processedUrl: z.string().url(),
   cdnUrl: z.string().url().optional(),
-  source: z.enum(['twitter', 'wikipedia']),
-  type: z.enum(['player', 'club', 'news', 'celebration']),
+  source: z.enum(["twitter", "wikipedia"]),
+  type: z.enum(["player", "club", "news", "celebration"]),
   title: z.string(),
   altText: z.string(),
   attribution: z.string(),
@@ -87,7 +87,7 @@ export class ImageProcessor {
 
   constructor(config: ProcessingConfig) {
     this.config = {
-      cdnBaseUrl: 'https://cdn.transferjuice.com',
+      cdnBaseUrl: "https://cdn.transferjuice.com",
       enableCdn: true,
       compressionQuality: 85,
       maxWidth: 1200,
@@ -121,7 +121,7 @@ export class ImageProcessor {
       // Generate enhanced alt text using AI
       const enhancedAltText = await this.generateAltText(
         imageSource,
-        imageInfo
+        imageInfo,
       );
 
       // Create optimized variants
@@ -139,7 +139,7 @@ export class ImageProcessor {
       const accessibility = await this.generateAccessibilityInfo(
         enhancedAltText,
         imageSource,
-        imageInfo
+        imageInfo,
       );
 
       const processingTime = Date.now() - startTime;
@@ -180,14 +180,14 @@ export class ImageProcessor {
         metadata: {
           processedAt: new Date(),
           processingTime,
-          aiModel: 'gpt-4-vision-preview',
+          aiModel: "gpt-4-vision-preview",
           cacheable: true,
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
         },
       });
     } catch (error) {
       throw new Error(
-        `Image processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Image processing failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -197,7 +197,7 @@ export class ImageProcessor {
    */
   async processImages(
     imageSources: ImageSource[],
-    concurrency: number = 3
+    concurrency: number = 3,
   ): Promise<ProcessedImage[]> {
     const results: ProcessedImage[] = [];
     const errors: string[] = [];
@@ -207,11 +207,11 @@ export class ImageProcessor {
       const batch = imageSources.slice(i, i + concurrency);
 
       const batchResults = await Promise.allSettled(
-        batch.map((source) => this.processImage(source))
+        batch.map((source) => this.processImage(source)),
       );
 
       for (const result of batchResults) {
-        if (result.status === 'fulfilled') {
+        if (result.status === "fulfilled") {
           results.push(result.value);
         } else {
           errors.push(result.reason.message);
@@ -227,7 +227,7 @@ export class ImageProcessor {
     if (errors.length > 0) {
       console.warn(
         `Image processing completed with ${errors.length} errors:`,
-        errors
+        errors,
       );
     }
 
@@ -240,7 +240,7 @@ export class ImageProcessor {
   private async downloadImage(url: string): Promise<Buffer> {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': this.config.userAgent,
+        "User-Agent": this.config.userAgent,
       },
     });
 
@@ -270,10 +270,10 @@ export class ImageProcessor {
     return {
       width: 800,
       height: 600,
-      format: 'jpeg',
+      format: "jpeg",
       fileSize,
       hasTransparency: false,
-      dominantColors: ['#1f3a93', '#ffffff', '#000000'],
+      dominantColors: ["#1f3a93", "#ffffff", "#000000"],
     };
   }
 
@@ -282,7 +282,7 @@ export class ImageProcessor {
    */
   private async generateAltText(
     imageSource: ImageSource,
-    imageInfo: { width: number; height: number; format: string }
+    imageInfo: { width: number; height: number; format: string },
   ): Promise<string> {
     const baseAltText = imageSource.altText;
     const context = {
@@ -295,10 +295,10 @@ export class ImageProcessor {
 
     try {
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4-turbo-preview',
+        model: "gpt-4-turbo-preview",
         messages: [
           {
-            role: 'system',
+            role: "system",
             content: `You are an accessibility expert creating alt text for transfer news images. Generate concise, descriptive alt text that:
 - Describes what's visible in the image
 - Includes relevant context for transfer news
@@ -307,7 +307,7 @@ export class ImageProcessor {
 - Avoids redundant phrases like "image of" or "picture showing"`,
           },
           {
-            role: 'user',
+            role: "user",
             content: `Generate enhanced alt text for this transfer news image:
             
 Type: ${context.type}
@@ -332,7 +332,7 @@ Create descriptive, accessible alt text that helps users understand the image co
 
       return enhancedAltText;
     } catch (error) {
-      console.warn('AI alt text generation failed, using fallback:', error);
+      console.warn("AI alt text generation failed, using fallback:", error);
       return baseAltText || `${imageSource.type} image: ${imageSource.title}`;
     }
   }
@@ -347,15 +347,15 @@ Create descriptive, accessible alt text that helps users understand the image co
       height: number;
       format: string;
       fileSize: number;
-    }
+    },
   ): Promise<{
     thumbnail: { url: string; width: number; height: number; fileSize: number };
     medium: { url: string; width: number; height: number; fileSize: number };
     large: { url: string; width: number; height: number; fileSize: number };
   }> {
     // Mock implementation - would use sharp or similar for actual image processing
-    const baseUrl = 'data:image/jpeg;base64,';
-    const mockImageData = imageBuffer.toString('base64').slice(0, 100);
+    const baseUrl = "data:image/jpeg;base64,";
+    const mockImageData = imageBuffer.toString("base64").slice(0, 100);
 
     return {
       thumbnail: {
@@ -407,8 +407,8 @@ Create descriptive, accessible alt text that helps users understand the image co
    */
   private calculateOptimization(
     originalBuffer: Buffer,
-    variants: { large: { fileSize: number } }
-  ): ProcessedImage['optimization'] {
+    variants: { large: { fileSize: number } },
+  ): ProcessedImage["optimization"] {
     const originalSize = originalBuffer.length;
     const optimizedSize = variants.large.fileSize;
     const compressionRatio = (originalSize - optimizedSize) / originalSize;
@@ -417,7 +417,7 @@ Create descriptive, accessible alt text that helps users understand the image co
       originalSize,
       optimizedSize,
       compressionRatio: Math.round(compressionRatio * 100) / 100,
-      format: 'jpeg',
+      format: "jpeg",
       quality: this.config.compressionQuality,
     };
   }
@@ -428,18 +428,18 @@ Create descriptive, accessible alt text that helps users understand the image co
   private async generateAccessibilityInfo(
     altText: string,
     imageSource: ImageSource,
-    imageInfo: { dominantColors: string[] }
-  ): Promise<ProcessedImage['accessibility']> {
+    imageInfo: { dominantColors: string[] },
+  ): Promise<ProcessedImage["accessibility"]> {
     // Generate detailed description for screen readers
     const description = await this.generateDetailedDescription(
       imageSource,
-      altText
+      altText,
     );
 
     // Calculate readability score
     const readabilityScore = this.calculateReadabilityScore(
       altText,
-      description
+      description,
     );
 
     // Estimate color contrast (simplified)
@@ -458,18 +458,18 @@ Create descriptive, accessible alt text that helps users understand the image co
    */
   private async generateDetailedDescription(
     imageSource: ImageSource,
-    altText: string
+    altText: string,
   ): Promise<string> {
     try {
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4-turbo-preview',
+        model: "gpt-4-turbo-preview",
         messages: [
           {
-            role: 'system',
+            role: "system",
             content: `Generate a detailed image description for accessibility tools. Expand on the alt text to provide more context while remaining concise and relevant to transfer news.`,
           },
           {
-            role: 'user',
+            role: "user",
             content: `Create a detailed description for this transfer news image:
 
 Type: ${imageSource.type}
@@ -486,7 +486,7 @@ Provide 1-2 sentences that give more context than the alt text while remaining f
 
       return response.choices[0]?.message?.content?.trim() || altText;
     } catch (error) {
-      console.warn('Detailed description generation failed:', error);
+      console.warn("Detailed description generation failed:", error);
       return altText;
     }
   }
@@ -496,7 +496,7 @@ Provide 1-2 sentences that give more context than the alt text while remaining f
    */
   private calculateReadabilityScore(
     altText: string,
-    description: string
+    description: string,
   ): number {
     // Simplified readability calculation
     const combinedText = `${altText} ${description}`;
@@ -531,7 +531,7 @@ Provide 1-2 sentences that give more context than the alt text while remaining f
     // Mock calculation - would implement actual color contrast calculation
     const hasHighContrast = dominantColors.some(
       (color) =>
-        color.toLowerCase() === '#ffffff' || color.toLowerCase() === '#000000'
+        color.toLowerCase() === "#ffffff" || color.toLowerCase() === "#000000",
     );
 
     return hasHighContrast ? 7.0 : 4.5;
@@ -548,24 +548,24 @@ Provide 1-2 sentences that give more context than the alt text while remaining f
 
     // Check alt text length
     if (processedImage.altText.length < 10) {
-      issues.push('Alt text too short');
+      issues.push("Alt text too short");
     }
     if (processedImage.altText.length > 125) {
-      issues.push('Alt text too long');
+      issues.push("Alt text too long");
     }
 
     // Check compression ratio
     if (processedImage.optimization.compressionRatio < 0.1) {
-      issues.push('Insufficient compression');
+      issues.push("Insufficient compression");
     }
 
     // Check accessibility score
     if (processedImage.accessibility.readabilityScore < 70) {
-      issues.push('Low readability score');
+      issues.push("Low readability score");
     }
 
     // Check image variants
-    const requiredVariants = ['thumbnail', 'medium', 'large'];
+    const requiredVariants = ["thumbnail", "medium", "large"];
     for (const variant of requiredVariants) {
       if (
         !processedImage.variants[
@@ -592,7 +592,7 @@ Provide 1-2 sentences that give more context than the alt text while remaining f
     cdnEnabled: boolean;
   } {
     return {
-      supportedFormats: ['jpeg', 'jpg', 'png', 'webp'],
+      supportedFormats: ["jpeg", "jpg", "png", "webp"],
       variantSizes: this.variantConfig,
       compressionQuality: this.config.compressionQuality,
       cdnEnabled: this.config.enableCdn,

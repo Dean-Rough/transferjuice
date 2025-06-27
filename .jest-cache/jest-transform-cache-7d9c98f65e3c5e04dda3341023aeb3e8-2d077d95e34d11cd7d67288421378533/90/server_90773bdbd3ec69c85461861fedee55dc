@@ -1,0 +1,65 @@
+02669ca1c6aa317d739e9cf11865e7e7
+/* istanbul ignore next */
+function cov_rkh0s5vwf() {
+  var path = "/Users/deannewton/Documents/TransferJuice/src/test/mocks/server.ts";
+  var hash = "cd707876c0a53f620520c5ea682115cf134d4847";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/Users/deannewton/Documents/TransferJuice/src/test/mocks/server.ts",
+    statementMap: {
+      "0": {
+        start: {
+          line: 5,
+          column: 22
+        },
+        end: {
+          line: 5,
+          column: 46
+        }
+      }
+    },
+    fnMap: {},
+    branchMap: {},
+    s: {
+      "0": 0
+    },
+    f: {},
+    b: {},
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "cd707876c0a53f620520c5ea682115cf134d4847"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_rkh0s5vwf = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_rkh0s5vwf();
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+import { setupServer } from "msw/node";
+import { handlers } from "./handlers";
+
+// Create MSW server for API mocking in tests
+export var server =
+/* istanbul ignore next */
+(cov_rkh0s5vwf().s[0]++,
+/* istanbul ignore next */
+setupServer.apply(
+/* istanbul ignore next */
+void 0,
+/* istanbul ignore next */
+_toConsumableArray(handlers)));
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfcmtoMHM1dndmIiwiYWN0dWFsQ292ZXJhZ2UiLCJfdG9Db25zdW1hYmxlQXJyYXkiLCJyIiwiX2FycmF5V2l0aG91dEhvbGVzIiwiX2l0ZXJhYmxlVG9BcnJheSIsIl91bnN1cHBvcnRlZEl0ZXJhYmxlVG9BcnJheSIsIl9ub25JdGVyYWJsZVNwcmVhZCIsIlR5cGVFcnJvciIsImEiLCJfYXJyYXlMaWtlVG9BcnJheSIsInQiLCJ0b1N0cmluZyIsImNhbGwiLCJzbGljZSIsImNvbnN0cnVjdG9yIiwibmFtZSIsIkFycmF5IiwiZnJvbSIsInRlc3QiLCJTeW1ib2wiLCJpdGVyYXRvciIsImlzQXJyYXkiLCJsZW5ndGgiLCJlIiwibiIsInNldHVwU2VydmVyIiwiaGFuZGxlcnMiLCJzZXJ2ZXIiLCJzIiwiYXBwbHkiXSwic291cmNlcyI6WyJzZXJ2ZXIudHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgc2V0dXBTZXJ2ZXIgfSBmcm9tIFwibXN3L25vZGVcIjtcbmltcG9ydCB7IGhhbmRsZXJzIH0gZnJvbSBcIi4vaGFuZGxlcnNcIjtcblxuLy8gQ3JlYXRlIE1TVyBzZXJ2ZXIgZm9yIEFQSSBtb2NraW5nIGluIHRlc3RzXG5leHBvcnQgY29uc3Qgc2VydmVyID0gc2V0dXBTZXJ2ZXIoLi4uaGFuZGxlcnMpO1xuIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7SUFlWTtJQUFBQSxhQUFBLFlBQUFBLENBQUE7TUFBQSxPQUFBQyxjQUFBO0lBQUE7RUFBQTtFQUFBLE9BQUFBLGNBQUE7QUFBQTtBQUFBRCxhQUFBO0FBQUEsU0FBQUUsbUJBQUFDLENBQUEsV0FBQUMsa0JBQUEsQ0FBQUQsQ0FBQSxLQUFBRSxnQkFBQSxDQUFBRixDQUFBLEtBQUFHLDJCQUFBLENBQUFILENBQUEsS0FBQUksa0JBQUE7QUFBQSxTQUFBQSxtQkFBQSxjQUFBQyxTQUFBO0FBQUEsU0FBQUYsNEJBQUFILENBQUEsRUFBQU0sQ0FBQSxRQUFBTixDQUFBLDJCQUFBQSxDQUFBLFNBQUFPLGlCQUFBLENBQUFQLENBQUEsRUFBQU0sQ0FBQSxPQUFBRSxDQUFBLE1BQUFDLFFBQUEsQ0FBQUMsSUFBQSxDQUFBVixDQUFBLEVBQUFXLEtBQUEsNkJBQUFILENBQUEsSUFBQVIsQ0FBQSxDQUFBWSxXQUFBLEtBQUFKLENBQUEsR0FBQVIsQ0FBQSxDQUFBWSxXQUFBLENBQUFDLElBQUEsYUFBQUwsQ0FBQSxjQUFBQSxDQUFBLEdBQUFNLEtBQUEsQ0FBQUMsSUFBQSxDQUFBZixDQUFBLG9CQUFBUSxDQUFBLCtDQUFBUSxJQUFBLENBQUFSLENBQUEsSUFBQUQsaUJBQUEsQ0FBQVAsQ0FBQSxFQUFBTSxDQUFBO0FBQUEsU0FBQUosaUJBQUFGLENBQUEsOEJBQUFpQixNQUFBLFlBQUFqQixDQUFBLENBQUFpQixNQUFBLENBQUFDLFFBQUEsYUFBQWxCLENBQUEsdUJBQUFjLEtBQUEsQ0FBQUMsSUFBQSxDQUFBZixDQUFBO0FBQUEsU0FBQUMsbUJBQUFELENBQUEsUUFBQWMsS0FBQSxDQUFBSyxPQUFBLENBQUFuQixDQUFBLFVBQUFPLGlCQUFBLENBQUFQLENBQUE7QUFBQSxTQUFBTyxrQkFBQVAsQ0FBQSxFQUFBTSxDQUFBLGFBQUFBLENBQUEsSUFBQUEsQ0FBQSxHQUFBTixDQUFBLENBQUFvQixNQUFBLE1BQUFkLENBQUEsR0FBQU4sQ0FBQSxDQUFBb0IsTUFBQSxZQUFBQyxDQUFBLE1BQUFDLENBQUEsR0FBQVIsS0FBQSxDQUFBUixDQUFBLEdBQUFlLENBQUEsR0FBQWYsQ0FBQSxFQUFBZSxDQUFBLElBQUFDLENBQUEsQ0FBQUQsQ0FBQSxJQUFBckIsQ0FBQSxDQUFBcUIsQ0FBQSxVQUFBQyxDQUFBO0FBZlosU0FBU0MsV0FBVyxRQUFRLFVBQVU7QUFDdEMsU0FBU0MsUUFBUSxRQUFRLFlBQVk7O0FBRXJDO0FBQ0EsT0FBTyxJQUFNQyxNQUFNO0FBQUE7QUFBQSxDQUFBNUIsYUFBQSxHQUFBNkIsQ0FBQTtBQUFHO0FBQUFILFdBQVcsQ0FBQUksS0FBQTtBQUFBO0FBQUE7QUFBQTtBQUFBNUIsa0JBQUEsQ0FBSXlCLFFBQVEsRUFBQyIsImlnbm9yZUxpc3QiOltdfQ==

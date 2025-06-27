@@ -22,13 +22,13 @@ import {
   type PartnerContent,
   type ContentMixingResult,
   DEFAULT_MIXING_CONFIG,
-} from './contentMixer';
+} from "./contentMixer";
 // TODO: Fix circular dependency with terryCommentarySystem
 // import { terryCommentarySystem } from '@/lib/ai/terryCommentarySystem';
 
 export interface SmartMixingConfig {
   enableSmartMixing: boolean;
-  mixingSchedule: 'continuous' | 'scheduled' | 'manual';
+  mixingSchedule: "continuous" | "scheduled" | "manual";
   scheduledIntervals: number[]; // Minutes past hour [15, 30, 45] for scheduled mixing
   quietPeriodDetection: boolean;
   terryCommentaryOnPartnerContent: boolean;
@@ -36,7 +36,7 @@ export interface SmartMixingConfig {
 }
 
 export interface MixingOrchestrationResult {
-  action: 'none' | 'mixed' | 'scheduled' | 'rejected';
+  action: "none" | "mixed" | "scheduled" | "rejected";
   reason: string;
   partnerContent?: FeedItem;
   nextScheduledCheck?: Date;
@@ -50,7 +50,7 @@ export interface MixingOrchestrationResult {
 
 export const DEFAULT_ORCHESTRATION_CONFIG: SmartMixingConfig = {
   enableSmartMixing: true,
-  mixingSchedule: 'continuous', // Check continuously for quiet periods
+  mixingSchedule: "continuous", // Check continuously for quiet periods
   scheduledIntervals: [20, 40], // Check at 20 and 40 minutes past hour if scheduled
   quietPeriodDetection: true,
   terryCommentaryOnPartnerContent: true,
@@ -75,7 +75,7 @@ export class SmartMixingOrchestrator {
 
   constructor(
     config: SmartMixingConfig = DEFAULT_ORCHESTRATION_CONFIG,
-    mixerConfig = DEFAULT_MIXING_CONFIG
+    mixerConfig = DEFAULT_MIXING_CONFIG,
   ) {
     this.config = config;
     this.contentMixer = new ContentMixer(mixerConfig);
@@ -86,34 +86,34 @@ export class SmartMixingOrchestrator {
    */
   public start(): void {
     if (this.isRunning) {
-      console.log('⚠️ Smart mixing orchestrator already running');
+      console.log("⚠️ Smart mixing orchestrator already running");
       return;
     }
 
     if (!this.config.enableSmartMixing) {
-      console.log('⏸️ Smart mixing disabled in configuration');
+      console.log("⏸️ Smart mixing disabled in configuration");
       return;
     }
 
     this.isRunning = true;
-    console.log('🎯 Starting Smart Mixing Orchestrator...');
+    console.log("🎯 Starting Smart Mixing Orchestrator...");
     console.log(`   Schedule: ${this.config.mixingSchedule}`);
     console.log(
-      `   Quiet period detection: ${this.config.quietPeriodDetection ? 'enabled' : 'disabled'}`
+      `   Quiet period detection: ${this.config.quietPeriodDetection ? "enabled" : "disabled"}`,
     );
     console.log(
-      `   Terry commentary on partners: ${this.config.terryCommentaryOnPartnerContent ? 'enabled' : 'disabled'}`
+      `   Terry commentary on partners: ${this.config.terryCommentaryOnPartnerContent ? "enabled" : "disabled"}`,
     );
 
-    if (this.config.mixingSchedule === 'continuous') {
+    if (this.config.mixingSchedule === "continuous") {
       // Check every 5 minutes for continuous mixing
       this.intervalId = setInterval(
         () => {
           this.checkAndMixContent();
         },
-        5 * 60 * 1000
+        5 * 60 * 1000,
       ); // 5 minutes
-    } else if (this.config.mixingSchedule === 'scheduled') {
+    } else if (this.config.mixingSchedule === "scheduled") {
       // Check at specific intervals
       this.scheduleIntervalChecks();
     }
@@ -136,14 +136,14 @@ export class SmartMixingOrchestrator {
       this.intervalId = null;
     }
 
-    console.log('🛑 Smart Mixing Orchestrator stopped');
+    console.log("🛑 Smart Mixing Orchestrator stopped");
   }
 
   /**
    * Manually trigger content mixing check
    */
   public async manualMixCheck(): Promise<MixingOrchestrationResult> {
-    console.log('🔄 Manual content mixing check triggered...');
+    console.log("🔄 Manual content mixing check triggered...");
     return await this.performMixingCheck();
   }
 
@@ -190,7 +190,7 @@ export class SmartMixingOrchestrator {
       this.start();
     }
 
-    console.log('⚙️ Updated smart mixing orchestrator config:', this.config);
+    console.log("⚙️ Updated smart mixing orchestrator config:", this.config);
   }
 
   /**
@@ -199,7 +199,7 @@ export class SmartMixingOrchestrator {
   public getRecentFeedActivity(hours: number = 2): FeedItem[] {
     // TODO: Re-enable feed store access once circular dependency is fixed
     console.log(
-      'Recent feed activity disabled temporarily due to circular dependency'
+      "Recent feed activity disabled temporarily due to circular dependency",
     );
     return [];
     // const feedStore = useFeedStore.getState();
@@ -220,7 +220,7 @@ export class SmartMixingOrchestrator {
     try {
       await this.performMixingCheck();
     } catch (error) {
-      console.error('Error in smart mixing check:', error);
+      console.error("Error in smart mixing check:", error);
     }
   }
 
@@ -234,8 +234,8 @@ export class SmartMixingOrchestrator {
     if (!this.isWithinPartnerContentLimits(recentFeedItems)) {
       this.mixingStats.rejectedMixes++;
       return {
-        action: 'rejected',
-        reason: 'Partner content ratio limit exceeded',
+        action: "rejected",
+        reason: "Partner content ratio limit exceeded",
         stats: { ...this.mixingStats },
       };
     }
@@ -246,7 +246,7 @@ export class SmartMixingOrchestrator {
 
     if (!mixingResult.shouldMixContent) {
       return {
-        action: 'none',
+        action: "none",
         reason: mixingResult.reason,
         nextScheduledCheck: mixingResult.nextCheckIn
           ? new Date(Date.now() + mixingResult.nextCheckIn * 60 * 1000)
@@ -262,8 +262,8 @@ export class SmartMixingOrchestrator {
     if (!partnerContent) {
       this.mixingStats.rejectedMixes++;
       return {
-        action: 'rejected',
-        reason: 'No suitable partner content available',
+        action: "rejected",
+        reason: "No suitable partner content available",
         stats: { ...this.mixingStats },
       };
     }
@@ -271,7 +271,7 @@ export class SmartMixingOrchestrator {
     // Convert to feed item
     const feedItem = this.contentMixer.convertPartnerContentToFeedItem(
       partnerContent,
-      this.config.terryCommentaryOnPartnerContent
+      this.config.terryCommentaryOnPartnerContent,
     );
 
     // Add Terry commentary if enabled and not already added
@@ -281,7 +281,7 @@ export class SmartMixingOrchestrator {
     ) {
       // TODO: Re-enable Terry commentary once circular dependency is fixed
       console.log(
-        'Terry commentary disabled temporarily due to circular dependency'
+        "Terry commentary disabled temporarily due to circular dependency",
       );
       // try {
       //   const terryResult =
@@ -307,7 +307,7 @@ export class SmartMixingOrchestrator {
 
     // TODO: Re-enable feed store updates once circular dependency is fixed
     console.log(
-      'Feed store update disabled temporarily due to circular dependency'
+      "Feed store update disabled temporarily due to circular dependency",
     );
     // // Add to feed store
     // const feedStore = useFeedStore.getState();
@@ -319,15 +319,15 @@ export class SmartMixingOrchestrator {
     this.mixingStats.lastMixTime = new Date();
 
     console.log(
-      `🎨 Smart mixing: Added partner content from ${partnerContent.source.name}`
+      `🎨 Smart mixing: Added partner content from ${partnerContent.source.name}`,
     );
     if (feedItem.terryCommentary) {
       console.log(`   🎭 With Terry commentary: "${feedItem.terryCommentary}"`);
     }
 
     return {
-      action: 'mixed',
-      reason: 'Successfully mixed partner content during quiet period',
+      action: "mixed",
+      reason: "Successfully mixed partner content during quiet period",
       partnerContent: feedItem,
       stats: { ...this.mixingStats },
     };
@@ -339,7 +339,7 @@ export class SmartMixingOrchestrator {
     }
 
     const partnerContentCount = recentFeedItems.filter(
-      (item) => item.type === 'partner'
+      (item) => item.type === "partner",
     ).length;
     const currentRatio = partnerContentCount / recentFeedItems.length;
 
@@ -370,12 +370,12 @@ export class SmartMixingOrchestrator {
           () => {
             this.checkAndMixContent();
           },
-          60 * 60 * 1000
+          60 * 60 * 1000,
         ); // Every hour
       }, timeToNext);
 
       console.log(
-        `⏰ Scheduled mixing check at :${interval.toString().padStart(2, '0')} (next: ${nextCheck.toLocaleTimeString()})`
+        `⏰ Scheduled mixing check at :${interval.toString().padStart(2, "0")} (next: ${nextCheck.toLocaleTimeString()})`,
       );
     }
   }
@@ -385,7 +385,7 @@ export class SmartMixingOrchestrator {
    */
   public async forceMixContent(
     sourceId: string,
-    contentOverride?: Partial<PartnerContent>
+    contentOverride?: Partial<PartnerContent>,
   ): Promise<MixingOrchestrationResult> {
     console.log(`🔧 Force mixing content from source: ${sourceId}`);
 
@@ -396,8 +396,8 @@ export class SmartMixingOrchestrator {
 
       if (!partnerContent) {
         return {
-          action: 'rejected',
-          reason: 'Could not generate partner content',
+          action: "rejected",
+          reason: "Could not generate partner content",
           stats: { ...this.mixingStats },
         };
       }
@@ -409,12 +409,12 @@ export class SmartMixingOrchestrator {
 
       const feedItem = this.contentMixer.convertPartnerContentToFeedItem(
         partnerContent,
-        this.config.terryCommentaryOnPartnerContent
+        this.config.terryCommentaryOnPartnerContent,
       );
 
       // TODO: Re-enable feed store updates once circular dependency is fixed
       console.log(
-        'Feed store update disabled temporarily due to circular dependency'
+        "Feed store update disabled temporarily due to circular dependency",
       );
       // const feedStore = useFeedStore.getState();
       // feedStore.addItem(feedItem);
@@ -423,16 +423,16 @@ export class SmartMixingOrchestrator {
       this.mixingStats.successfulMixes++;
 
       return {
-        action: 'mixed',
-        reason: 'Force mixed partner content',
+        action: "mixed",
+        reason: "Force mixed partner content",
         partnerContent: feedItem,
         stats: { ...this.mixingStats },
       };
     } catch (error) {
-      console.error('Failed to force mix content:', error);
+      console.error("Failed to force mix content:", error);
       this.mixingStats.rejectedMixes++;
       return {
-        action: 'rejected',
+        action: "rejected",
         reason: `Force mix failed: ${error}`,
         stats: { ...this.mixingStats },
       };

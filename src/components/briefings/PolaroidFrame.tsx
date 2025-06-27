@@ -3,8 +3,8 @@
  * Instagram-style instant photo frames with captions
  */
 
-import React from 'react';
-import Image from 'next/image';
+import React from "react";
+import Image from "next/image";
 
 interface PolaroidFrameProps {
   image: {
@@ -17,15 +17,15 @@ interface PolaroidFrameProps {
   className?: string;
 }
 
-export function PolaroidFrame({ 
-  image, 
-  caption, 
-  timestamp, 
+export function PolaroidFrame({
+  image,
+  caption,
+  timestamp,
   angle = 0,
-  className = '' 
+  className = "",
 }: PolaroidFrameProps) {
   return (
-    <div 
+    <div
       className={`inline-block ${className}`}
       style={{ transform: `rotate(${angle}deg)` }}
     >
@@ -39,20 +39,20 @@ export function PolaroidFrame({
             sizes="256px"
           />
         </div>
-        
+
         <div className="mt-3 space-y-1">
           {caption && (
             <p className="text-sm text-black font-handwriting text-center px-2">
               {caption}
             </p>
           )}
-          
+
           <time className="block text-xs text-gray-600 text-center">
-            {timestamp.toLocaleDateString('en-GB', {
-              day: 'numeric',
-              month: 'short',
-              hour: '2-digit',
-              minute: '2-digit'
+            {timestamp.toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+              hour: "2-digit",
+              minute: "2-digit",
             })}
           </time>
         </div>

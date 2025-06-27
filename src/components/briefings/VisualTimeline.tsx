@@ -3,9 +3,9 @@
  * Displays transfer timeline with polaroid images
  */
 
-import React from 'react';
-import Image from 'next/image';
-import type { TimelineItem } from '@/types/briefing';
+import React from "react";
+import Image from "next/image";
+import type { TimelineItem } from "@/types/briefing";
 
 interface VisualTimelineProps {
   items: TimelineItem[];
@@ -25,15 +25,11 @@ export function VisualTimeline({ items }: VisualTimelineProps) {
     <div className="visual-timeline relative">
       {/* Timeline line */}
       <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-zinc-800" />
-      
+
       {/* Timeline items */}
       <div className="timeline-items space-y-8">
         {items.map((item, index) => (
-          <TimelineEntry 
-            key={item.id} 
-            item={item} 
-            index={index}
-          />
+          <TimelineEntry key={item.id} item={item} index={index} />
         ))}
       </div>
     </div>
@@ -42,24 +38,26 @@ export function VisualTimeline({ items }: VisualTimelineProps) {
 
 function TimelineEntry({ item, index }: { item: TimelineItem; index: number }) {
   const typeColors = {
-    transfer: 'bg-green-500',
-    rumour: 'bg-blue-500',
-    update: 'bg-yellow-500',
-    partner: 'bg-purple-500',
+    transfer: "bg-green-500",
+    rumour: "bg-blue-500",
+    update: "bg-yellow-500",
+    partner: "bg-purple-500",
   };
 
   const typeIcons = {
-    transfer: '✅',
-    rumour: '🗣️',
-    update: '📰',
-    partner: '🤝',
+    transfer: "✅",
+    rumour: "🗣️",
+    update: "📰",
+    partner: "🤝",
   };
 
   return (
     <div className="timeline-entry relative flex gap-4">
       {/* Time marker */}
       <div className="timeline-marker relative z-10">
-        <div className={`w-16 h-16 rounded-full ${typeColors[item.type]} flex items-center justify-center`}>
+        <div
+          className={`w-16 h-16 rounded-full ${typeColors[item.type]} flex items-center justify-center`}
+        >
           <span className="text-2xl">{typeIcons[item.type]}</span>
         </div>
         <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-zinc-500 whitespace-nowrap">
@@ -69,17 +67,13 @@ function TimelineEntry({ item, index }: { item: TimelineItem; index: number }) {
 
       {/* Content */}
       <div className="timeline-content flex-1 pt-2">
-        <h3 className="text-lg font-bold mb-1 text-white">
-          {item.title}
-        </h3>
-        <p className="text-sm text-zinc-400 mb-3">
-          {item.description}
-        </p>
+        <h3 className="text-lg font-bold mb-1 text-white">{item.title}</h3>
+        <p className="text-sm text-zinc-400 mb-3">{item.description}</p>
 
         {/* Polaroid if player is mentioned */}
         {item.polaroid && (
           <div className="timeline-polaroid mt-4">
-            <Polaroid 
+            <Polaroid
               playerName={item.polaroid.playerName}
               clubName={item.polaroid.clubName}
               imageUrl={item.polaroid.imageUrl}
@@ -92,11 +86,11 @@ function TimelineEntry({ item, index }: { item: TimelineItem; index: number }) {
   );
 }
 
-function Polaroid({ 
-  playerName, 
-  clubName, 
-  imageUrl, 
-  frameColor 
+function Polaroid({
+  playerName,
+  clubName,
+  imageUrl,
+  frameColor,
 }: {
   playerName: string;
   clubName: string;
@@ -104,7 +98,7 @@ function Polaroid({
   frameColor: string;
 }) {
   return (
-    <div 
+    <div
       className="polaroid-frame relative inline-block transform hover:rotate-1 transition-transform"
       style={{ backgroundColor: frameColor }}
     >
@@ -122,11 +116,14 @@ function Polaroid({
         ) : (
           <div className="polaroid-placeholder w-48 h-48 bg-zinc-900 flex items-center justify-center">
             <span className="text-6xl text-zinc-700">
-              {playerName.split(' ').map(n => n[0]).join('')}
+              {playerName
+                .split(" ")
+                .map((n) => n[0])
+                .join("")}
             </span>
           </div>
         )}
-        
+
         <div className="polaroid-caption mt-2 text-center">
           <p className="text-sm font-bold text-black">{playerName}</p>
           <p className="text-xs text-gray-600">{clubName}</p>
@@ -148,15 +145,16 @@ function Polaroid({
         }
 
         .polaroid-frame::before {
-          content: '';
+          content: "";
           position: absolute;
           top: -2px;
           left: -2px;
           right: -2px;
           bottom: -2px;
-          background: linear-gradient(45deg, 
-            transparent 30%, 
-            rgba(255,255,255,0.1) 50%, 
+          background: linear-gradient(
+            45deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.1) 50%,
             transparent 70%
           );
           pointer-events: none;

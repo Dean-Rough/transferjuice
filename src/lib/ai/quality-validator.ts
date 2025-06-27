@@ -5,33 +5,33 @@
 
 // TODO: Fix circular dependency with terry-style
 // import { applyTerryStyle } from '@/lib/terry-style';
-import OpenAI from 'openai';
-import { z } from 'zod';
-import type { ArticleGeneration } from './article-generator';
+import OpenAI from "openai";
+import { z } from "zod";
+import type { ArticleGeneration } from "./article-generator";
 
 // Quality validation schemas
 export const QualityCheckSchema = z.object({
   category: z.enum([
-    'factual_accuracy',
-    'brand_voice',
-    'content_safety',
-    'legal_compliance',
-    'editorial_quality',
-    'accessibility',
+    "factual_accuracy",
+    "brand_voice",
+    "content_safety",
+    "legal_compliance",
+    "editorial_quality",
+    "accessibility",
   ]),
   score: z.number().min(0).max(100),
   passed: z.boolean(),
   issues: z.array(
     z.object({
-      severity: z.enum(['low', 'medium', 'high', 'critical']),
+      severity: z.enum(["low", "medium", "high", "critical"]),
       type: z.string(),
       description: z.string(),
       line: z.number().optional(),
       suggestion: z.string().optional(),
-    })
+    }),
   ),
   checkedAt: z.date(),
-  checker: z.enum(['ai', 'human', 'automated']),
+  checker: z.enum(["ai", "human", "automated"]),
 });
 
 export const ValidationResultSchema = z.object({
@@ -43,10 +43,10 @@ export const ValidationResultSchema = z.object({
   checks: z.array(QualityCheckSchema),
   recommendations: z.array(
     z.object({
-      type: z.enum(['improvement', 'fix_required', 'suggestion']),
+      type: z.enum(["improvement", "fix_required", "suggestion"]),
       description: z.string(),
-      priority: z.enum(['low', 'medium', 'high']),
-    })
+      priority: z.enum(["low", "medium", "high"]),
+    }),
   ),
   validatedAt: z.date(),
   validationTime: z.number(),
@@ -81,29 +81,29 @@ export class ContentQualityValidator {
   private readonly SAFETY_PATTERNS = [
     {
       pattern: /\b(libel|defamation|slander)\b/i,
-      severity: 'critical' as const,
-      description: 'Potential legal issues',
+      severity: "critical" as const,
+      description: "Potential legal issues",
     },
     {
       pattern: /\b(racist|sexist|homophobic)\b/i,
-      severity: 'critical' as const,
-      description: 'Discriminatory language',
+      severity: "critical" as const,
+      description: "Discriminatory language",
     },
     {
       pattern: /\b(fuck|shit|cunt)\b/i,
-      severity: 'medium' as const,
-      description: 'Profanity detected',
+      severity: "medium" as const,
+      description: "Profanity detected",
     },
     {
       pattern: /\$\d+/g,
-      severity: 'low' as const,
-      description: 'Consider using £ for UK audience',
+      severity: "low" as const,
+      description: "Consider using £ for UK audience",
     },
   ];
 
   constructor(config: ValidatorConfig) {
     this.config = {
-      model: 'gpt-4.1',
+      model: "gpt-4.1",
       strictMode: false,
       autoReviewThreshold: 85,
       terryMinimumScore: 75,
@@ -157,7 +157,7 @@ export class ContentQualityValidator {
       // Check if human review is required
       const requiresHumanReview = this.requiresHumanReview(
         checks,
-        overallScore
+        overallScore,
       );
 
       // Extract blockers and warnings
@@ -181,7 +181,7 @@ export class ContentQualityValidator {
       return ValidationResultSchema.parse(result);
     } catch (error) {
       throw new Error(
-        `Content validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Content validation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -190,15 +190,15 @@ export class ContentQualityValidator {
    * Check factual accuracy using AI
    */
   private async checkFactualAccuracy(
-    article: ArticleGeneration
+    article: ArticleGeneration,
   ): Promise<QualityCheck> {
-    const content = article.content.sections.map((s) => s.content).join('\n\n');
+    const content = article.content.sections.map((s) => s.content).join("\n\n");
 
     const response = await this.openai.chat.completions.create({
       model: this.config.model,
       messages: [
         {
-          role: 'system',
+          role: "system",
           content: `You are a fact-checking expert for football transfer news. Check content for factual accuracy.
 
 Return JSON with:
@@ -213,25 +213,25 @@ Focus on:
 - Unverifiable claims`,
         },
         {
-          role: 'user',
+          role: "user",
           content: `Check this transfer article for factual accuracy:\n\n${content}`,
         },
       ],
       max_tokens: 800,
       temperature: 0.2,
-      response_format: { type: 'json_object' },
+      response_format: { type: "json_object" },
     });
 
-    const result = JSON.parse(response.choices[0]?.message?.content || '{}');
+    const result = JSON.parse(response.choices[0]?.message?.content || "{}");
 
     return {
-      category: 'factual_accuracy',
+      category: "factual_accuracy",
       score: result.score || 0,
       passed:
         (result.score || 0) >= this.QUALITY_THRESHOLDS.factualAccuracy.min,
       issues: result.issues || [],
       checkedAt: new Date(),
-      checker: 'ai',
+      checker: "ai",
     };
   }
 
@@ -239,15 +239,15 @@ Focus on:
    * Check brand voice consistency
    */
   private async checkBrandVoice(
-    article: ArticleGeneration
+    article: ArticleGeneration,
   ): Promise<QualityCheck> {
-    const content = article.content.sections.map((s) => s.content).join('\n\n');
+    const content = article.content.sections.map((s) => s.content).join("\n\n");
 
     const response = await this.openai.chat.completions.create({
       model: this.config.model,
       messages: [
         {
-          role: 'system',
+          role: "system",
           content: `You are evaluating content for Terry/Joel Golby brand voice consistency.
 
 Terry's voice characteristics:
@@ -262,24 +262,24 @@ Return JSON with:
 - issues: array of issues where voice is off-brand`,
         },
         {
-          role: 'user',
+          role: "user",
           content: `Evaluate this content for Terry brand voice:\n\n${content}`,
         },
       ],
       max_tokens: 600,
       temperature: 0.3,
-      response_format: { type: 'json_object' },
+      response_format: { type: "json_object" },
     });
 
-    const result = JSON.parse(response.choices[0]?.message?.content || '{}');
+    const result = JSON.parse(response.choices[0]?.message?.content || "{}");
 
     return {
-      category: 'brand_voice',
+      category: "brand_voice",
       score: Math.max(result.score || 0, article.content.terryScore),
       passed: (result.score || 0) >= this.QUALITY_THRESHOLDS.brandVoice.min,
       issues: result.issues || [],
       checkedAt: new Date(),
-      checker: 'ai',
+      checker: "ai",
     };
   }
 
@@ -287,10 +287,10 @@ Return JSON with:
    * Check content safety
    */
   private async checkContentSafety(
-    article: ArticleGeneration
+    article: ArticleGeneration,
   ): Promise<QualityCheck> {
-    const content = article.content.sections.map((s) => s.content).join('\n\n');
-    const issues: QualityCheck['issues'] = [];
+    const content = article.content.sections.map((s) => s.content).join("\n\n");
+    const issues: QualityCheck["issues"] = [];
 
     // Run pattern-based safety checks
     for (const safety of this.SAFETY_PATTERNS) {
@@ -298,9 +298,9 @@ Return JSON with:
       if (matches) {
         issues.push({
           severity: safety.severity,
-          type: 'safety_pattern',
+          type: "safety_pattern",
           description: safety.description,
-          suggestion: 'Review and modify flagged content',
+          suggestion: "Review and modify flagged content",
         });
       }
     }
@@ -310,7 +310,7 @@ Return JSON with:
       model: this.config.model,
       messages: [
         {
-          role: 'system',
+          role: "system",
           content: `Check content for safety issues. Return JSON with:
 - score: 0-100 (safety rating)
 - issues: array of safety concerns
@@ -322,30 +322,30 @@ Check for:
 - Harmful misinformation`,
         },
         {
-          role: 'user',
+          role: "user",
           content: `Safety check this content:\n\n${content}`,
         },
       ],
       max_tokens: 400,
       temperature: 0.1,
-      response_format: { type: 'json_object' },
+      response_format: { type: "json_object" },
     });
 
-    const aiResult = JSON.parse(response.choices[0]?.message?.content || '{}');
+    const aiResult = JSON.parse(response.choices[0]?.message?.content || "{}");
     issues.push(...(aiResult.issues || []));
 
     const score = Math.min(
       aiResult.score || 100,
-      issues.length === 0 ? 100 : 90
+      issues.length === 0 ? 100 : 90,
     );
 
     return {
-      category: 'content_safety',
+      category: "content_safety",
       score,
       passed: score >= this.QUALITY_THRESHOLDS.contentSafety.min,
       issues,
       checkedAt: new Date(),
-      checker: 'ai',
+      checker: "ai",
     };
   }
 
@@ -353,15 +353,15 @@ Check for:
    * Check legal compliance
    */
   private async checkLegalCompliance(
-    article: ArticleGeneration
+    article: ArticleGeneration,
   ): Promise<QualityCheck> {
-    const content = article.content.sections.map((s) => s.content).join('\n\n');
+    const content = article.content.sections.map((s) => s.content).join("\n\n");
 
     const response = await this.openai.chat.completions.create({
       model: this.config.model,
       messages: [
         {
-          role: 'system',
+          role: "system",
           content: `Check content for legal compliance issues. Return JSON with:
 - score: 0-100 (legal safety)
 - issues: array of potential legal issues
@@ -374,25 +374,25 @@ Focus on:
 - Misleading statements`,
         },
         {
-          role: 'user',
+          role: "user",
           content: `Legal compliance check:\n\n${content}`,
         },
       ],
       max_tokens: 500,
       temperature: 0.1,
-      response_format: { type: 'json_object' },
+      response_format: { type: "json_object" },
     });
 
-    const result = JSON.parse(response.choices[0]?.message?.content || '{}');
+    const result = JSON.parse(response.choices[0]?.message?.content || "{}");
 
     return {
-      category: 'legal_compliance',
+      category: "legal_compliance",
       score: result.score || 0,
       passed:
         (result.score || 0) >= this.QUALITY_THRESHOLDS.legalCompliance.min,
       issues: result.issues || [],
       checkedAt: new Date(),
-      checker: 'ai',
+      checker: "ai",
     };
   }
 
@@ -400,55 +400,55 @@ Focus on:
    * Check editorial quality
    */
   private async checkEditorialQuality(
-    article: ArticleGeneration
+    article: ArticleGeneration,
   ): Promise<QualityCheck> {
-    const issues: QualityCheck['issues'] = [];
+    const issues: QualityCheck["issues"] = [];
     let score = 100;
 
     // Basic quality checks
     if (article.content.wordCount < 300) {
       issues.push({
-        severity: 'medium',
-        type: 'length',
-        description: 'Article may be too short for substantive coverage',
-        suggestion: 'Consider adding more detail or context',
+        severity: "medium",
+        type: "length",
+        description: "Article may be too short for substantive coverage",
+        suggestion: "Consider adding more detail or context",
       });
       score -= 15;
     }
 
     if (article.content.wordCount > 1500) {
       issues.push({
-        severity: 'low',
-        type: 'length',
-        description: 'Article may be too long for target audience',
-        suggestion: 'Consider breaking into multiple pieces',
+        severity: "low",
+        type: "length",
+        description: "Article may be too long for target audience",
+        suggestion: "Consider breaking into multiple pieces",
       });
       score -= 5;
     }
 
     // Check section balance
     const sectionLengths = article.content.sections.map(
-      (s) => s.content.length
+      (s) => s.content.length,
     );
     const imbalanced =
       Math.max(...sectionLengths) > Math.min(...sectionLengths) * 3;
     if (imbalanced) {
       issues.push({
-        severity: 'low',
-        type: 'structure',
-        description: 'Sections appear unbalanced in length',
-        suggestion: 'Redistribute content more evenly',
+        severity: "low",
+        type: "structure",
+        description: "Sections appear unbalanced in length",
+        suggestion: "Redistribute content more evenly",
       });
       score -= 10;
     }
 
     return {
-      category: 'editorial_quality',
+      category: "editorial_quality",
       score: Math.max(score, 0),
       passed: score >= this.QUALITY_THRESHOLDS.editorialQuality.min,
       issues,
       checkedAt: new Date(),
-      checker: 'automated',
+      checker: "automated",
     };
   }
 
@@ -456,19 +456,19 @@ Focus on:
    * Check accessibility
    */
   private async checkAccessibility(
-    article: ArticleGeneration
+    article: ArticleGeneration,
   ): Promise<QualityCheck> {
-    const issues: QualityCheck['issues'] = [];
+    const issues: QualityCheck["issues"] = [];
     let score = 100;
 
     // Check readability
     const avgWordsPerSentence = this.calculateAverageWordsPerSentence(article);
     if (avgWordsPerSentence > 25) {
       issues.push({
-        severity: 'medium',
-        type: 'readability',
-        description: 'Sentences may be too long for accessibility',
-        suggestion: 'Break up longer sentences',
+        severity: "medium",
+        type: "readability",
+        description: "Sentences may be too long for accessibility",
+        suggestion: "Break up longer sentences",
       });
       score -= 15;
     }
@@ -476,21 +476,21 @@ Focus on:
     // Check for clear section structure
     if (article.content.sections.length < 3) {
       issues.push({
-        severity: 'low',
-        type: 'structure',
-        description: 'Article could benefit from clearer section structure',
-        suggestion: 'Consider adding subheadings',
+        severity: "low",
+        type: "structure",
+        description: "Article could benefit from clearer section structure",
+        suggestion: "Consider adding subheadings",
       });
       score -= 10;
     }
 
     return {
-      category: 'accessibility',
+      category: "accessibility",
       score: Math.max(score, 0),
       passed: score >= this.QUALITY_THRESHOLDS.accessibility.min,
       issues,
       checkedAt: new Date(),
-      checker: 'automated',
+      checker: "automated",
     };
   }
 
@@ -524,13 +524,13 @@ Focus on:
    */
   private determinePassStatus(
     checks: QualityCheck[],
-    overallScore: number
+    overallScore: number,
   ): boolean {
     // Must pass all critical checks
     const hasCriticalFailures = checks.some(
       (check) =>
         !check.passed &&
-        check.issues.some((issue) => issue.severity === 'critical')
+        check.issues.some((issue) => issue.severity === "critical"),
     );
 
     if (hasCriticalFailures) return false;
@@ -545,11 +545,11 @@ Focus on:
    */
   private requiresHumanReview(
     checks: QualityCheck[],
-    overallScore: number
+    overallScore: number,
   ): boolean {
     // Always require human review for critical issues
     const hasCriticalIssues = checks.some((check) =>
-      check.issues.some((issue) => issue.severity === 'critical')
+      check.issues.some((issue) => issue.severity === "critical"),
     );
 
     if (hasCriticalIssues) return true;
@@ -572,7 +572,7 @@ Focus on:
       for (const issue of check.issues) {
         const message = `${check.category}: ${issue.description}`;
 
-        if (issue.severity === 'critical' || issue.severity === 'high') {
+        if (issue.severity === "critical" || issue.severity === "high") {
           blockers.push(message);
         } else {
           warnings.push(message);
@@ -588,17 +588,17 @@ Focus on:
    */
   private generateRecommendations(
     checks: QualityCheck[],
-    article: ArticleGeneration
-  ): ValidationResult['recommendations'] {
-    const recommendations: ValidationResult['recommendations'] = [];
+    article: ArticleGeneration,
+  ): ValidationResult["recommendations"] {
+    const recommendations: ValidationResult["recommendations"] = [];
 
     // Add recommendations based on check results
     for (const check of checks) {
       if (!check.passed) {
         recommendations.push({
-          type: 'fix_required',
-          description: `Improve ${check.category.replace('_', ' ')} score (currently ${check.score}/100)`,
-          priority: 'high',
+          type: "fix_required",
+          description: `Improve ${check.category.replace("_", " ")} score (currently ${check.score}/100)`,
+          priority: "high",
         });
       }
     }
@@ -606,20 +606,20 @@ Focus on:
     // Terry-specific recommendations
     if (article.content.terryScore < this.config.terryMinimumScore) {
       recommendations.push({
-        type: 'improvement',
+        type: "improvement",
         description:
-          'Enhance Terry voice with more parenthetical asides and specific observations',
-        priority: 'medium',
+          "Enhance Terry voice with more parenthetical asides and specific observations",
+        priority: "medium",
       });
     }
 
     // Quality improvements
     if (article.qualityScore < 90) {
       recommendations.push({
-        type: 'suggestion',
+        type: "suggestion",
         description:
-          'Consider adding more specific details and context to improve overall quality',
-        priority: 'low',
+          "Consider adding more specific details and context to improve overall quality",
+        priority: "low",
       });
     }
 
@@ -630,7 +630,7 @@ Focus on:
    * Calculate average words per sentence
    */
   private calculateAverageWordsPerSentence(article: ArticleGeneration): number {
-    const allText = article.content.sections.map((s) => s.content).join(' ');
+    const allText = article.content.sections.map((s) => s.content).join(" ");
     const sentences = allText
       .split(/[.!?]+/)
       .filter((s) => s.trim().length > 0);
@@ -646,7 +646,7 @@ Focus on:
     try {
       const response = await this.openai.chat.completions.create({
         model: this.config.model,
-        messages: [{ role: 'user', content: 'Test' }],
+        messages: [{ role: "user", content: "Test" }],
         max_tokens: 5,
       });
 
@@ -654,7 +654,7 @@ Focus on:
     } catch (error) {
       return {
         valid: false,
-        error: `Quality validator validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error: `Quality validator validation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       };
     }
   }

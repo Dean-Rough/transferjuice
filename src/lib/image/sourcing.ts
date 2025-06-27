@@ -13,14 +13,14 @@ type TweetMediaInfo = {
   width?: number;
   height?: number;
 };
-import { z } from 'zod';
+import { z } from "zod";
 
 // Image source schemas
 export const TwitterImageSchema = z.object({
   id: z.string(),
   url: z.string().url(),
   altText: z.string().optional(),
-  type: z.enum(['photo', 'video_thumbnail']),
+  type: z.enum(["photo", "video_thumbnail"]),
   width: z.number().optional(),
   height: z.number().optional(),
   tweetId: z.string(),
@@ -42,8 +42,8 @@ export const WikipediaImageSchema = z.object({
 export const ImageSourceSchema = z.object({
   id: z.string(),
   url: z.string().url(),
-  source: z.enum(['twitter', 'wikipedia']),
-  type: z.enum(['player', 'club', 'news', 'celebration']),
+  source: z.enum(["twitter", "wikipedia"]),
+  type: z.enum(["player", "club", "news", "celebration"]),
   title: z.string(),
   altText: z.string(),
   attribution: z.string(),
@@ -59,7 +59,7 @@ export const ImageSourceSchema = z.object({
     relevanceScore: z.number().min(0).max(100),
   }),
   quality: z.object({
-    resolution: z.enum(['low', 'medium', 'high']),
+    resolution: z.enum(["low", "medium", "high"]),
     format: z.string(),
     fileSize: z.number().optional(),
   }),
@@ -108,7 +108,7 @@ export class ImageSourcingService {
 
   constructor(config: ImageSourcingConfig) {
     this.config = {
-      wikipediaApiUrl: 'https://en.wikipedia.org/w/api.php',
+      wikipediaApiUrl: "https://en.wikipedia.org/w/api.php",
       enableCaching: true,
       cacheTtl: 3600000, // 1 hour
       qualityThreshold: 60,
@@ -122,17 +122,17 @@ export class ImageSourcingService {
   async extractTwitterImages(
     mediaInfo: TweetMediaInfo[],
     tweetId: string,
-    authorHandle: string
+    authorHandle: string,
   ): Promise<ImageSource[]> {
     const images: ImageSource[] = [];
 
     for (const media of mediaInfo) {
-      if (media.type === 'photo') {
+      if (media.type === "photo") {
         try {
           const twitterImage = this.processTwitterImage(
             media,
             tweetId,
-            authorHandle
+            authorHandle,
           );
           const imageSource =
             await this.convertTwitterToImageSource(twitterImage);
@@ -144,7 +144,7 @@ export class ImageSourcingService {
     }
 
     return images.filter(
-      (img) => img.metadata.relevanceScore >= this.config.qualityThreshold
+      (img) => img.metadata.relevanceScore >= this.config.qualityThreshold,
     );
   }
 
@@ -153,9 +153,9 @@ export class ImageSourcingService {
    */
   async searchWikipediaImages(
     searchTerms: string[],
-    imageType: ImageSource['type'] = 'player'
+    imageType: ImageSource["type"] = "player",
   ): Promise<ImageSource[]> {
-    const cacheKey = `wiki_${searchTerms.join('_')}_${imageType}`;
+    const cacheKey = `wiki_${searchTerms.join("_")}_${imageType}`;
 
     if (this.config.enableCaching && this.cache.has(cacheKey)) {
       return this.cache.get(cacheKey)!;
@@ -192,15 +192,15 @@ export class ImageSourcingService {
   async findContextualImages(
     playerNames: string[],
     clubNames: string[],
-    transferType: string
+    transferType: string,
   ): Promise<{
     players: ImageSource[];
     clubs: ImageSource[];
     contextual: ImageSource[];
   }> {
     const [playerImages, clubImages, contextualImages] = await Promise.all([
-      this.searchMultipleTerms(playerNames, 'player'),
-      this.searchMultipleTerms(clubNames, 'club'),
+      this.searchMultipleTerms(playerNames, "player"),
+      this.searchMultipleTerms(clubNames, "club"),
       this.searchContextualImages(transferType),
     ]);
 
@@ -217,13 +217,13 @@ export class ImageSourcingService {
   private processTwitterImage(
     media: TweetMediaInfo,
     tweetId: string,
-    authorHandle: string
+    authorHandle: string,
   ): TwitterImage {
     return TwitterImageSchema.parse({
       id: media.media_key,
       url: media.url,
       altText: media.alt_text,
-      type: media.type === 'photo' ? 'photo' : 'video_thumbnail',
+      type: media.type === "photo" ? "photo" : "video_thumbnail",
       width: media.width,
       height: media.height,
       tweetId,
@@ -235,25 +235,25 @@ export class ImageSourcingService {
    * Convert Twitter image to standard ImageSource format
    */
   private async convertTwitterToImageSource(
-    twitterImage: TwitterImage
+    twitterImage: TwitterImage,
   ): Promise<ImageSource> {
     const relevanceScore = this.calculateTwitterRelevance(twitterImage);
     const resolution = this.determineResolution(
       twitterImage.width,
-      twitterImage.height
+      twitterImage.height,
     );
 
     return ImageSourceSchema.parse({
       id: `twitter_${twitterImage.id}`,
       url: twitterImage.url,
-      source: 'twitter',
-      type: 'news',
+      source: "twitter",
+      type: "news",
       title: `Tweet image from @${twitterImage.authorHandle}`,
       altText:
         twitterImage.altText ||
         `Image from tweet by @${twitterImage.authorHandle}`,
       attribution: `@${twitterImage.authorHandle} on Twitter`,
-      license: 'Twitter Terms of Service',
+      license: "Twitter Terms of Service",
       dimensions: {
         width: twitterImage.width || 400,
         height: twitterImage.height || 300,
@@ -276,21 +276,21 @@ export class ImageSourcingService {
    */
   private async searchWikipediaForTerm(
     searchTerm: string,
-    imageType: ImageSource['type']
+    imageType: ImageSource["type"],
   ): Promise<ImageSource[]> {
     const searchUrl = new URL(this.config.wikipediaApiUrl);
-    searchUrl.searchParams.set('action', 'query');
-    searchUrl.searchParams.set('format', 'json');
-    searchUrl.searchParams.set('prop', 'imageinfo');
-    searchUrl.searchParams.set('generator', 'images');
-    searchUrl.searchParams.set('gimlimit', '10');
-    searchUrl.searchParams.set('titles', searchTerm);
-    searchUrl.searchParams.set('iiprop', 'url|size|extmetadata');
-    searchUrl.searchParams.set('origin', '*');
+    searchUrl.searchParams.set("action", "query");
+    searchUrl.searchParams.set("format", "json");
+    searchUrl.searchParams.set("prop", "imageinfo");
+    searchUrl.searchParams.set("generator", "images");
+    searchUrl.searchParams.set("gimlimit", "10");
+    searchUrl.searchParams.set("titles", searchTerm);
+    searchUrl.searchParams.set("iiprop", "url|size|extmetadata");
+    searchUrl.searchParams.set("origin", "*");
 
     const response = await fetch(searchUrl.toString(), {
       headers: {
-        'User-Agent': this.config.userAgent,
+        "User-Agent": this.config.userAgent,
       },
     });
 
@@ -313,11 +313,11 @@ export class ImageSourcingService {
             const wikipediaImage = this.processWikipediaImage(
               imageInfo,
               page.title,
-              searchTerm
+              searchTerm,
             );
             const imageSource = this.convertWikipediaToImageSource(
               wikipediaImage,
-              imageType
+              imageType,
             );
             images.push(imageSource);
           } catch (error) {
@@ -336,17 +336,17 @@ export class ImageSourcingService {
   private processWikipediaImage(
     imageInfo: any,
     title: string,
-    searchTerm: string
+    searchTerm: string,
   ): WikipediaImage {
     const extmetadata = imageInfo.extmetadata || {};
     const description = extmetadata.ImageDescription?.value || title;
-    const license = extmetadata.LicenseShortName?.value || 'CC BY-SA';
-    const attribution = extmetadata.Attribution?.value || 'Wikipedia';
+    const license = extmetadata.LicenseShortName?.value || "CC BY-SA";
+    const attribution = extmetadata.Attribution?.value || "Wikipedia";
 
     const relevanceScore = this.calculateWikipediaRelevance(
       title,
       searchTerm,
-      description
+      description,
     );
 
     return WikipediaImageSchema.parse({
@@ -367,17 +367,17 @@ export class ImageSourcingService {
    */
   private convertWikipediaToImageSource(
     wikipediaImage: WikipediaImage,
-    imageType: ImageSource['type']
+    imageType: ImageSource["type"],
   ): ImageSource {
     const resolution = this.determineResolution(
       wikipediaImage.width,
-      wikipediaImage.height
+      wikipediaImage.height,
     );
 
     return ImageSourceSchema.parse({
       id: `wiki_${this.generateImageId(wikipediaImage.url)}`,
       url: wikipediaImage.url,
-      source: 'wikipedia',
+      source: "wikipedia",
       type: imageType,
       title: wikipediaImage.title,
       altText: wikipediaImage.description,
@@ -404,15 +404,15 @@ export class ImageSourcingService {
    */
   private async searchMultipleTerms(
     terms: string[],
-    imageType: ImageSource['type']
+    imageType: ImageSource["type"],
   ): Promise<ImageSource[]> {
     const allResults = await Promise.allSettled(
-      terms.map((term) => this.searchWikipediaForTerm(term, imageType))
+      terms.map((term) => this.searchWikipediaForTerm(term, imageType)),
     );
 
     const images: ImageSource[] = [];
     for (const result of allResults) {
-      if (result.status === 'fulfilled') {
+      if (result.status === "fulfilled") {
         images.push(...result.value);
       }
     }
@@ -426,19 +426,19 @@ export class ImageSourcingService {
    * Search for contextual images based on transfer type
    */
   private async searchContextualImages(
-    transferType: string
+    transferType: string,
   ): Promise<ImageSource[]> {
     const contextualTerms = {
-      signing: ['football signing', 'contract signing', 'player presentation'],
-      rumour: ['transfer news', 'football speculation'],
-      medical: ['medical test', 'football medical'],
-      agreement: ['handshake', 'agreement'],
+      signing: ["football signing", "contract signing", "player presentation"],
+      rumour: ["transfer news", "football speculation"],
+      medical: ["medical test", "football medical"],
+      agreement: ["handshake", "agreement"],
     };
 
     const terms = contextualTerms[
       transferType as keyof typeof contextualTerms
-    ] || ['football'];
-    return this.searchMultipleTerms(terms, 'news');
+    ] || ["football"];
+    return this.searchMultipleTerms(terms, "news");
   }
 
   /**
@@ -477,7 +477,7 @@ export class ImageSourcingService {
   private calculateWikipediaRelevance(
     title: string,
     searchTerm: string,
-    description: string
+    description: string,
   ): number {
     let score = 30; // Base score
 
@@ -491,9 +491,9 @@ export class ImageSourcingService {
     }
 
     // Partial match in title
-    const searchWords = searchLower.split(' ');
+    const searchWords = searchLower.split(" ");
     const titleMatches = searchWords.filter((word) =>
-      titleLower.includes(word)
+      titleLower.includes(word),
     );
     score += titleMatches.length * 10;
 
@@ -503,15 +503,15 @@ export class ImageSourcingService {
 
     // Bonus for common football terms
     const footballTerms = [
-      'football',
-      'soccer',
-      'premier league',
-      'fc',
-      'united',
-      'city',
+      "football",
+      "soccer",
+      "premier league",
+      "fc",
+      "united",
+      "city",
     ];
     const footballMatches = footballTerms.filter(
-      (term) => titleLower.includes(term) || descLower.includes(term)
+      (term) => titleLower.includes(term) || descLower.includes(term),
     );
     score += footballMatches.length * 5;
 
@@ -523,14 +523,14 @@ export class ImageSourcingService {
    */
   private determineResolution(
     width?: number,
-    height?: number
-  ): 'low' | 'medium' | 'high' {
-    if (!width || !height) return 'medium';
+    height?: number,
+  ): "low" | "medium" | "high" {
+    if (!width || !height) return "medium";
 
     const pixels = width * height;
-    if (pixels >= 1000000) return 'high'; // 1MP+
-    if (pixels >= 300000) return 'medium'; // 300K+
-    return 'low';
+    if (pixels >= 1000000) return "high"; // 1MP+
+    if (pixels >= 300000) return "medium"; // 300K+
+    return "low";
   }
 
   /**
@@ -538,14 +538,14 @@ export class ImageSourcingService {
    */
   private extractFormat(url: string): string {
     const match = url.match(/\.([a-zA-Z0-9]+)(?:\?|$)/);
-    return match ? match[1].toLowerCase() : 'unknown';
+    return match ? match[1].toLowerCase() : "unknown";
   }
 
   /**
    * Generate unique image ID from URL
    */
   private generateImageId(url: string): string {
-    return Buffer.from(url).toString('base64').slice(0, 16);
+    return Buffer.from(url).toString("base64").slice(0, 16);
   }
 
   /**
@@ -553,11 +553,11 @@ export class ImageSourcingService {
    */
   private isKnownItk(handle: string): boolean {
     const knownItks = [
-      'fabrizioromano',
-      'johnnygould',
-      'davidornstein',
-      'jimwhite',
-      'kayajournalist',
+      "fabrizioromano",
+      "johnnygould",
+      "davidornstein",
+      "jimwhite",
+      "kayajournalist",
     ];
     return knownItks.includes(handle.toLowerCase());
   }
@@ -566,7 +566,7 @@ export class ImageSourcingService {
    * Strip HTML tags from text
    */
   private stripHtml(text: string): string {
-    return text.replace(/<[^>]*>/g, '').trim();
+    return text.replace(/<[^>]*>/g, "").trim();
   }
 
   /**

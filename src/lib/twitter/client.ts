@@ -3,10 +3,12 @@
  * Handles authentication, rate limiting, and global ITK source monitoring
  */
 
-import { validateEnvironment } from '@/lib/validations/environment';
-import { TwitterTweetsResponseSchema } from '@/lib/validations/twitter';
-import { z } from 'zod';
-import { applyTerryStyle } from '@/lib/terry-style';
+import { validateEnvironment } from "@/lib/validations/environment";
+import { TwitterTweetsResponseSchema } from "@/lib/validations/twitter";
+import { z } from "zod";
+import { applyTerryStyle } from "@/lib/terry-style";
+import { apifyClient, ApifyTweet } from "@/lib/apify/client";
+import { getHybridTwitterClient, SimplifiedTweet } from "./hybrid-client";
 
 // Twitter API v2 Response Schemas
 export const TwitterUserSchema = z.object({
@@ -26,7 +28,7 @@ export const TwitterUserSchema = z.object({
 // Missing type exports that are referenced elsewhere
 export const TweetMediaInfoSchema = z.object({
   media_key: z.string(),
-  type: z.enum(['photo', 'video', 'gif']),
+  type: z.enum(["photo", "video", "gif"]),
   url: z.string().optional(),
   preview_image_url: z.string().optional(),
   alt_text: z.string().optional(),
@@ -50,7 +52,7 @@ export const TwitterTweetSchema = z.object({
           id: z.string(),
           name: z.string(),
         }),
-      })
+      }),
     )
     .optional(),
   public_metrics: z.object({
@@ -70,7 +72,7 @@ export const TwitterTweetSchema = z.object({
       z.object({
         type: z.string(),
         id: z.string(),
-      })
+      }),
     )
     .optional(),
 });
@@ -87,7 +89,7 @@ export const TwitterTimelineResponseSchema = z.object({
             type: z.string(),
             url: z.string().optional(),
             preview_image_url: z.string().optional(),
-          })
+          }),
         )
         .optional(),
     })
@@ -104,7 +106,7 @@ export const TwitterTimelineResponseSchema = z.object({
         title: z.string(),
         detail: z.string(),
         type: z.string(),
-      })
+      }),
     )
     .optional(),
 });
@@ -128,6 +130,7 @@ interface TwitterClientConfig {
   defaultMaxResults?: number;
   retryAttempts?: number;
   retryDelay?: number;
+  useApifyFallback?: boolean;
 }
 
 export class TwitterAPIError extends Error {
@@ -135,20 +138,20 @@ export class TwitterAPIError extends Error {
     message: string,
     public statusCode?: number,
     public errorType?: string,
-    public details?: unknown
+    public details?: unknown,
   ) {
     super(message);
-    this.name = 'TwitterAPIError';
+    this.name = "TwitterAPIError";
   }
 }
 
 export class TwitterRateLimitError extends TwitterAPIError {
   constructor(
     message: string,
-    public resetTime: number
+    public resetTime: number,
   ) {
-    super(message, 429, 'rate_limit_exceeded');
-    this.name = 'TwitterRateLimitError';
+    super(message, 429, "rate_limit_exceeded");
+    this.name = "TwitterRateLimitError";
   }
 }
 
@@ -159,13 +162,32 @@ export class TwitterClient {
   private retryAttempts: number;
   private retryDelay: number;
   private rateLimits: Map<string, RateLimitInfo> = new Map();
+  private static instance: TwitterClient | null = null;
+  private useApifyFallback: boolean;
+  private hybridClient = getHybridTwitterClient();
+  private useHybridMode: boolean;
 
   constructor(config: TwitterClientConfig) {
-    this.baseUrl = config.baseUrl || 'https://api.twitter.com/2';
+    this.baseUrl = config.baseUrl || "https://api.twitter.com/2";
     this.bearerToken = config.bearerToken;
     this.defaultMaxResults = config.defaultMaxResults || 100;
     this.retryAttempts = config.retryAttempts || 3;
     this.retryDelay = config.retryDelay || 1000;
+    this.useApifyFallback = config.useApifyFallback ?? true;
+    this.useHybridMode = process.env.USE_HYBRID_TWITTER === "true";
+  }
+
+  /**
+   * Get singleton instance
+   */
+  static getInstance(): TwitterClient {
+    if (!TwitterClient.instance) {
+      const env = validateEnvironment();
+      TwitterClient.instance = new TwitterClient({
+        bearerToken: env.TWITTER_BEARER_TOKEN,
+      });
+    }
+    return TwitterClient.instance;
   }
 
   /**
@@ -180,7 +202,7 @@ export class TwitterClient {
       const waitTime = rateLimitInfo.reset - now;
       throw new TwitterRateLimitError(
         `Rate limit exceeded for ${endpoint}. Reset in ${waitTime} seconds.`,
-        rateLimitInfo.reset
+        rateLimitInfo.reset,
       );
     }
   }
@@ -189,9 +211,9 @@ export class TwitterClient {
    * Update rate limit information from response headers
    */
   private updateRateLimit(endpoint: string, headers: Headers): void {
-    const limit = parseInt(headers.get('x-rate-limit-limit') || '0');
-    const remaining = parseInt(headers.get('x-rate-limit-remaining') || '0');
-    const reset = parseInt(headers.get('x-rate-limit-reset') || '0');
+    const limit = parseInt(headers.get("x-rate-limit-limit") || "0");
+    const remaining = parseInt(headers.get("x-rate-limit-remaining") || "0");
+    const reset = parseInt(headers.get("x-rate-limit-reset") || "0");
 
     if (limit > 0) {
       this.rateLimits.set(endpoint, { limit, remaining, reset });
@@ -203,7 +225,7 @@ export class TwitterClient {
    */
   private async makeRequest(
     endpoint: string,
-    params: Record<string, string> = {}
+    params: Record<string, string> = {},
   ): Promise<Response> {
     this.checkRateLimit(endpoint);
 
@@ -219,7 +241,7 @@ export class TwitterClient {
         const response = await fetch(url.toString(), {
           headers: {
             Authorization: `Bearer ${this.bearerToken}`,
-            'User-Agent': 'TransferJuice/1.0',
+            "User-Agent": "TransferJuice/1.0",
           },
         });
 
@@ -229,11 +251,11 @@ export class TwitterClient {
         if (!response.ok) {
           if (response.status === 429) {
             const resetTime = parseInt(
-              response.headers.get('x-rate-limit-reset') || '0'
+              response.headers.get("x-rate-limit-reset") || "0",
             );
             throw new TwitterRateLimitError(
-              'Hit the Twitter rate limit like a proper muppet',
-              resetTime
+              "Hit the Twitter rate limit like a proper muppet",
+              resetTime,
             );
           }
 
@@ -242,7 +264,7 @@ export class TwitterClient {
             `Twitter API responded with ${response.status}: ${errorData.detail || response.statusText}`,
             response.status,
             errorData.type,
-            errorData
+            errorData,
           );
         }
 
@@ -266,17 +288,17 @@ export class TwitterClient {
 
         if (attempt < this.retryAttempts) {
           console.warn(
-            `Attempt ${attempt} failed, retrying in ${this.retryDelay}ms: ${error instanceof Error ? error.message : 'Unknown error'}`
+            `Attempt ${attempt} failed, retrying in ${this.retryDelay}ms: ${error instanceof Error ? error.message : "Unknown error"}`,
           );
           await new Promise((resolve) =>
-            setTimeout(resolve, this.retryDelay * attempt)
+            setTimeout(resolve, this.retryDelay * attempt),
           );
         }
       }
     }
 
     throw new TwitterAPIError(
-      `Failed to make request after ${this.retryAttempts} attempts: ${lastError?.message}`
+      `Failed to make request after ${this.retryAttempts} attempts: ${lastError?.message}`,
     );
   }
 
@@ -291,32 +313,33 @@ export class TwitterClient {
       untilId?: string;
       startTime?: string;
       endTime?: string;
-    } = {}
+      username?: string; // For Apify fallback
+    } = {},
   ): Promise<TwitterTimelineResponse> {
     const params: Record<string, string> = {
       max_results: (options.maxResults || this.defaultMaxResults).toString(),
-      'tweet.fields': [
-        'id',
-        'text',
-        'author_id',
-        'created_at',
-        'context_annotations',
-        'public_metrics',
-        'attachments',
-        'lang',
-        'referenced_tweets',
-      ].join(','),
-      'user.fields': [
-        'id',
-        'username',
-        'name',
-        'verified',
-        'public_metrics',
-      ].join(','),
-      'media.fields': ['media_key', 'type', 'url', 'preview_image_url'].join(
-        ','
+      "tweet.fields": [
+        "id",
+        "text",
+        "author_id",
+        "created_at",
+        "context_annotations",
+        "public_metrics",
+        "attachments",
+        "lang",
+        "referenced_tweets",
+      ].join(","),
+      "user.fields": [
+        "id",
+        "username",
+        "name",
+        "verified",
+        "public_metrics",
+      ].join(","),
+      "media.fields": ["media_key", "type", "url", "preview_image_url"].join(
+        ",",
       ),
-      expansions: 'author_id,attachments.media_keys',
+      expansions: "author_id,attachments.media_keys",
     };
 
     if (options.sinceId) params.since_id = options.sinceId;
@@ -327,17 +350,29 @@ export class TwitterClient {
     try {
       const response = await this.makeRequest(
         `/users/${userId}/tweets`,
-        params
+        params,
       );
       const data = await response.json();
 
       return TwitterTimelineResponseSchema.parse(data);
     } catch (error) {
+      // If rate limited and Apify fallback is enabled, use Apify
+      if (
+        error instanceof TwitterRateLimitError &&
+        this.useApifyFallback &&
+        options.username
+      ) {
+        console.log(
+          `[Twitter] Rate limited, falling back to Apify for @${options.username}`,
+        );
+        return this.getUserTimelineViaApify(options.username, options);
+      }
+
       if (error instanceof z.ZodError) {
         throw new TwitterAPIError(
           applyTerryStyle.enhanceError(
-            `Twitter API returned unexpected data structure: ${error.errors.map((e) => e.message).join(', ')}`
-          )
+            `Twitter API returned unexpected data structure: ${error.errors.map((e) => e.message).join(", ")}`,
+          ),
         );
       }
       throw error;
@@ -349,27 +384,27 @@ export class TwitterClient {
    */
   async getUserByUsername(username: string): Promise<TwitterUser> {
     const params = {
-      'user.fields': [
-        'id',
-        'username',
-        'name',
-        'verified',
-        'public_metrics',
-      ].join(','),
+      "user.fields": [
+        "id",
+        "username",
+        "name",
+        "verified",
+        "public_metrics",
+      ].join(","),
     };
 
     try {
       const response = await this.makeRequest(
         `/users/by/username/${username}`,
-        params
+        params,
       );
       const data = await response.json();
 
       if (!data.data) {
         throw new TwitterAPIError(
           applyTerryStyle.enhanceError(
-            `User @${username} not found or account is private`
-          )
+            `User @${username} not found or account is private`,
+          ),
         );
       }
 
@@ -378,8 +413,8 @@ export class TwitterClient {
       if (error instanceof z.ZodError) {
         throw new TwitterAPIError(
           applyTerryStyle.enhanceError(
-            `Invalid user data from Twitter API: ${error.message}`
-          )
+            `Invalid user data from Twitter API: ${error.message}`,
+          ),
         );
       }
       throw error;
@@ -410,8 +445,8 @@ export class TwitterClient {
     if (waitTime > 0) {
       console.log(
         applyTerryStyle.enhanceMessage(
-          `Waiting ${waitTime} seconds for rate limit reset on ${endpoint}`
-        )
+          `Waiting ${waitTime} seconds for rate limit reset on ${endpoint}`,
+        ),
       );
       await new Promise((resolve) => setTimeout(resolve, waitTime * 1000));
     }
@@ -424,16 +459,247 @@ export class TwitterClient {
     const errors: string[] = [];
 
     if (!this.bearerToken) {
-      errors.push('Bearer token is required');
+      errors.push("Bearer token is required");
     }
 
-    if (!this.bearerToken.startsWith('AAAAAAA')) {
-      errors.push('Bearer token appears to be invalid format');
+    if (!this.bearerToken.startsWith("AAAAAAA")) {
+      errors.push("Bearer token appears to be invalid format");
     }
 
     return {
       valid: errors.length === 0,
       errors: errors.map((error) => applyTerryStyle.enhanceError(error)),
     };
+  }
+
+  /**
+   * Get user timeline via Apify fallback
+   */
+  private async getUserTimelineViaApify(
+    username: string,
+    options: {
+      maxResults?: number;
+      sinceId?: string;
+    } = {},
+  ): Promise<TwitterTimelineResponse> {
+    try {
+      const tweets = await apifyClient.fetchUserTweets(username, {
+        maxItems: options.maxResults || this.defaultMaxResults,
+        sinceId: options.sinceId,
+      });
+
+      // Transform Apify tweets to Twitter API format
+      const transformedTweets: TwitterTweet[] = tweets.map((tweet) => ({
+        id: tweet.id,
+        text: tweet.text,
+        author_id: username, // We don't have the actual ID from Apify
+        created_at: tweet.createdAt,
+        context_annotations: undefined,
+        public_metrics: {
+          retweet_count: tweet.metrics?.retweetCount || 0,
+          like_count: tweet.metrics?.likeCount || 0,
+          reply_count: tweet.metrics?.replyCount || 0,
+          quote_count: 0, // Apify doesn't provide this
+        },
+        attachments: undefined, // TODO: Map media if needed
+        lang: undefined,
+        referenced_tweets: undefined,
+      }));
+
+      // Create Twitter API compatible response
+      const response: TwitterTimelineResponse = {
+        data: transformedTweets.length > 0 ? transformedTweets : undefined,
+        includes: {
+          users: [
+            {
+              id: username, // Use username as ID for now
+              username: username,
+              name: tweets[0]?.author.displayName || username,
+              verified: false,
+              profile_image_url: tweets[0]?.author.profileImageUrl,
+              description: undefined,
+              public_metrics: {
+                followers_count: 0,
+                following_count: 0,
+                tweet_count: 0,
+              },
+            },
+          ],
+        },
+        meta: {
+          result_count: transformedTweets.length,
+          newest_id: transformedTweets[0]?.id,
+          oldest_id: transformedTweets[transformedTweets.length - 1]?.id,
+        },
+      };
+
+      return response;
+    } catch (error) {
+      console.error(`[Apify] Failed to fetch tweets for @${username}:`, error);
+      throw new TwitterAPIError(
+        `Failed to fetch tweets via Apify: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    }
+  }
+
+  /**
+   * Batch fetch multiple users' timelines
+   */
+  async batchGetUserTimelines(
+    users: Array<{ id: string; username: string }>,
+    options: {
+      maxResults?: number;
+      sinceId?: string;
+    } = {},
+  ): Promise<Map<string, TwitterTimelineResponse>> {
+    const results = new Map<string, TwitterTimelineResponse>();
+
+    // Try Twitter API first for all users
+    const rateLimitedUsers: Array<{ id: string; username: string }> = [];
+
+    for (const user of users) {
+      try {
+        const timeline = await this.getUserTimeline(user.id, {
+          ...options,
+          username: user.username,
+        });
+        results.set(user.username, timeline);
+      } catch (error) {
+        if (error instanceof TwitterRateLimitError) {
+          rateLimitedUsers.push(user);
+        } else {
+          console.error(
+            `Failed to fetch timeline for @${user.username}:`,
+            error,
+          );
+        }
+      }
+    }
+
+    // If we have rate limited users and Apify is enabled, batch fetch them
+    if (rateLimitedUsers.length > 0 && this.useApifyFallback) {
+      console.log(
+        `[Twitter] Fetching ${rateLimitedUsers.length} rate-limited users via Apify`,
+      );
+
+      try {
+        const usernames = rateLimitedUsers.map((u) => u.username);
+        const apifyResults = await apifyClient.fetchMultipleUsersTweets(
+          usernames,
+          {
+            maxItemsPerUser: options.maxResults || this.defaultMaxResults,
+          },
+        );
+
+        // Transform and add to results
+        for (const [username, tweets] of Object.entries(apifyResults)) {
+          const user = rateLimitedUsers.find(
+            (u) => u.username.toLowerCase() === username,
+          );
+          if (user) {
+            results.set(
+              user.username,
+              this.transformApifyToTwitterResponse(tweets, user.username),
+            );
+          }
+        }
+      } catch (error) {
+        console.error("[Apify] Batch fetch failed:", error);
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Transform Apify tweets to Twitter API response format
+   */
+  private transformApifyToTwitterResponse(
+    tweets: ApifyTweet[],
+    username: string,
+  ): TwitterTimelineResponse {
+    const transformedTweets: TwitterTweet[] = tweets.map((tweet) => ({
+      id: tweet.id,
+      text: tweet.text,
+      author_id: username,
+      created_at: tweet.createdAt,
+      context_annotations: undefined,
+      public_metrics: {
+        retweet_count: tweet.metrics?.retweetCount || 0,
+        like_count: tweet.metrics?.likeCount || 0,
+        reply_count: tweet.metrics?.replyCount || 0,
+        quote_count: 0,
+      },
+      attachments: undefined,
+      lang: undefined,
+      referenced_tweets: undefined,
+    }));
+
+    return {
+      data: transformedTweets.length > 0 ? transformedTweets : undefined,
+      includes: {
+        users: [
+          {
+            id: username,
+            username: username,
+            name: tweets[0]?.author.displayName || username,
+            verified: false,
+            profile_image_url: tweets[0]?.author.profileImageUrl,
+            description: undefined,
+            public_metrics: {
+              followers_count: 0,
+              following_count: 0,
+              tweet_count: 0,
+            },
+          },
+        ],
+      },
+      meta: {
+        result_count: transformedTweets.length,
+        newest_id: transformedTweets[0]?.id,
+        oldest_id: transformedTweets[transformedTweets.length - 1]?.id,
+      },
+    };
+  }
+
+  /**
+   * Get user tweets using hybrid approach (scraper + API fallback)
+   */
+  async getUserTweetsHybrid(
+    username: string,
+    limit = 20,
+  ): Promise<SimplifiedTweet[]> {
+    if (!this.useHybridMode) {
+      // Use traditional API approach if hybrid mode is disabled
+      const user = await this.getUserByUsername(username);
+      const timeline = await this.getUserTimeline(user.id, {
+        maxResults: limit,
+        username: username,
+      });
+
+      // Convert to simplified format
+      return (timeline.data || []).map((tweet) => ({
+        id: tweet.id,
+        text: tweet.text,
+        media: [], // Would need to map from includes
+        replies: tweet.public_metrics.reply_count,
+        createdAt: new Date(tweet.created_at),
+        author: {
+          username: username,
+          name: user.name,
+          verified: user.verified,
+        },
+      }));
+    }
+
+    // Use hybrid client
+    return await this.hybridClient.getUserTweets(username, limit);
+  }
+
+  /**
+   * Get hybrid client status
+   */
+  getHybridStatus() {
+    return this.hybridClient.getStatus();
   }
 }

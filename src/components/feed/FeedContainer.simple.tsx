@@ -1,33 +1,40 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 export function FeedContainer() {
   const [items] = useState([
     {
-      id: '1',
-      content: '🎉 BREAKING: Fresh TransferJuice build is working! The Terry has successfully escaped the webpack haunted house.',
+      id: "1",
+      content:
+        "🎉 BREAKING: Fresh TransferJuice build is working! The Terry has successfully escaped the webpack haunted house.",
       timestamp: new Date(),
-      source: { name: 'The Terry', tier: 1 as const, reliability: 1 },
-      tags: { clubs: ['TransferJuice FC'], players: ['webpack'], sources: ['The Terry'] },
-      metadata: { priority: 'breaking' as const, relevanceScore: 1 }
+      source: { name: "The Terry", tier: 1 as const, reliability: 1 },
+      tags: {
+        clubs: ["TransferJuice FC"],
+        players: ["webpack"],
+        sources: ["The Terry"],
+      },
+      metadata: { priority: "breaking" as const, relevanceScore: 1 },
     },
     {
-      id: '2', 
-      content: '✅ Next.js 14.2.3 confirmed working without cursed webpack errors. No more "Cannot read properties of undefined" madness.',
+      id: "2",
+      content:
+        '✅ Next.js 14.2.3 confirmed working without cursed webpack errors. No more "Cannot read properties of undefined" madness.',
       timestamp: new Date(Date.now() - 300000),
-      source: { name: 'Development Team', tier: 1 as const, reliability: 0.95 },
-      tags: { clubs: ['Next.js'], players: ['webpack'], sources: ['Dev Team'] },
-      metadata: { priority: 'high' as const, relevanceScore: 0.9 }
+      source: { name: "Development Team", tier: 1 as const, reliability: 0.95 },
+      tags: { clubs: ["Next.js"], players: ["webpack"], sources: ["Dev Team"] },
+      metadata: { priority: "high" as const, relevanceScore: 0.9 },
     },
     {
-      id: '3',
-      content: '🔧 Fresh project setup complete with Tailwind CSS, Prisma, and all essential dependencies. Ready for the real feed implementation.',
+      id: "3",
+      content:
+        "🔧 Fresh project setup complete with Tailwind CSS, Prisma, and all essential dependencies. Ready for the real feed implementation.",
       timestamp: new Date(Date.now() - 600000),
-      source: { name: 'System', tier: 2 as const, reliability: 0.9 },
-      tags: { clubs: ['Tailwind'], players: ['Prisma'], sources: ['System'] },
-      metadata: { priority: 'medium' as const, relevanceScore: 0.8 }
-    }
+      source: { name: "System", tier: 2 as const, reliability: 0.9 },
+      tags: { clubs: ["Tailwind"], players: ["Prisma"], sources: ["System"] },
+      metadata: { priority: "medium" as const, relevanceScore: 0.8 },
+    },
   ]);
 
   return (
@@ -46,7 +53,7 @@ export function FeedContainer() {
 
       <div className="space-y-6">
         {items.map((item) => (
-          <div 
+          <div
             key={item.id}
             className="bg-card border border-border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
           >
@@ -55,11 +62,15 @@ export function FeedContainer() {
                 <div className="font-semibold text-foreground">
                   {item.source.name}
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-mono ${
-                  item.metadata.priority === 'breaking' ? 'bg-red-600 text-white' :
-                  item.metadata.priority === 'high' ? 'bg-orange-600 text-white' :
-                  'bg-gray-600 text-white'
-                }`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-mono ${
+                    item.metadata.priority === "breaking"
+                      ? "bg-red-600 text-white"
+                      : item.metadata.priority === "high"
+                        ? "bg-orange-600 text-white"
+                        : "bg-gray-600 text-white"
+                  }`}
+                >
                   {item.metadata.priority.toUpperCase()}
                 </span>
               </div>
@@ -72,12 +83,18 @@ export function FeedContainer() {
             </p>
             <div className="flex flex-wrap gap-2">
               {item.tags.clubs.map((club, i) => (
-                <span key={i} className="px-3 py-1 bg-orange-600 text-white text-xs rounded-full font-mono">
+                <span
+                  key={i}
+                  className="px-3 py-1 bg-orange-600 text-white text-xs rounded-full font-mono"
+                >
                   #{club}
                 </span>
               ))}
               {item.tags.players.map((player, i) => (
-                <span key={i} className="px-3 py-1 bg-green-600 text-white text-xs rounded-full font-mono">
+                <span
+                  key={i}
+                  className="px-3 py-1 bg-green-600 text-white text-xs rounded-full font-mono"
+                >
                   @{player}
                 </span>
               ))}
@@ -87,7 +104,9 @@ export function FeedContainer() {
       </div>
 
       <div className="mt-8 p-4 bg-card border border-border rounded-lg">
-        <h3 className="text-lg font-semibold text-foreground mb-2">✅ Status: OPERATIONAL</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">
+          ✅ Status: OPERATIONAL
+        </h3>
         <ul className="text-sm text-muted-foreground space-y-1">
           <li>• Fresh Next.js 14.2.3 build working</li>
           <li>• Webpack errors eliminated</li>

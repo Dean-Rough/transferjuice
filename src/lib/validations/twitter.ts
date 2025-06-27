@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Twitter API v2 Response Schemas
@@ -36,7 +36,7 @@ export const TwitterEntitiesSchema = z.object({
         start: z.number(),
         end: z.number(),
         tag: z.string(),
-      })
+      }),
     )
     .optional(),
   mentions: z
@@ -46,7 +46,7 @@ export const TwitterEntitiesSchema = z.object({
         end: z.number(),
         username: z.string(),
         id: z.string(),
-      })
+      }),
     )
     .optional(),
   urls: z
@@ -61,7 +61,7 @@ export const TwitterEntitiesSchema = z.object({
         title: z.string().optional(),
         description: z.string().optional(),
         unwound_url: z.string().url().optional(),
-      })
+      }),
     )
     .optional(),
   annotations: z
@@ -72,7 +72,7 @@ export const TwitterEntitiesSchema = z.object({
         probability: z.number().min(0).max(1),
         type: z.string(),
         normalized_text: z.string().optional(),
-      })
+      }),
     )
     .optional(),
 });
@@ -98,9 +98,9 @@ export const TwitterTweetSchema = z.object({
   referenced_tweets: z
     .array(
       z.object({
-        type: z.enum(['retweeted', 'quoted', 'replied_to']),
+        type: z.enum(["retweeted", "quoted", "replied_to"]),
         id: z.string(),
-      })
+      }),
     )
     .optional(),
   attachments: TwitterAttachmentsSchema.optional(),
@@ -117,7 +117,7 @@ export const TwitterTweetSchema = z.object({
           name: z.string(),
           description: z.string().optional(),
         }),
-      })
+      }),
     )
     .optional(),
   entities: TwitterEntitiesSchema.optional(),
@@ -125,7 +125,7 @@ export const TwitterTweetSchema = z.object({
     .object({
       coordinates: z
         .object({
-          type: z.literal('Point'),
+          type: z.literal("Point"),
           coordinates: z.array(z.number()).length(2),
         })
         .optional(),
@@ -136,14 +136,14 @@ export const TwitterTweetSchema = z.object({
   possibly_sensitive: z.boolean().optional(),
   public_metrics: TwitterPublicMetricsSchema.optional(),
   reply_settings: z
-    .enum(['everyone', 'mentionedUsers', 'following'])
+    .enum(["everyone", "mentionedUsers", "following"])
     .optional(),
   source: z.string().optional(),
   withheld: z
     .object({
       copyright: z.boolean().optional(),
       country_codes: z.array(z.string().length(2)).optional(),
-      scope: z.enum(['tweet', 'user']).optional(),
+      scope: z.enum(["tweet", "user"]).optional(),
     })
     .optional(),
 });
@@ -151,7 +151,7 @@ export const TwitterTweetSchema = z.object({
 // Twitter Media Schema
 export const TwitterMediaSchema = z.object({
   media_key: z.string(),
-  type: z.enum(['photo', 'video', 'animated_gif']),
+  type: z.enum(["photo", "video", "animated_gif"]),
   url: z.string().url().optional(),
   duration_ms: z.number().min(0).optional(),
   height: z.number().min(1).optional(),
@@ -169,7 +169,7 @@ export const TwitterMediaSchema = z.object({
         bit_rate: z.number().min(0).optional(),
         content_type: z.string(),
         url: z.string().url(),
-      })
+      }),
     )
     .optional(),
 });
@@ -193,7 +193,7 @@ export const TwitterUsersResponseSchema = z.object({
         parameter: z.string().optional(),
         resource_id: z.string().optional(),
         type: z.string().url().optional(),
-      })
+      }),
     )
     .optional(),
   meta: z
@@ -225,7 +225,7 @@ export const TwitterTweetsResponseSchema = z.object({
         parameter: z.string().optional(),
         resource_id: z.string().optional(),
         type: z.string().url().optional(),
-      })
+      }),
     )
     .optional(),
   meta: z
@@ -252,16 +252,16 @@ export const TransferRelevanceSchema = z.object({
   }),
   transferType: z
     .enum([
-      'rumour',
-      'confirmed',
-      'medical',
-      'contract',
-      'loan',
-      'release',
-      'denial',
+      "rumour",
+      "confirmed",
+      "medical",
+      "contract",
+      "loan",
+      "release",
+      "denial",
     ])
     .optional(),
-  priority: z.enum(['low', 'medium', 'high', 'urgent']),
+  priority: z.enum(["low", "medium", "high", "urgent"]),
 });
 
 // Processed Tweet Schema (internal)

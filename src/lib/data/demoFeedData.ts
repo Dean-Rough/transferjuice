@@ -3,28 +3,28 @@
  * Sample transfer feed items for development and demonstration
  */
 
-import { type FeedItem } from '@/lib/stores/feedStore';
+import { type FeedItem } from "@/lib/stores/feedStore";
 
 export const DEMO_FEED_DATA: FeedItem[] = [
   {
-    id: 'demo-1',
-    type: 'breaking',
+    id: "demo-1",
+    type: "breaking",
     timestamp: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
     content:
-      '🚨 BREAKING: Arsenal agree €65M fee for Declan Rice! Medical scheduled for tomorrow. Personal terms already agreed. Here we go! ✅',
+      "🚨 BREAKING: Arsenal agree €65M fee for Declan Rice! Medical scheduled for tomorrow. Personal terms already agreed. Here we go! ✅",
     terryCommentary:
-      'Right, Arsenal spending €65M on Declan Rice is either genius or the most expensive way to disappoint their fanbase.',
+      "Right, Arsenal spending €65M on Declan Rice is either genius or the most expensive way to disappoint their fanbase.",
     source: {
-      name: 'Fabrizio Romano',
-      handle: '@FabrizioRomano',
+      name: "Fabrizio Romano",
+      handle: "@FabrizioRomano",
       tier: 1,
       reliability: 0.95,
-      region: 'GLOBAL',
+      region: "GLOBAL",
     },
     tags: {
-      clubs: ['Arsenal'],
-      players: ['Declan Rice'],
-      sources: ['Fabrizio Romano'],
+      clubs: ["Arsenal"],
+      players: ["Declan Rice"],
+      sources: ["Fabrizio Romano"],
     },
     engagement: {
       shares: 847,
@@ -32,31 +32,31 @@ export const DEMO_FEED_DATA: FeedItem[] = [
       clicks: 156,
     },
     metadata: {
-      transferType: 'confirmed',
-      priority: 'breaking',
+      transferType: "confirmed",
+      priority: "breaking",
       relevanceScore: 0.95,
-      league: 'PL',
+      league: "PL",
     },
   },
   {
-    id: 'demo-2',
-    type: 'itk',
+    id: "demo-2",
+    type: "itk",
     timestamp: new Date(Date.now() - 32 * 60 * 1000), // 32 minutes ago
     content:
-      'Personal terms agreed between Kylian Mbappé and Real Madrid. Club-to-club negotiations ongoing for final fee structure. Deal expected to be completed within 48-72 hours.',
+      "Personal terms agreed between Kylian Mbappé and Real Madrid. Club-to-club negotiations ongoing for final fee structure. Deal expected to be completed within 48-72 hours.",
     terryCommentary:
-      'When David Ornstein says something, football Twitter collectively holds its breath. Kylian Mbappé to Real Madrid is as good as done.',
+      "When David Ornstein says something, football Twitter collectively holds its breath. Kylian Mbappé to Real Madrid is as good as done.",
     source: {
-      name: 'David Ornstein',
-      handle: '@David_Ornstein',
+      name: "David Ornstein",
+      handle: "@David_Ornstein",
       tier: 1,
       reliability: 0.93,
-      region: 'UK',
+      region: "UK",
     },
     tags: {
-      clubs: ['Real Madrid'],
-      players: ['Kylian Mbappé'],
-      sources: ['David Ornstein'],
+      clubs: ["Real Madrid"],
+      players: ["Kylian Mbappé"],
+      sources: ["David Ornstein"],
     },
     engagement: {
       shares: 623,
@@ -64,31 +64,31 @@ export const DEMO_FEED_DATA: FeedItem[] = [
       clicks: 89,
     },
     metadata: {
-      transferType: 'personal_terms',
-      priority: 'high',
+      transferType: "personal_terms",
+      priority: "high",
       relevanceScore: 0.91,
-      league: 'LaLiga',
+      league: "LaLiga",
     },
   },
   {
-    id: 'demo-3',
-    type: 'itk',
+    id: "demo-3",
+    type: "itk",
     timestamp: new Date(Date.now() - 45 * 60 * 1000), // 45 minutes ago
     content:
-      'UFFICIALE: Juventus confermato accordo per Victor Osimhen! Visite mediche programmate per domani mattina. Contratto di 5 anni. 🇳🇬⚫⚪',
+      "UFFICIALE: Juventus confermato accordo per Victor Osimhen! Visite mediche programmate per domani mattina. Contratto di 5 anni. 🇳🇬⚫⚪",
     terryCommentary:
-      'Gianluca Di Marzio with the Italian exclusive. Victor Osimhen to Juventus because apparently Serie A needed more drama.',
+      "Gianluca Di Marzio with the Italian exclusive. Victor Osimhen to Juventus because apparently Serie A needed more drama.",
     source: {
-      name: 'Gianluca Di Marzio',
-      handle: '@DiMarzio',
+      name: "Gianluca Di Marzio",
+      handle: "@DiMarzio",
       tier: 1,
       reliability: 0.9,
-      region: 'IT',
+      region: "IT",
     },
     tags: {
-      clubs: ['Juventus'],
-      players: ['Victor Osimhen'],
-      sources: ['Gianluca Di Marzio'],
+      clubs: ["Juventus"],
+      players: ["Victor Osimhen"],
+      sources: ["Gianluca Di Marzio"],
     },
     engagement: {
       shares: 445,
@@ -96,30 +96,30 @@ export const DEMO_FEED_DATA: FeedItem[] = [
       clicks: 67,
     },
     metadata: {
-      transferType: 'confirmed',
-      priority: 'high',
+      transferType: "confirmed",
+      priority: "high",
       relevanceScore: 0.87,
-      league: 'SerieA',
+      league: "SerieA",
     },
   },
   {
-    id: 'demo-4',
-    type: 'partner',
+    id: "demo-4",
+    type: "partner",
     timestamp: new Date(Date.now() - 65 * 60 * 1000), // 1 hour 5 minutes ago
     content:
       "Tactical Analysis: How Arsenal's transfer strategy is shaping their season. Deep dive into Arsenal's recent transfer decisions and their tactical implications for the upcoming matches.",
     terryCommentary:
       'Quality content from The Upshot to fill the void between "Here we go!" announcements.',
     source: {
-      name: 'The Upshot',
+      name: "The Upshot",
       tier: 2,
       reliability: 0.88,
-      region: 'UK',
+      region: "UK",
     },
     tags: {
-      clubs: ['Arsenal'],
+      clubs: ["Arsenal"],
       players: [],
-      sources: ['The Upshot'],
+      sources: ["The Upshot"],
     },
     engagement: {
       shares: 89,
@@ -127,32 +127,32 @@ export const DEMO_FEED_DATA: FeedItem[] = [
       clicks: 145,
     },
     metadata: {
-      priority: 'medium',
+      priority: "medium",
       relevanceScore: 0.75,
-      league: 'PL',
+      league: "PL",
       attribution:
-        'Originally published by The Upshot - https://www.theupshot.co.uk',
+        "Originally published by The Upshot - https://www.theupshot.co.uk",
       originalUrl:
-        'https://www.theupshot.co.uk/article/arsenal-transfer-strategy',
+        "https://www.theupshot.co.uk/article/arsenal-transfer-strategy",
     },
   },
   {
-    id: 'demo-5',
-    type: 'itk',
+    id: "demo-5",
+    type: "itk",
     timestamp: new Date(Date.now() - 78 * 60 * 1000), // 1 hour 18 minutes ago
     content:
-      'Bayern Munich officials confident about completing Jamal Musiala contract extension. New deal until 2029 with significant salary increase. Announcement expected this week.',
+      "Bayern Munich officials confident about completing Jamal Musiala contract extension. New deal until 2029 with significant salary increase. Announcement expected this week.",
     source: {
-      name: 'Sky Sports',
-      handle: '@SkySports',
+      name: "Sky Sports",
+      handle: "@SkySports",
       tier: 2,
       reliability: 0.8,
-      region: 'UK',
+      region: "UK",
     },
     tags: {
-      clubs: ['Bayern Munich'],
-      players: ['Jamal Musiala'],
-      sources: ['Sky Sports'],
+      clubs: ["Bayern Munich"],
+      players: ["Jamal Musiala"],
+      sources: ["Sky Sports"],
     },
     engagement: {
       shares: 234,
@@ -160,31 +160,31 @@ export const DEMO_FEED_DATA: FeedItem[] = [
       clicks: 45,
     },
     metadata: {
-      transferType: 'signing',
-      priority: 'medium',
+      transferType: "signing",
+      priority: "medium",
       relevanceScore: 0.72,
-      league: 'Bundesliga',
+      league: "Bundesliga",
     },
   },
   {
-    id: 'demo-6',
-    type: 'itk',
+    id: "demo-6",
+    type: "itk",
     timestamp: new Date(Date.now() - 95 * 60 * 1000), // 1 hour 35 minutes ago
     content:
-      'EXCLUSIVE: Manchester United monitoring Pedri situation at Barcelona. Initial contact made with player representatives. No formal bid yet but interest is genuine.',
+      "EXCLUSIVE: Manchester United monitoring Pedri situation at Barcelona. Initial contact made with player representatives. No formal bid yet but interest is genuine.",
     terryCommentary:
       'Manchester United "monitoring" a player is code for "we\'ll probably sign someone else entirely in six months."',
     source: {
-      name: 'MARCA',
-      handle: '@marca',
+      name: "MARCA",
+      handle: "@marca",
       tier: 2,
       reliability: 0.82,
-      region: 'ES',
+      region: "ES",
     },
     tags: {
-      clubs: ['Manchester United', 'Barcelona'],
-      players: ['Pedri'],
-      sources: ['MARCA'],
+      clubs: ["Manchester United", "Barcelona"],
+      players: ["Pedri"],
+      sources: ["MARCA"],
     },
     engagement: {
       shares: 345,
@@ -192,29 +192,29 @@ export const DEMO_FEED_DATA: FeedItem[] = [
       clicks: 78,
     },
     metadata: {
-      transferType: 'rumour',
-      priority: 'medium',
+      transferType: "rumour",
+      priority: "medium",
       relevanceScore: 0.69,
-      league: 'PL',
+      league: "PL",
     },
   },
   {
-    id: 'demo-7',
-    type: 'itk',
+    id: "demo-7",
+    type: "itk",
     timestamp: new Date(Date.now() - 112 * 60 * 1000), // 1 hour 52 minutes ago
     content:
-      'Chelsea preparing improved offer for Rafael Leão. AC Milan want €120M, Chelsea willing to pay €100M plus bonuses. Player keen on Premier League move.',
+      "Chelsea preparing improved offer for Rafael Leão. AC Milan want €120M, Chelsea willing to pay €100M plus bonuses. Player keen on Premier League move.",
     terryCommentary:
       "€120M for Rafael Leão? That's either shrewd business or the most expensive midlife crisis in football history.",
     source: {
       name: "L'Équipe",
       tier: 2,
       reliability: 0.85,
-      region: 'FR',
+      region: "FR",
     },
     tags: {
-      clubs: ['Chelsea', 'AC Milan'],
-      players: ['Rafael Leão'],
+      clubs: ["Chelsea", "AC Milan"],
+      players: ["Rafael Leão"],
       sources: ["L'Équipe"],
     },
     engagement: {
@@ -223,28 +223,28 @@ export const DEMO_FEED_DATA: FeedItem[] = [
       clicks: 56,
     },
     metadata: {
-      transferType: 'bid',
-      priority: 'medium',
+      transferType: "bid",
+      priority: "medium",
       relevanceScore: 0.78,
-      league: 'PL',
+      league: "PL",
     },
   },
   {
-    id: 'demo-8',
-    type: 'itk',
+    id: "demo-8",
+    type: "itk",
     timestamp: new Date(Date.now() - 135 * 60 * 1000), // 2 hours 15 minutes ago
     content:
-      'Liverpool close to securing João Palhinha deal. West Ham demanding £40M, Liverpool confident of agreement at £35M plus add-ons. Medical could be arranged quickly.',
+      "Liverpool close to securing João Palhinha deal. West Ham demanding £40M, Liverpool confident of agreement at £35M plus add-ons. Medical could be arranged quickly.",
     source: {
-      name: 'The Times',
+      name: "The Times",
       tier: 2,
       reliability: 0.83,
-      region: 'UK',
+      region: "UK",
     },
     tags: {
-      clubs: ['Liverpool', 'West Ham'],
-      players: ['João Palhinha'],
-      sources: ['The Times'],
+      clubs: ["Liverpool", "West Ham"],
+      players: ["João Palhinha"],
+      sources: ["The Times"],
     },
     engagement: {
       shares: 189,
@@ -252,30 +252,30 @@ export const DEMO_FEED_DATA: FeedItem[] = [
       clicks: 34,
     },
     metadata: {
-      transferType: 'bid',
-      priority: 'medium',
+      transferType: "bid",
+      priority: "medium",
       relevanceScore: 0.71,
-      league: 'PL',
+      league: "PL",
     },
   },
   {
-    id: 'demo-9',
-    type: 'itk',
+    id: "demo-9",
+    type: "itk",
     timestamp: new Date(Date.now() - 158 * 60 * 1000), // 2 hours 38 minutes ago
     content:
       "PSG exploring move for Marcus Rashford. Manchester United open to offers over €80M. Player's representatives in contact with multiple clubs.",
     terryCommentary:
-      'PSG "exploring" Marcus Rashford like they explore every winger who\'s had a decent season. Spoiler: they\'ll sign someone completely different.',
+      "PSG \"exploring\" Marcus Rashford like they explore every winger who's had a decent season. Spoiler: they'll sign someone completely different.",
     source: {
-      name: 'RMC Sport',
+      name: "RMC Sport",
       tier: 2,
       reliability: 0.79,
-      region: 'FR',
+      region: "FR",
     },
     tags: {
-      clubs: ['PSG', 'Manchester United'],
-      players: ['Marcus Rashford'],
-      sources: ['RMC Sport'],
+      clubs: ["PSG", "Manchester United"],
+      players: ["Marcus Rashford"],
+      sources: ["RMC Sport"],
     },
     engagement: {
       shares: 412,
@@ -283,28 +283,28 @@ export const DEMO_FEED_DATA: FeedItem[] = [
       clicks: 98,
     },
     metadata: {
-      transferType: 'rumour',
-      priority: 'medium',
+      transferType: "rumour",
+      priority: "medium",
       relevanceScore: 0.76,
-      league: 'PL',
+      league: "PL",
     },
   },
   {
-    id: 'demo-10',
-    type: 'itk',
+    id: "demo-10",
+    type: "itk",
     timestamp: new Date(Date.now() - 185 * 60 * 1000), // 3 hours 5 minutes ago
     content:
-      'Tottenham target Ivan Toney as Harry Kane replacement. Brentford valuation around €60M. Spurs willing to meet asking price if Kane deal materializes.',
+      "Tottenham target Ivan Toney as Harry Kane replacement. Brentford valuation around €60M. Spurs willing to meet asking price if Kane deal materializes.",
     source: {
-      name: 'Football London',
+      name: "Football London",
       tier: 3,
       reliability: 0.72,
-      region: 'UK',
+      region: "UK",
     },
     tags: {
-      clubs: ['Tottenham', 'Brentford'],
-      players: ['Ivan Toney', 'Harry Kane'],
-      sources: ['Football London'],
+      clubs: ["Tottenham", "Brentford"],
+      players: ["Ivan Toney", "Harry Kane"],
+      sources: ["Football London"],
     },
     engagement: {
       shares: 156,
@@ -312,10 +312,10 @@ export const DEMO_FEED_DATA: FeedItem[] = [
       clicks: 29,
     },
     metadata: {
-      transferType: 'rumour',
-      priority: 'low',
+      transferType: "rumour",
+      priority: "low",
       relevanceScore: 0.65,
-      league: 'PL',
+      league: "PL",
     },
   },
 ];
@@ -342,7 +342,7 @@ export function getMoreDemoFeedData(offset: number = 0): FeedItem[] {
     ...item,
     id: `demo-${offset}-${index + 1}`,
     timestamp: new Date(
-      Date.now() - (200 + offset * 30 + index * 15) * 60 * 1000
+      Date.now() - (200 + offset * 30 + index * 15) * 60 * 1000,
     ),
     engagement: {
       shares: Math.floor(Math.random() * 500),

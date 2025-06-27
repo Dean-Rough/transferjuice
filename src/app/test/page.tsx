@@ -5,7 +5,8 @@ export default function TestPage() {
         TransferJuice Fresh Build Works! 🎉
       </h1>
       <p className="text-xl text-foreground">
-        The Terry says: &quot;Well look at that, we&apos;ve escaped the webpack haunted house.&quot;
+        The Terry says: &quot;Well look at that, we&apos;ve escaped the webpack
+        haunted house.&quot;
       </p>
       <div className="mt-8 p-6 bg-card rounded-lg border border-border">
         <h2 className="text-2xl font-semibold mb-2">Next Steps:</h2>

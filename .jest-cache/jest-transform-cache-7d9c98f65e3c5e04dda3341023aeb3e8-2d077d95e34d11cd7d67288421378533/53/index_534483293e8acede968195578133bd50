@@ -1,0 +1,55 @@
+dd9f705a88ef547f4225141d0b03fee9
+/* istanbul ignore next */
+function cov_183s7folup() {
+  var path = "/Users/deannewton/Documents/TransferJuice/src/lib/database/index.ts";
+  var hash = "f7537a068e691cc73a05dce57998803b6163ab84";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/Users/deannewton/Documents/TransferJuice/src/lib/database/index.ts",
+    statementMap: {},
+    fnMap: {},
+    branchMap: {},
+    s: {},
+    f: {},
+    b: {},
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "f7537a068e691cc73a05dce57998803b6163ab84"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_183s7folup = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_183s7folup();
+/**
+ * Database Operations Export
+ * Central export for all database access layer functions
+ */
+
+// Briefing operations
+export * from "./briefings";
+
+// Feed item operations
+export * from "./feedItems";
+
+// Tag operations
+export * from "./tags";
+
+// Source operations
+export * from "./sources";
+
+// Subscriber operations
+export * from "./subscribers";
+
+// Re-export prisma client
+export { prisma } from "@/lib/prisma";
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMTgzczdmb2x1cCIsImFjdHVhbENvdmVyYWdlIiwicHJpc21hIl0sInNvdXJjZXMiOlsiaW5kZXgudHMiXSwic291cmNlc0NvbnRlbnQiOlsiLyoqXG4gKiBEYXRhYmFzZSBPcGVyYXRpb25zIEV4cG9ydFxuICogQ2VudHJhbCBleHBvcnQgZm9yIGFsbCBkYXRhYmFzZSBhY2Nlc3MgbGF5ZXIgZnVuY3Rpb25zXG4gKi9cblxuLy8gQnJpZWZpbmcgb3BlcmF0aW9uc1xuZXhwb3J0ICogZnJvbSBcIi4vYnJpZWZpbmdzXCI7XG5cbi8vIEZlZWQgaXRlbSBvcGVyYXRpb25zXG5leHBvcnQgKiBmcm9tIFwiLi9mZWVkSXRlbXNcIjtcblxuLy8gVGFnIG9wZXJhdGlvbnNcbmV4cG9ydCAqIGZyb20gXCIuL3RhZ3NcIjtcblxuLy8gU291cmNlIG9wZXJhdGlvbnNcbmV4cG9ydCAqIGZyb20gXCIuL3NvdXJjZXNcIjtcblxuLy8gU3Vic2NyaWJlciBvcGVyYXRpb25zXG5leHBvcnQgKiBmcm9tIFwiLi9zdWJzY3JpYmVyc1wiO1xuXG4vLyBSZS1leHBvcnQgcHJpc21hIGNsaWVudFxuZXhwb3J0IHsgcHJpc21hIH0gZnJvbSBcIkAvbGliL3ByaXNtYVwiO1xuIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztJQWVZO0lBQUFBLGNBQUEsWUFBQUEsQ0FBQTtNQUFBLE9BQUFDLGNBQUE7SUFBQTtFQUFBO0VBQUEsT0FBQUEsY0FBQTtBQUFBO0FBQUFELGNBQUE7QUFmWjtBQUNBO0FBQ0E7QUFDQTs7QUFFQTtBQUNBLGNBQWMsYUFBYTs7QUFFM0I7QUFDQSxjQUFjLGFBQWE7O0FBRTNCO0FBQ0EsY0FBYyxRQUFROztBQUV0QjtBQUNBLGNBQWMsV0FBVzs7QUFFekI7QUFDQSxjQUFjLGVBQWU7O0FBRTdCO0FBQ0EsU0FBU0UsTUFBTSxRQUFRLGNBQWMiLCJpZ25vcmVMaXN0IjpbXX0=

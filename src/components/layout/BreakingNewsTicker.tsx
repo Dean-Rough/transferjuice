@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 interface BreakingNewsItem {
   id: string;
@@ -10,18 +10,18 @@ interface BreakingNewsItem {
 
 const mockBreakingNews: BreakingNewsItem[] = [
   {
-    id: '1',
-    text: '🚨 BREAKING: Ten Hag reportedly spotted at Carrington despite sacking rumors',
+    id: "1",
+    text: "🚨 BREAKING: Ten Hag reportedly spotted at Carrington despite sacking rumors",
     timestamp: new Date(),
   },
   {
-    id: '2',
-    text: '🔴 Liverpool close in on £60m midfielder from Real Madrid',
+    id: "2",
+    text: "🔴 Liverpool close in on £60m midfielder from Real Madrid",
     timestamp: new Date(Date.now() - 3600000),
   },
   {
-    id: '3',
-    text: '⚡ Chelsea preparing fourth bid for striker after £150m spending spree',
+    id: "3",
+    text: "⚡ Chelsea preparing fourth bid for striker after £150m spending spree",
     timestamp: new Date(Date.now() - 7200000),
   },
 ];
@@ -52,7 +52,7 @@ export function BreakingNewsTicker() {
         {/* Ticker Content */}
         <div className="flex-1 relative h-10 overflow-hidden">
           <div className="absolute inset-0 flex items-center">
-            <div 
+            <div
               className="flex transition-transform duration-500 ease-in-out"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
@@ -63,9 +63,9 @@ export function BreakingNewsTicker() {
                 >
                   <p className="text-sm font-medium pr-4">{item.text}</p>
                   <time className="text-xs opacity-75 data-mono flex-shrink-0">
-                    {item.timestamp.toLocaleTimeString('en-GB', {
-                      hour: '2-digit',
-                      minute: '2-digit',
+                    {item.timestamp.toLocaleTimeString("en-GB", {
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
                   </time>
                 </div>

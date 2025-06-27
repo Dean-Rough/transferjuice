@@ -3,15 +3,15 @@
  * Database operations for email subscriber management
  */
 
-import { prisma } from '@/lib/prisma';
-import type { EmailSubscriber, EmailFrequency, Prisma } from '@prisma/client';
-import { createHash } from 'crypto';
+import { prisma } from "@/lib/prisma";
+import type { EmailSubscriber, EmailFrequency, Prisma } from "@prisma/client";
+import { createHash } from "crypto";
 
 /**
  * Hash email for privacy
  */
 function hashEmail(email: string): string {
-  return createHash('sha256').update(email.toLowerCase()).digest('hex');
+  return createHash("sha256").update(email.toLowerCase()).digest("hex");
 }
 
 /**
@@ -32,9 +32,9 @@ export async function createSubscriber(data: {
       source: data.source,
       ipAddress: data.ipAddress,
       userAgent: data.userAgent,
-      frequency: data.frequency || 'DAILY',
-      preferredTime: data.preferredTime || '08:00',
-      timezone: data.timezone || 'Europe/London',
+      frequency: data.frequency || "DAILY",
+      preferredTime: data.preferredTime || "08:00",
+      timezone: data.timezone || "Europe/London",
     },
   });
 }
@@ -43,7 +43,7 @@ export async function createSubscriber(data: {
  * Get subscriber by email
  */
 export async function getSubscriberByEmail(
-  email: string
+  email: string,
 ): Promise<EmailSubscriber | null> {
   return await prisma.emailSubscriber.findUnique({
     where: { email: email.toLowerCase() },
@@ -59,7 +59,7 @@ export async function updateSubscriberPreferences(
     frequency?: EmailFrequency;
     preferredTime?: string;
     timezone?: string;
-  }
+  },
 ): Promise<EmailSubscriber> {
   return await prisma.emailSubscriber.update({
     where: { email: email.toLowerCase() },
@@ -106,37 +106,35 @@ export async function resubscribeUser(email: string): Promise<EmailSubscriber> {
 /**
  * Get active subscribers for mailing
  */
-export async function getActiveSubscribersForMailing(
-  options?: {
-    frequency?: EmailFrequency;
-    hour?: number;
-    timezone?: string;
-    limit?: number;
-    offset?: number;
-  }
-): Promise<EmailSubscriber[]> {
+export async function getActiveSubscribersForMailing(options?: {
+  frequency?: EmailFrequency;
+  hour?: number;
+  timezone?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<EmailSubscriber[]> {
   const { frequency, hour, timezone, limit, offset } = options || {};
-  
+
   const where: Prisma.EmailSubscriberWhereInput = {
     isActive: true,
     isVerified: true,
     ...(frequency && { frequency }),
     ...(timezone && { timezone }),
   };
-  
+
   // If hour is specified, filter by preferred time
   if (hour !== undefined) {
-    const hourStr = hour.toString().padStart(2, '0');
+    const hourStr = hour.toString().padStart(2, "0");
     where.preferredTime = {
       startsWith: hourStr,
     };
   }
-  
+
   return await prisma.emailSubscriber.findMany({
     where,
     ...(limit && { take: limit }),
     ...(offset && { skip: offset }),
-    orderBy: { subscribedAt: 'asc' },
+    orderBy: { subscribedAt: "asc" },
   });
 }
 
@@ -145,7 +143,7 @@ export async function getActiveSubscribersForMailing(
  */
 export async function trackEmailSent(
   subscriberId: string,
-  briefingId: string
+  briefingId: string,
 ): Promise<void> {
   await prisma.$transaction([
     // Update subscriber stats
@@ -156,7 +154,7 @@ export async function trackEmailSent(
         totalEmailsSent: { increment: 1 },
       },
     }),
-    
+
     // Create briefing email record
     prisma.briefingEmail.create({
       data: {
@@ -172,7 +170,7 @@ export async function trackEmailSent(
  */
 export async function trackEmailOpened(
   subscriberId: string,
-  briefingId: string
+  briefingId: string,
 ): Promise<void> {
   await prisma.$transaction([
     // Update subscriber stats
@@ -183,7 +181,7 @@ export async function trackEmailOpened(
         totalOpens: { increment: 1 },
       },
     }),
-    
+
     // Update briefing email record
     prisma.briefingEmail.updateMany({
       where: {
@@ -203,7 +201,7 @@ export async function trackEmailOpened(
  */
 export async function trackEmailClick(
   subscriberId: string,
-  briefingId: string
+  briefingId: string,
 ): Promise<void> {
   await prisma.$transaction([
     // Update subscriber stats
@@ -213,7 +211,7 @@ export async function trackEmailClick(
         totalClicks: { increment: 1 },
       },
     }),
-    
+
     // Update briefing email record
     prisma.briefingEmail.updateMany({
       where: {
@@ -246,7 +244,7 @@ export async function getSubscriberStats(): Promise<{
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  
+
   const [
     total,
     active,
@@ -262,7 +260,7 @@ export async function getSubscriberStats(): Promise<{
     prisma.emailSubscriber.count({ where: { isVerified: true } }),
     prisma.emailSubscriber.count({ where: { isActive: false } }),
     prisma.emailSubscriber.groupBy({
-      by: ['frequency'],
+      by: ["frequency"],
       where: { isActive: true },
       _count: true,
     }),
@@ -276,19 +274,24 @@ export async function getSubscriberStats(): Promise<{
       where: { unsubscribedAt: { gte: weekAgo } },
     }),
   ]);
-  
+
   const frequencyMap = Object.fromEntries(
-    byFrequency.map(f => [f.frequency, f._count])
+    byFrequency.map((f) => [f.frequency, f._count]),
   ) as Record<EmailFrequency, number>;
-  
+
   // Ensure all frequencies are represented
-  const allFrequencies: EmailFrequency[] = ['DAILY', 'WEEKLY', 'BREAKING_ONLY', 'DISABLED'];
-  allFrequencies.forEach(freq => {
+  const allFrequencies: EmailFrequency[] = [
+    "DAILY",
+    "WEEKLY",
+    "BREAKING_ONLY",
+    "DISABLED",
+  ];
+  allFrequencies.forEach((freq) => {
     if (!frequencyMap[freq]) {
       frequencyMap[freq] = 0;
     }
   });
-  
+
   return {
     total,
     active,
@@ -307,17 +310,17 @@ export async function getSubscriberStats(): Promise<{
  * Clean up unverified old subscribers
  */
 export async function cleanupUnverifiedSubscribers(
-  daysOld = 7
+  daysOld = 7,
 ): Promise<number> {
   const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
-  
+
   const result = await prisma.emailSubscriber.deleteMany({
     where: {
       isVerified: false,
       subscribedAt: { lt: cutoffDate },
     },
   });
-  
+
   return result.count;
 }
 
@@ -325,48 +328,45 @@ export async function cleanupUnverifiedSubscribers(
  * Get subscribers by engagement level
  */
 export async function getSubscribersByEngagement(
-  level: 'high' | 'medium' | 'low' | 'inactive'
+  level: "high" | "medium" | "low" | "inactive",
 ): Promise<EmailSubscriber[]> {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  
+
   let where: Prisma.EmailSubscriberWhereInput = {
     isActive: true,
     isVerified: true,
   };
-  
+
   switch (level) {
-    case 'high':
+    case "high":
       where.AND = [
         { lastOpenedAt: { gte: thirtyDaysAgo } },
         { totalOpens: { gte: 10 } },
         { totalClicks: { gte: 5 } },
       ];
       break;
-    
-    case 'medium':
+
+    case "medium":
       where.AND = [
         { lastOpenedAt: { gte: thirtyDaysAgo } },
         { totalOpens: { gte: 3 } },
       ];
       break;
-    
-    case 'low':
+
+    case "low":
       where.OR = [
         { lastOpenedAt: { lt: thirtyDaysAgo } },
         { totalOpens: { lt: 3 } },
       ];
       break;
-    
-    case 'inactive':
-      where.OR = [
-        { lastOpenedAt: null },
-        { totalOpens: 0 },
-      ];
+
+    case "inactive":
+      where.OR = [{ lastOpenedAt: null }, { totalOpens: 0 }];
       break;
   }
-  
+
   return await prisma.emailSubscriber.findMany({
     where,
-    orderBy: { lastOpenedAt: 'desc' },
+    orderBy: { lastOpenedAt: "desc" },
   });
 }

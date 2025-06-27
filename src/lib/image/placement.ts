@@ -3,21 +3,21 @@
  * AI-powered image-to-content matching and layout optimization
  */
 
-import type { ProcessedImage } from './processor';
-import type { ArticleSection } from '@/lib/ai/article-generator';
-import type { ContentAnalysis } from '@/lib/ai/content-analyzer';
-import { z } from 'zod';
-import OpenAI from 'openai';
+import type { ProcessedImage } from "./processor";
+import type { ArticleSection } from "@/lib/ai/article-generator";
+import type { ContentAnalysis } from "@/lib/ai/content-analyzer";
+import { z } from "zod";
+import OpenAI from "openai";
 
 // Placement schemas
 export const ImagePlacementSchema = z.object({
   id: z.string(),
   imageId: z.string(),
   sectionId: z.string(),
-  position: z.enum(['header', 'inline', 'sidebar', 'footer']),
+  position: z.enum(["header", "inline", "sidebar", "footer"]),
   order: z.number(),
-  size: z.enum(['thumbnail', 'medium', 'large', 'full-width']),
-  alignment: z.enum(['left', 'center', 'right', 'justify']),
+  size: z.enum(["thumbnail", "medium", "large", "full-width"]),
+  alignment: z.enum(["left", "center", "right", "justify"]),
   caption: z.string(),
   relevanceScore: z.number().min(0).max(100),
   contextMatch: z.object({
@@ -33,23 +33,23 @@ export const ImagePlacementSchema = z.object({
     marginBottom: z.number(),
     responsive: z.object({
       mobile: z.object({
-        size: z.enum(['thumbnail', 'medium', 'large']),
-        alignment: z.enum(['left', 'center', 'right']),
+        size: z.enum(["thumbnail", "medium", "large"]),
+        alignment: z.enum(["left", "center", "right"]),
       }),
       tablet: z.object({
-        size: z.enum(['thumbnail', 'medium', 'large']),
-        alignment: z.enum(['left', 'center', 'right']),
+        size: z.enum(["thumbnail", "medium", "large"]),
+        alignment: z.enum(["left", "center", "right"]),
       }),
       desktop: z.object({
-        size: z.enum(['thumbnail', 'medium', 'large', 'full-width']),
-        alignment: z.enum(['left', 'center', 'right', 'justify']),
+        size: z.enum(["thumbnail", "medium", "large", "full-width"]),
+        alignment: z.enum(["left", "center", "right", "justify"]),
       }),
     }),
   }),
   optimization: z.object({
     lazyLoad: z.boolean(),
     preload: z.boolean(),
-    priority: z.enum(['high', 'medium', 'low']),
+    priority: z.enum(["high", "medium", "low"]),
     srcSet: z.array(z.string()),
   }),
 });
@@ -60,7 +60,7 @@ export const ArticleLayoutSchema = z.object({
     z.object({
       sectionId: z.string(),
       placements: z.array(ImagePlacementSchema),
-    })
+    }),
   ),
   heroImage: ImagePlacementSchema.optional(),
   thumbnailImage: ImagePlacementSchema.optional(),
@@ -116,7 +116,7 @@ export class ImagePlacementService {
   async createArticleLayout(
     sections: ArticleSection[],
     availableImages: ProcessedImage[],
-    contentAnalyses: ContentAnalysis[]
+    contentAnalyses: ContentAnalysis[],
   ): Promise<ArticleLayout> {
     const startTime = Date.now();
 
@@ -126,14 +126,14 @@ export class ImagePlacementService {
     // Select thumbnail for article preview
     const thumbnailImage = await this.selectThumbnailImage(
       availableImages,
-      sections
+      sections,
     );
 
     // Create placements for each section
     const sectionPlacements = await Promise.all(
       sections.map((section) =>
-        this.createSectionPlacements(section, availableImages, contentAnalyses)
-      )
+        this.createSectionPlacements(section, availableImages, contentAnalyses),
+      ),
     );
 
     // Calculate layout metrics
@@ -141,7 +141,7 @@ export class ImagePlacementService {
     const metadata = this.calculateLayoutMetrics(allPlacements);
     const performance = this.calculatePerformanceMetrics(
       allPlacements,
-      availableImages
+      availableImages,
     );
 
     const layoutTime = Date.now() - startTime;
@@ -165,7 +165,7 @@ export class ImagePlacementService {
   async findOptimalPlacements(
     content: string,
     availableImages: ProcessedImage[],
-    contentAnalysis: ContentAnalysis
+    contentAnalysis: ContentAnalysis,
   ): Promise<ImagePlacement[]> {
     const placements: ImagePlacement[] = [];
 
@@ -173,11 +173,11 @@ export class ImagePlacementService {
     const relevantImages = await this.scoreImageRelevance(
       availableImages,
       content,
-      contentAnalysis
+      contentAnalysis,
     );
 
     const filteredImages = relevantImages.filter(
-      (scored) => scored.score >= this.config.minRelevanceScore
+      (scored) => scored.score >= this.config.minRelevanceScore,
     );
 
     // Create placements for top images
@@ -193,7 +193,7 @@ export class ImagePlacementService {
         content,
         i,
         score,
-        contextMatch
+        contextMatch,
       );
 
       placements.push(placement);
@@ -207,14 +207,14 @@ export class ImagePlacementService {
    */
   private async selectHeroImage(
     availableImages: ProcessedImage[],
-    firstSection: ArticleSection
+    firstSection: ArticleSection,
   ): Promise<ImagePlacement | undefined> {
     if (availableImages.length === 0) return undefined;
 
     // Prefer high-quality, high-relevance images for hero
     const candidates = availableImages
       .filter((img) => img.variants.large.width >= 600)
-      .filter((img) => img.type === 'player' || img.type === 'club')
+      .filter((img) => img.type === "player" || img.type === "club")
       .sort((a, b) => {
         // Prioritize by type, then by resolution
         const aScore = this.calculateHeroScore(a);
@@ -231,10 +231,10 @@ export class ImagePlacementService {
       id: `hero_${heroImage.id}`,
       imageId: heroImage.id,
       sectionId: firstSection.id,
-      position: 'header',
+      position: "header",
       order: 0,
-      size: 'full-width',
-      alignment: 'center',
+      size: "full-width",
+      alignment: "center",
       caption,
       relevanceScore: 95,
       contextMatch: {
@@ -243,11 +243,11 @@ export class ImagePlacementService {
         topicMatch: 95,
         sentimentMatch: 80,
       },
-      layout: this.createResponsiveLayout('header', 'full-width'),
+      layout: this.createResponsiveLayout("header", "full-width"),
       optimization: {
         lazyLoad: false,
         preload: true,
-        priority: 'high',
+        priority: "high",
         srcSet: this.generateSrcSet(heroImage),
       },
     };
@@ -258,7 +258,7 @@ export class ImagePlacementService {
    */
   private async selectThumbnailImage(
     availableImages: ProcessedImage[],
-    sections: ArticleSection[]
+    sections: ArticleSection[],
   ): Promise<ImagePlacement | undefined> {
     if (availableImages.length === 0) return undefined;
 
@@ -283,12 +283,12 @@ export class ImagePlacementService {
     return {
       id: `thumb_${image.id}`,
       imageId: image.id,
-      sectionId: 'thumbnail',
-      position: 'inline',
+      sectionId: "thumbnail",
+      position: "inline",
       order: 0,
-      size: 'thumbnail',
-      alignment: 'center',
-      caption: '',
+      size: "thumbnail",
+      alignment: "center",
+      caption: "",
       relevanceScore: 80,
       contextMatch: {
         playerMatch: 75,
@@ -296,11 +296,11 @@ export class ImagePlacementService {
         topicMatch: 80,
         sentimentMatch: 70,
       },
-      layout: this.createResponsiveLayout('inline', 'thumbnail'),
+      layout: this.createResponsiveLayout("inline", "thumbnail"),
       optimization: {
         lazyLoad: false,
         preload: true,
-        priority: 'high',
+        priority: "high",
         srcSet: [image.variants.thumbnail.url],
       },
     };
@@ -312,10 +312,10 @@ export class ImagePlacementService {
   private async createSectionPlacements(
     section: ArticleSection,
     availableImages: ProcessedImage[],
-    contentAnalyses: ContentAnalysis[]
+    contentAnalyses: ContentAnalysis[],
   ): Promise<{ sectionId: string; placements: ImagePlacement[] }> {
     const sectionAnalysis = contentAnalyses.find((analysis) =>
-      section.sourceTweets.some((tweetId) => analysis.tweetId === tweetId)
+      section.sourceTweets.some((tweetId) => analysis.tweetId === tweetId),
     );
 
     if (!sectionAnalysis) {
@@ -325,7 +325,7 @@ export class ImagePlacementService {
     const placements = await this.findOptimalPlacements(
       section.content,
       availableImages,
-      sectionAnalysis
+      sectionAnalysis,
     );
 
     return {
@@ -340,12 +340,12 @@ export class ImagePlacementService {
   private async scoreImageRelevance(
     images: ProcessedImage[],
     content: string,
-    contentAnalysis: ContentAnalysis
+    contentAnalysis: ContentAnalysis,
   ): Promise<
     Array<{
       image: ProcessedImage;
       score: number;
-      contextMatch: ImagePlacement['contextMatch'];
+      contextMatch: ImagePlacement["contextMatch"];
     }>
   > {
     const results = await Promise.all(
@@ -353,13 +353,13 @@ export class ImagePlacementService {
         const contextMatch = await this.calculateContextMatch(
           image,
           content,
-          contentAnalysis
+          contentAnalysis,
         );
 
         const score = this.calculateOverallRelevance(contextMatch, image);
 
         return { image, score, contextMatch };
-      })
+      }),
     );
 
     return results;
@@ -371,8 +371,8 @@ export class ImagePlacementService {
   private async calculateContextMatch(
     image: ProcessedImage,
     content: string,
-    contentAnalysis: ContentAnalysis
-  ): Promise<ImagePlacement['contextMatch']> {
+    contentAnalysis: ContentAnalysis,
+  ): Promise<ImagePlacement["contextMatch"]> {
     const playerMatch = this.calculatePlayerMatch(image, contentAnalysis);
     const clubMatch = this.calculateClubMatch(image, contentAnalysis);
     const topicMatch = await this.calculateTopicMatch(image, content);
@@ -391,12 +391,12 @@ export class ImagePlacementService {
    */
   private calculatePlayerMatch(
     image: ProcessedImage,
-    contentAnalysis: ContentAnalysis
+    contentAnalysis: ContentAnalysis,
   ): number {
-    if (image.type !== 'player') return 50; // Neutral for non-player images
+    if (image.type !== "player") return 50; // Neutral for non-player images
 
     const playerNames = contentAnalysis.entities.players.map((p) =>
-      p.name.toLowerCase()
+      p.name.toLowerCase(),
     );
     const imageTitle = image.title.toLowerCase();
     const imageAlt = image.altText.toLowerCase();
@@ -409,7 +409,7 @@ export class ImagePlacementService {
       }
 
       // Partial name matching
-      const nameParts = playerName.split(' ');
+      const nameParts = playerName.split(" ");
       for (const part of nameParts) {
         if (
           part.length > 2 &&
@@ -433,12 +433,12 @@ export class ImagePlacementService {
    */
   private calculateClubMatch(
     image: ProcessedImage,
-    contentAnalysis: ContentAnalysis
+    contentAnalysis: ContentAnalysis,
   ): number {
-    if (image.type !== 'club') return 50; // Neutral for non-club images
+    if (image.type !== "club") return 50; // Neutral for non-club images
 
     const clubNames = contentAnalysis.entities.clubs.map((c) =>
-      c.name.toLowerCase()
+      c.name.toLowerCase(),
     );
     const imageTitle = image.title.toLowerCase();
     const imageAlt = image.altText.toLowerCase();
@@ -465,7 +465,7 @@ export class ImagePlacementService {
       }
 
       // Partial word matching for club names
-      const clubWords = lowerClubName.split(' ');
+      const clubWords = lowerClubName.split(" ");
       for (const word of clubWords) {
         if (
           word.length > 2 &&
@@ -484,19 +484,19 @@ export class ImagePlacementService {
    */
   private async calculateTopicMatch(
     image: ProcessedImage,
-    content: string
+    content: string,
   ): Promise<number> {
     try {
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4-turbo-preview',
+        model: "gpt-4-turbo-preview",
         messages: [
           {
-            role: 'system',
+            role: "system",
             content:
-              'You are an expert at matching images to content. Rate how well an image relates to the given text content on a scale of 0-100.',
+              "You are an expert at matching images to content. Rate how well an image relates to the given text content on a scale of 0-100.",
           },
           {
-            role: 'user',
+            role: "user",
             content: `Rate the relevance of this image to the content (0-100):
 
 Image: ${image.title}
@@ -514,11 +514,11 @@ Return only a number between 0 and 100.`,
       });
 
       const score = parseInt(
-        response.choices[0]?.message?.content?.trim() || '50'
+        response.choices[0]?.message?.content?.trim() || "50",
       );
       return Math.max(0, Math.min(100, score));
     } catch (error) {
-      console.warn('Topic matching failed, using fallback:', error);
+      console.warn("Topic matching failed, using fallback:", error);
       return 50; // Neutral fallback
     }
   }
@@ -528,23 +528,23 @@ Return only a number between 0 and 100.`,
    */
   private calculateSentimentMatch(
     image: ProcessedImage,
-    contentAnalysis: ContentAnalysis
+    contentAnalysis: ContentAnalysis,
   ): number {
     // Images from celebrations/signings match positive sentiment
     if (
-      image.type === 'celebration' &&
-      contentAnalysis.sentiment.sentiment === 'positive'
+      image.type === "celebration" &&
+      contentAnalysis.sentiment.sentiment === "positive"
     ) {
       return 90;
     }
 
     // News images are generally neutral and match any sentiment
-    if (image.type === 'news') {
+    if (image.type === "news") {
       return 75;
     }
 
     // Player/club images match based on transfer context
-    if (contentAnalysis.classification.transferType === 'CONFIRMED') {
+    if (contentAnalysis.classification.transferType === "CONFIRMED") {
       return 85;
     }
 
@@ -555,8 +555,8 @@ Return only a number between 0 and 100.`,
    * Calculate overall relevance score
    */
   private calculateOverallRelevance(
-    contextMatch: ImagePlacement['contextMatch'],
-    image: ProcessedImage
+    contextMatch: ImagePlacement["contextMatch"],
+    image: ProcessedImage,
   ): number {
     const weights = {
       playerMatch: 0.3,
@@ -587,7 +587,7 @@ Return only a number between 0 and 100.`,
     content: string,
     order: number,
     relevanceScore: number,
-    contextMatch: ImagePlacement['contextMatch']
+    contextMatch: ImagePlacement["contextMatch"],
   ): Promise<ImagePlacement> {
     const position = this.determineOptimalPosition(content, order);
     const size = this.determineOptimalSize(image, position);
@@ -597,7 +597,7 @@ Return only a number between 0 and 100.`,
     return {
       id: `placement_${image.id}_${order}`,
       imageId: image.id,
-      sectionId: '', // Will be set by caller
+      sectionId: "", // Will be set by caller
       position,
       order,
       size,
@@ -609,7 +609,7 @@ Return only a number between 0 and 100.`,
       optimization: {
         lazyLoad: this.config.enableLazyLoading && order > 0,
         preload: order === 0,
-        priority: order === 0 ? 'high' : 'medium',
+        priority: order === 0 ? "high" : "medium",
         srcSet: this.generateSrcSet(image),
       },
     };
@@ -620,16 +620,16 @@ Return only a number between 0 and 100.`,
    */
   private determineOptimalPosition(
     content: string,
-    order: number
-  ): ImagePlacement['position'] {
+    order: number,
+  ): ImagePlacement["position"] {
     const contentLength = content.length;
 
-    if (order === 0 && contentLength < 500) return 'sidebar'; // First image in short content goes to sidebar
-    if (order === 0) return 'inline'; // First image in longer content inline
+    if (order === 0 && contentLength < 500) return "sidebar"; // First image in short content goes to sidebar
+    if (order === 0) return "inline"; // First image in longer content inline
 
-    if (contentLength > 1000) return 'inline'; // Long content benefits from inline images
+    if (contentLength > 1000) return "inline"; // Long content benefits from inline images
 
-    return 'sidebar'; // Shorter content can use sidebar
+    return "sidebar"; // Shorter content can use sidebar
   }
 
   /**
@@ -637,32 +637,32 @@ Return only a number between 0 and 100.`,
    */
   private determineOptimalSize(
     image: ProcessedImage,
-    position: ImagePlacement['position']
-  ): ImagePlacement['size'] {
-    if (position === 'header') return 'full-width';
-    if (position === 'sidebar') return 'medium';
+    position: ImagePlacement["position"],
+  ): ImagePlacement["size"] {
+    if (position === "header") return "full-width";
+    if (position === "sidebar") return "medium";
 
     // For inline, choose based on image quality and aspect ratio
     const aspect = image.variants.large.width / image.variants.large.height;
 
-    if (aspect > 1.8) return 'large'; // Wide images work well large
-    if (aspect < 1.2) return 'medium'; // Square-ish images better medium
+    if (aspect > 1.8) return "large"; // Wide images work well large
+    if (aspect < 1.2) return "medium"; // Square-ish images better medium
 
-    return 'medium'; // Default to medium
+    return "medium"; // Default to medium
   }
 
   /**
    * Determine optimal alignment
    */
   private determineOptimalAlignment(
-    size: ImagePlacement['size'],
-    position: ImagePlacement['position']
-  ): ImagePlacement['alignment'] {
-    if (position === 'header') return 'center';
-    if (position === 'sidebar') return 'right';
-    if (size === 'full-width') return 'center';
+    size: ImagePlacement["size"],
+    position: ImagePlacement["position"],
+  ): ImagePlacement["alignment"] {
+    if (position === "header") return "center";
+    if (position === "sidebar") return "right";
+    if (size === "full-width") return "center";
 
-    return 'left'; // Default for inline images
+    return "left"; // Default for inline images
   }
 
   /**
@@ -670,19 +670,19 @@ Return only a number between 0 and 100.`,
    */
   private async generateCaption(
     image: ProcessedImage,
-    content: string
+    content: string,
   ): Promise<string> {
     try {
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4-turbo-preview',
+        model: "gpt-4-turbo-preview",
         messages: [
           {
-            role: 'system',
+            role: "system",
             content:
-              'Generate concise, informative captions for transfer news images. Include attribution and keep under 100 characters.',
+              "Generate concise, informative captions for transfer news images. Include attribution and keep under 100 characters.",
           },
           {
-            role: 'user',
+            role: "user",
             content: `Generate a caption for this image in the context of this content:
 
 Image: ${image.title}
@@ -704,7 +704,7 @@ Create a caption that's informative, includes proper attribution, and is under 1
         ? caption
         : `${image.title} (${image.attribution})`;
     } catch (error) {
-      console.warn('Caption generation failed:', error);
+      console.warn("Caption generation failed:", error);
       return `${image.title} (${image.attribution})`;
     }
   }
@@ -713,28 +713,28 @@ Create a caption that's informative, includes proper attribution, and is under 1
    * Create responsive layout configuration
    */
   private createResponsiveLayout(
-    position: ImagePlacement['position'],
-    size: ImagePlacement['size']
-  ): ImagePlacement['layout'] {
+    position: ImagePlacement["position"],
+    size: ImagePlacement["size"],
+  ): ImagePlacement["layout"] {
     const baseMargin = 16;
 
     return {
       breakAt: 0, // Will be calculated during actual placement
-      wrapText: position === 'inline',
+      wrapText: position === "inline",
       marginTop: baseMargin,
       marginBottom: baseMargin,
       responsive: {
         mobile: {
-          size: size === 'full-width' ? 'large' : 'medium',
-          alignment: 'center',
+          size: size === "full-width" ? "large" : "medium",
+          alignment: "center",
         },
         tablet: {
-          size: size === 'full-width' ? 'large' : (size as any),
-          alignment: position === 'sidebar' ? 'right' : 'center',
+          size: size === "full-width" ? "large" : (size as any),
+          alignment: position === "sidebar" ? "right" : "center",
         },
         desktop: {
           size,
-          alignment: position === 'header' ? 'center' : 'left',
+          alignment: position === "header" ? "center" : "left",
         },
       },
     };
@@ -758,9 +758,9 @@ Create a caption that's informative, includes proper attribution, and is under 1
     let score = 0;
 
     // Type preferences
-    if (image.type === 'player') score += 40;
-    else if (image.type === 'club') score += 35;
-    else if (image.type === 'celebration') score += 30;
+    if (image.type === "player") score += 40;
+    else if (image.type === "club") score += 35;
+    else if (image.type === "celebration") score += 30;
     else score += 20;
 
     // Quality bonuses
@@ -768,7 +768,7 @@ Create a caption that's informative, includes proper attribution, and is under 1
     score += image.variants.large.width / 10; // Resolution bonus
 
     // Source preferences
-    if (image.source === 'twitter') score += 10;
+    if (image.source === "twitter") score += 10;
 
     return score;
   }
@@ -781,18 +781,18 @@ Create a caption that's informative, includes proper attribution, and is under 1
     const abbreviations: string[] = [];
 
     // Common patterns
-    if (name.includes('manchester united'))
-      abbreviations.push('mufc', 'united');
-    if (name.includes('manchester city')) abbreviations.push('mcfc', 'city');
-    if (name.includes('arsenal')) abbreviations.push('afc');
-    if (name.includes('chelsea')) abbreviations.push('cfc');
-    if (name.includes('liverpool')) abbreviations.push('lfc');
-    if (name.includes('tottenham')) abbreviations.push('thfc', 'spurs');
+    if (name.includes("manchester united"))
+      abbreviations.push("mufc", "united");
+    if (name.includes("manchester city")) abbreviations.push("mcfc", "city");
+    if (name.includes("arsenal")) abbreviations.push("afc");
+    if (name.includes("chelsea")) abbreviations.push("cfc");
+    if (name.includes("liverpool")) abbreviations.push("lfc");
+    if (name.includes("tottenham")) abbreviations.push("thfc", "spurs");
 
     // Generic patterns
-    if (name.includes(' fc')) abbreviations.push(name.replace(' fc', ' f.c.'));
-    if (name.includes(' united'))
-      abbreviations.push(name.replace(' united', ' utd'));
+    if (name.includes(" fc")) abbreviations.push(name.replace(" fc", " f.c."));
+    if (name.includes(" united"))
+      abbreviations.push(name.replace(" united", " utd"));
 
     return abbreviations;
   }
@@ -801,8 +801,8 @@ Create a caption that's informative, includes proper attribution, and is under 1
    * Calculate layout metrics
    */
   private calculateLayoutMetrics(
-    placements: ImagePlacement[]
-  ): Omit<ArticleLayout['metadata'], 'loadTime'> {
+    placements: ImagePlacement[],
+  ): Omit<ArticleLayout["metadata"], "loadTime"> {
     const totalImages = placements.length;
     const averageRelevance =
       placements.length > 0
@@ -834,30 +834,30 @@ Create a caption that's informative, includes proper attribution, and is under 1
    */
   private calculatePerformanceMetrics(
     placements: ImagePlacement[],
-    availableImages: ProcessedImage[]
-  ): ArticleLayout['performance'] {
+    availableImages: ProcessedImage[],
+  ): ArticleLayout["performance"] {
     const usedImages = availableImages.filter((img) =>
-      placements.some((p) => p.imageId === img.id)
+      placements.some((p) => p.imageId === img.id),
     );
 
     const totalImageSize = usedImages.reduce(
       (sum, img) => sum + img.variants.large.fileSize,
-      0
+      0,
     );
 
     const originalSize = usedImages.reduce(
       (sum, img) => sum + img.optimization.originalSize,
-      0
+      0,
     );
 
     const compressionRatio =
       originalSize > 0 ? (originalSize - totalImageSize) / originalSize : 0;
 
     const lazyLoadCount = placements.filter(
-      (p) => p.optimization.lazyLoad
+      (p) => p.optimization.lazyLoad,
     ).length;
     const preloadCount = placements.filter(
-      (p) => p.optimization.preload
+      (p) => p.optimization.preload,
     ).length;
 
     return {

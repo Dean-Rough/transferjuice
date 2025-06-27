@@ -3,24 +3,24 @@
  * Manages partner content from The Upshot, FourFourTwo, Football Ramble, etc.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { FeedType, Priority, League } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { FeedType, Priority, League } from "@prisma/client";
 
 // Partner sources configuration
 const PARTNER_SOURCES = {
-  'the-upshot': { name: 'The Upshot', tier: 2, reliability: 0.85 },
-  fourfourtwo: { name: 'FourFourTwo', tier: 2, reliability: 0.82 },
-  'football-ramble': {
-    name: 'The Football Ramble',
+  "the-upshot": { name: "The Upshot", tier: 2, reliability: 0.85 },
+  fourfourtwo: { name: "FourFourTwo", tier: 2, reliability: 0.82 },
+  "football-ramble": {
+    name: "The Football Ramble",
     tier: 3,
     reliability: 0.75,
   },
-  'espn-fc': { name: 'ESPN FC', tier: 2, reliability: 0.8 },
-  'the-athletic': { name: 'The Athletic', tier: 1, reliability: 0.9 },
-  'sky-sports': { name: 'Sky Sports', tier: 1, reliability: 0.88 },
-  'bbc-sport': { name: 'BBC Sport', tier: 1, reliability: 0.92 },
+  "espn-fc": { name: "ESPN FC", tier: 2, reliability: 0.8 },
+  "the-athletic": { name: "The Athletic", tier: 1, reliability: 0.9 },
+  "sky-sports": { name: "Sky Sports", tier: 1, reliability: 0.88 },
+  "bbc-sport": { name: "BBC Sport", tier: 1, reliability: 0.92 },
 };
 
 // Validation schemas
@@ -29,7 +29,7 @@ const CreateStorySchema = z.object({
   content: z.string().min(1),
   excerpt: z.string().optional(),
   sourceKey: z.string().refine((key) => key in PARTNER_SOURCES, {
-    message: 'Invalid partner source',
+    message: "Invalid partner source",
   }),
   originalUrl: z.string().url(),
   author: z.string().optional(),
@@ -37,7 +37,7 @@ const CreateStorySchema = z.object({
   imageUrl: z.string().url().optional(),
   league: z.nativeEnum(League).optional(),
   tags: z.array(z.string()).optional(),
-  priority: z.nativeEnum(Priority).default('MEDIUM'),
+  priority: z.nativeEnum(Priority).default("MEDIUM"),
 });
 
 const UpdateStorySchema = CreateStorySchema.partial().extend({
@@ -51,12 +51,12 @@ export async function GET(request: NextRequest) {
     const searchParams = url.searchParams;
 
     // Parse query parameters
-    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
-    const offset = parseInt(searchParams.get('offset') || '0');
-    const sourceKey = searchParams.get('source');
-    const league = searchParams.get('league') as League | null;
-    const fromDate = searchParams.get('fromDate');
-    const toDate = searchParams.get('toDate');
+    const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
+    const offset = parseInt(searchParams.get("offset") || "0");
+    const sourceKey = searchParams.get("source");
+    const league = searchParams.get("league") as League | null;
+    const fromDate = searchParams.get("fromDate");
+    const toDate = searchParams.get("toDate");
 
     // Build where clause
     const where: any = {
@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
           },
         },
       },
-      orderBy: [{ priority: 'desc' }, { publishedAt: 'desc' }],
+      orderBy: [{ priority: "desc" }, { publishedAt: "desc" }],
       take: limit,
       skip: offset,
     });
@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
     // Transform to story format
     const transformedStories = stories.map((story) => ({
       id: story.id,
-      title: story.content.split('\n')[0] || story.content, // First line as title
+      title: story.content.split("\n")[0] || story.content, // First line as title
       content: story.content,
       excerpt: story.terryCommentary,
       source: {
@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
       },
       originalUrl: story.originalUrl,
       publishedAt: story.publishedAt,
-      imageUrl: story.media.find((m) => m.type === 'IMAGE')?.url,
+      imageUrl: story.media.find((m) => m.type === "IMAGE")?.url,
       league: story.league,
       tags: story.tags.map((t) => t.tag.name),
       engagement: {
@@ -203,15 +203,15 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Failed to fetch partner stories:', error);
+    console.error("Failed to fetch partner stories:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to fetch partner stories',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to fetch partner stories",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -239,7 +239,7 @@ export async function POST(request: NextRequest) {
           username: validatedData.sourceKey,
           tier: partnerConfig.tier,
           reliability: partnerConfig.reliability,
-          region: 'GLOBAL',
+          region: "GLOBAL",
           isActive: true,
           isVerified: true,
           description: `Official ${partnerConfig.name} partnership`,
@@ -269,7 +269,7 @@ export async function POST(request: NextRequest) {
         ...(validatedData.imageUrl && {
           media: {
             create: {
-              type: 'IMAGE',
+              type: "IMAGE",
               url: validatedData.imageUrl,
               altText: validatedData.title,
             },
@@ -288,7 +288,7 @@ export async function POST(request: NextRequest) {
         // Find or create tag
         let tag = await prisma.tag.findFirst({
           where: {
-            normalizedName: tagName.toLowerCase().replace(/\s+/g, ''),
+            normalizedName: tagName.toLowerCase().replace(/\s+/g, ""),
           },
         });
 
@@ -296,8 +296,8 @@ export async function POST(request: NextRequest) {
           tag = await prisma.tag.create({
             data: {
               name: tagName,
-              type: 'GENERAL',
-              normalizedName: tagName.toLowerCase().replace(/\s+/g, ''),
+              type: "GENERAL",
+              normalizedName: tagName.toLowerCase().replace(/\s+/g, ""),
             },
           });
         }
@@ -325,31 +325,31 @@ export async function POST(request: NextRequest) {
       {
         success: true,
         data: story,
-        message: 'Partner story created successfully',
+        message: "Partner story created successfully",
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid story data',
+          error: "Invalid story data",
           details: error.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    console.error('Failed to create partner story:', error);
+    console.error("Failed to create partner story:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to create partner story',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to create partner story",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -383,29 +383,29 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: updatedStory,
-      message: 'Partner story updated successfully',
+      message: "Partner story updated successfully",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid update data',
+          error: "Invalid update data",
           details: error.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    console.error('Failed to update partner story:', error);
+    console.error("Failed to update partner story:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to update partner story',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to update partner story",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -414,15 +414,15 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const id = url.searchParams.get('id');
+    const id = url.searchParams.get("id");
 
     if (!id) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Story ID is required',
+          error: "Story ID is required",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -438,18 +438,18 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Partner story archived successfully',
+      message: "Partner story archived successfully",
     });
   } catch (error) {
-    console.error('Failed to archive partner story:', error);
+    console.error("Failed to archive partner story:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to archive partner story',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to archive partner story",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

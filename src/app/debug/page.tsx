@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export default function DebugPage() {
-  const [status, setStatus] = useState('Initial');
+  const [status, setStatus] = useState("Initial");
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    console.log('Debug: useEffect triggered');
-    setStatus('useEffect triggered');
-    
-    fetch('/api/feed?limit=3')
-      .then(res => {
-        setStatus('Response received');
+    console.log("Debug: useEffect triggered");
+    setStatus("useEffect triggered");
+
+    fetch("/api/feed?limit=3")
+      .then((res) => {
+        setStatus("Response received");
         return res.json();
       })
-      .then(data => {
-        setStatus('Data parsed');
+      .then((data) => {
+        setStatus("Data parsed");
         setData(data);
       })
-      .catch(err => {
+      .catch((err) => {
         setStatus(`Error: ${err.message}`);
       });
   }, []);

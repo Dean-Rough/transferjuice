@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import { ReactNode, useEffect, useState, useRef } from 'react';
-import { PolaroidTimeline } from './PolaroidTimeline';
-import { BriefingSidebar } from './BriefingSidebar';
-import { BriefingContent } from './BriefingContent';
-import { VisualTimeline } from './VisualTimeline';
-import type { BriefingWithRelations } from '@/types/briefing';
+import { ReactNode, useEffect, useState, useRef } from "react";
+import Image from "next/image";
+import { PolaroidTimeline } from "./PolaroidTimeline";
+import { BriefingSidebar } from "./BriefingSidebar";
+import { BriefingContent } from "./BriefingContent";
+import { VisualTimeline } from "./VisualTimeline";
+import type { BriefingWithRelations } from "@/types/briefing";
 
 interface MagazineLayoutProps {
   briefing: BriefingWithRelations;
@@ -13,10 +14,10 @@ interface MagazineLayoutProps {
   className?: string;
 }
 
-export function MagazineLayout({ 
+export function MagazineLayout({
   briefing,
   onShare,
-  className = '' 
+  className = "",
 }: MagazineLayoutProps) {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [contentHeight, setContentHeight] = useState(0);
@@ -29,12 +30,15 @@ export function MagazineLayout({
       if (contentRef.current) {
         const rect = contentRef.current.getBoundingClientRect();
         const windowHeight = window.innerHeight;
-        
+
         // Calculate relative scroll position within content
         const relativeScroll = Math.max(0, -rect.top);
-        const maxScroll = Math.max(0, contentRef.current.offsetHeight - windowHeight);
+        const maxScroll = Math.max(
+          0,
+          contentRef.current.offsetHeight - windowHeight,
+        );
         const scrollProgress = maxScroll > 0 ? relativeScroll / maxScroll : 0;
-        
+
         setScrollPosition(scrollProgress);
       }
     };
@@ -46,21 +50,21 @@ export function MagazineLayout({
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', updateContentHeight);
-    
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", updateContentHeight);
+
     // Initial calculations
     handleScroll();
     updateContentHeight();
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', updateContentHeight);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateContentHeight);
     };
   }, []);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={`magazine-layout min-h-screen bg-background ${className}`}
       data-testid="magazine-layout"
@@ -69,13 +73,13 @@ export function MagazineLayout({
       <header className="magazine-header px-4 py-8 md:px-8 lg:px-12 border-b border-zinc-800">
         <div className="max-w-[1400px] mx-auto">
           <time className="text-zinc-500 text-sm uppercase tracking-wider">
-            {new Date(briefing.timestamp).toLocaleDateString('en-GB', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
+            {new Date(briefing.timestamp).toLocaleDateString("en-GB", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
             })}
           </time>
           <h1 className="mt-4 text-4xl md:text-6xl lg:text-7xl font-bold leading-tight text-white">
@@ -86,7 +90,7 @@ export function MagazineLayout({
               {(briefing.title as any).subtitle}
             </p>
           )}
-          
+
           {/* Metadata bar */}
           <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-zinc-500">
             <span>{briefing.readTime} min read</span>
@@ -104,28 +108,48 @@ export function MagazineLayout({
         </div>
       </header>
 
+      {/* Hero Image */}
+      {briefing.media &&
+        briefing.media.length > 0 &&
+        briefing.media[0]?.type === "IMAGE" && (
+          <div className="hero-image-container max-w-[1400px] mx-auto px-4 lg:px-8 py-8">
+            <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] rounded-lg overflow-hidden">
+              <Image
+                src={briefing.media[0].url}
+                alt={briefing.media[0].altText || (briefing.title as any).main}
+                fill
+                className="object-cover"
+                priority
+              />
+              {briefing.media[0].caption && (
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                  <p className="text-white text-sm">
+                    {briefing.media[0].caption}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
       {/* Magazine Grid Container */}
       <div className="magazine-grid max-w-[1400px] mx-auto px-4 lg:px-8">
-        
         {/* Column 1: Main Content (40%) */}
-        <article 
+        <article
           ref={contentRef}
           className="content-column prose prose-invert max-w-none"
           data-testid="content-column"
         >
           <div className="content-wrapper">
-            <BriefingContent 
-              sections={briefing.content as any[]} 
+            <BriefingContent
+              sections={briefing.content as any[]}
               feedItems={briefing.feedItems}
             />
           </div>
         </article>
 
         {/* Column 2: Visual Timeline (40%) */}
-        <aside 
-          className="timeline-column"
-          data-testid="timeline-column"
-        >
+        <aside className="timeline-column" data-testid="timeline-column">
           <VisualTimeline
             items={briefing.visualTimeline as any[]}
             feedItems={briefing.feedItems}
@@ -133,10 +157,7 @@ export function MagazineLayout({
         </aside>
 
         {/* Column 3: Sidebar (20%) */}
-        <aside 
-          className="sidebar-column"
-          data-testid="sidebar-column"
-        >
+        <aside className="sidebar-column" data-testid="sidebar-column">
           <BriefingSidebar
             sections={briefing.sidebarSections as any[]}
             tags={briefing.tags}
@@ -223,12 +244,14 @@ export function MagazineLayout({
           position: relative;
           margin: 2rem 0;
           padding: 1.5rem 2rem;
-          background: linear-gradient(135deg, 
-            rgba(255, 138, 0, 0.1) 0%, 
-            rgba(255, 138, 0, 0.05) 100%);
+          background: linear-gradient(
+            135deg,
+            rgba(255, 138, 0, 0.1) 0%,
+            rgba(255, 138, 0, 0.05) 100%
+          );
           border-left: 4px solid hsl(var(--tj-orange));
           border-radius: 0 8px 8px 0;
-          font-family: 'Bouchers Sans', system-ui, sans-serif;
+          font-family: "Bouchers Sans", system-ui, sans-serif;
           font-style: italic;
           transform: rotate(-0.5deg);
           transition: transform 0.3s ease;
@@ -388,8 +411,10 @@ export function MagazineLayout({
         }
 
         .content-wrapper .tweet-quote::before {
-          content: '🐦';
+          content: "@";
           margin-right: 0.5rem;
+          font-weight: bold;
+          color: #1da1f2;
         }
 
         /* Partner content callouts */
@@ -411,9 +436,11 @@ export function MagazineLayout({
 
         /* Bullshit Corner styling */
         .content-wrapper .bullshit-corner {
-          background: linear-gradient(135deg, 
-            rgba(239, 68, 68, 0.1) 0%, 
-            rgba(239, 68, 68, 0.05) 100%);
+          background: linear-gradient(
+            135deg,
+            rgba(239, 68, 68, 0.1) 0%,
+            rgba(239, 68, 68, 0.05) 100%
+          );
           border: 2px dashed #ef4444;
           padding: 2rem;
           margin: 3rem 0;
@@ -423,13 +450,15 @@ export function MagazineLayout({
         }
 
         .content-wrapper .bullshit-corner::before {
-          content: '💩';
+          content: "BS";
           position: absolute;
           top: -10px;
           left: 20px;
           background: hsl(var(--background));
           padding: 0 8px;
-          font-size: 1.5rem;
+          font-size: 0.875rem;
+          font-weight: 800;
+          color: #ef4444;
         }
 
         .content-wrapper .bullshit-corner h4 {

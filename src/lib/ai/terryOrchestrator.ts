@@ -6,21 +6,21 @@
 import {
   globalMonitor,
   type GlobalMonitoringStats,
-} from '@/lib/twitter/globalMonitor';
+} from "@/lib/twitter/globalMonitor";
 import {
   terryIntegration,
   type TerryIntegrationConfig,
   DEFAULT_INTEGRATION_CONFIG,
-} from './terryIntegration';
-import { convertTweetToFeedItem } from '@/lib/twitter/feedIntegration';
+} from "./terryIntegration";
+import { convertTweetToFeedItem } from "@/lib/twitter/feedIntegration";
 // TODO: Fix circular dependency with feedStore
 // import { useFeedStore } from '@/lib/stores/feedStore';
 import {
   type TweetData,
   type ClassificationResult,
   classifyTransferContent,
-} from '@/lib/twitter/transferClassifier';
-import { type ITKSource, getSourceByHandle } from '@/lib/twitter/globalSources';
+} from "@/lib/twitter/transferClassifier";
+import { type ITKSource, getSourceByHandle } from "@/lib/twitter/globalSources";
 
 export interface TerryOrchestrationConfig {
   integration: TerryIntegrationConfig;
@@ -85,12 +85,12 @@ export class TerryOrchestrator {
    */
   public start(): void {
     if (this.isRunning) {
-      console.warn('Terry Orchestrator is already running');
+      console.warn("Terry Orchestrator is already running");
       return;
     }
 
     this.isRunning = true;
-    console.log('🎭 Starting Terry Commentary Orchestrator...');
+    console.log("🎭 Starting Terry Commentary Orchestrator...");
 
     // Hook into global monitoring system
     this.setupGlobalMonitoringIntegration();
@@ -100,7 +100,7 @@ export class TerryOrchestrator {
       this.startHourlyUpdateCycle();
     }
 
-    console.log('🎬 Terry Commentary Orchestrator started successfully');
+    console.log("🎬 Terry Commentary Orchestrator started successfully");
   }
 
   /**
@@ -108,7 +108,7 @@ export class TerryOrchestrator {
    */
   public stop(): void {
     if (!this.isRunning) {
-      console.warn('Terry Orchestrator is not running');
+      console.warn("Terry Orchestrator is not running");
       return;
     }
 
@@ -123,7 +123,7 @@ export class TerryOrchestrator {
     // Clean up Terry integration
     terryIntegration.cleanup();
 
-    console.log('⏹️ Terry Commentary Orchestrator stopped');
+    console.log("⏹️ Terry Commentary Orchestrator stopped");
   }
 
   /**
@@ -133,7 +133,7 @@ export class TerryOrchestrator {
     // In production, this would hook into the global monitor's event system
     // For now, we'll simulate by checking for new tweets periodically
 
-    console.log('🔗 Connecting Terry to global ITK monitoring system...');
+    console.log("🔗 Connecting Terry to global ITK monitoring system...");
 
     // Monitor the feed store for new items and add Terry commentary
     this.monitorFeedStoreChanges();
@@ -153,7 +153,7 @@ export class TerryOrchestrator {
 
       // TODO: Re-enable feed store monitoring once circular dependency is fixed
       console.log(
-        'Feed store monitoring disabled temporarily due to circular dependency'
+        "Feed store monitoring disabled temporarily due to circular dependency",
       );
       // const feedStore = useFeedStore.getState();
       // const currentItemCount = feedStore.items.length;
@@ -214,12 +214,12 @@ export class TerryOrchestrator {
 
     // Prioritize breaking news
     if (
-      feedItem.type === 'breaking' &&
+      feedItem.type === "breaking" &&
       this.config.monitoring.prioritizeBreakingNews
     ) {
       const success = await terryIntegration.processBreakingNews(
         feedItem,
-        true
+        true,
       );
       if (success) {
         this.stats.breakingNewsCommentaries++;
@@ -229,7 +229,7 @@ export class TerryOrchestrator {
     }
 
     // Process regular transfer content
-    if (feedItem.type === 'itk' || feedItem.type === 'confirmed') {
+    if (feedItem.type === "itk" || feedItem.type === "confirmed") {
       const success = await terryIntegration.processFeedItem(feedItem);
       if (success) {
         this.stats.commentariesGenerated++;
@@ -242,14 +242,14 @@ export class TerryOrchestrator {
    * Start hourly update cycle
    */
   private startHourlyUpdateCycle(): void {
-    console.log('⏰ Starting Terry hourly update cycle...');
+    console.log("⏰ Starting Terry hourly update cycle...");
 
     // Run every hour
     this.intervalId = setInterval(
       () => {
         this.runHourlyUpdate();
       },
-      60 * 60 * 1000
+      60 * 60 * 1000,
     );
 
     // Run initial update
@@ -262,7 +262,7 @@ export class TerryOrchestrator {
   private async runHourlyUpdate(): Promise<void> {
     if (!this.isRunning) return;
 
-    console.log('🕐 Running Terry hourly update...');
+    console.log("🕐 Running Terry hourly update...");
 
     try {
       // Get global monitoring stats
@@ -279,7 +279,7 @@ export class TerryOrchestrator {
 
       this.stats.activeHoursToday++;
     } catch (error) {
-      console.error('Terry hourly update failed:', error);
+      console.error("Terry hourly update failed:", error);
     }
   }
 
@@ -289,7 +289,7 @@ export class TerryOrchestrator {
   private async processHighPriorityItems(): Promise<void> {
     // TODO: Re-enable feed store access once circular dependency is fixed
     console.log(
-      'High priority item processing disabled temporarily due to circular dependency'
+      "High priority item processing disabled temporarily due to circular dependency",
     );
     const highPriorityItems: any[] = [];
     // const feedStore = useFeedStore.getState();
@@ -305,7 +305,7 @@ export class TerryOrchestrator {
 
     if (highPriorityItems.length > 0) {
       console.log(
-        `⚡ Terry processing ${highPriorityItems.length} high-priority items...`
+        `⚡ Terry processing ${highPriorityItems.length} high-priority items...`,
       );
 
       for (const item of highPriorityItems.slice(0, 3)) {
@@ -319,7 +319,7 @@ export class TerryOrchestrator {
    * Update stats from global monitoring
    */
   private updateStatsFromMonitoring(
-    monitoringStats: GlobalMonitoringStats
+    monitoringStats: GlobalMonitoringStats,
   ): void {
     this.stats.transferTweetsDetected += monitoringStats.totalTransferTweets;
 
@@ -355,7 +355,7 @@ export class TerryOrchestrator {
   private logHourlySummary(monitoringStats: GlobalMonitoringStats): void {
     const terryStats = terryIntegration.getStats();
 
-    console.log('📊 Terry Hourly Summary:', {
+    console.log("📊 Terry Hourly Summary:", {
       transferTweetsDetected: monitoringStats.totalTransferTweets,
       commentariesGenerated: terryStats.commentariesGenerated,
       successRate: `${terryStats.successRate}%`,
@@ -369,7 +369,7 @@ export class TerryOrchestrator {
    */
   public async generateBreakingNewsAlert(
     feedItem: any,
-    isGenuineDrama: boolean = true
+    isGenuineDrama: boolean = true,
   ): Promise<boolean> {
     if (!this.config.scheduling.enableBreakingNewsAlerts) {
       return false;
@@ -379,12 +379,12 @@ export class TerryOrchestrator {
 
     const success = await terryIntegration.processBreakingNews(
       feedItem,
-      isGenuineDrama
+      isGenuineDrama,
     );
 
     if (success) {
       this.stats.breakingNewsCommentaries++;
-      console.log('🎬 Terry Breaking News commentary published');
+      console.log("🎬 Terry Breaking News commentary published");
     }
 
     return success;
@@ -422,7 +422,7 @@ export class TerryOrchestrator {
       terryIntegration.updateConfig(newConfig.integration);
     }
 
-    console.log('🔧 Updated Terry orchestration config');
+    console.log("🔧 Updated Terry orchestration config");
   }
 
   /**
@@ -431,7 +431,7 @@ export class TerryOrchestrator {
   public resetStats(): void {
     this.stats = this.initializeStats();
     terryIntegration.resetStats();
-    console.log('📊 Terry orchestration stats reset');
+    console.log("📊 Terry orchestration stats reset");
   }
 
   /**
@@ -469,7 +469,7 @@ export const terryOrchestrator = new TerryOrchestrator();
  * Start Terry's continuous commentary system
  */
 export const startTerrySystem = (
-  config?: Partial<TerryOrchestrationConfig>
+  config?: Partial<TerryOrchestrationConfig>,
 ) => {
   if (config) {
     terryOrchestrator.updateConfig(config);
@@ -497,7 +497,7 @@ export const getTerrySystemStatus = () => {
  */
 export const triggerTerryBreakingNews = (
   feedItem: any,
-  isGenuineDrama: boolean = true
+  isGenuineDrama: boolean = true,
 ) => {
   return terryOrchestrator.generateBreakingNewsAlert(feedItem, isGenuineDrama);
 };
@@ -506,7 +506,7 @@ export const triggerTerryBreakingNews = (
  * Update Terry system configuration
  */
 export const updateTerrySystemConfig = (
-  config: Partial<TerryOrchestrationConfig>
+  config: Partial<TerryOrchestrationConfig>,
 ) => {
   terryOrchestrator.updateConfig(config);
 };

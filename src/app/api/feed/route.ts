@@ -3,9 +3,9 @@
  * Serves real-time transfer feed data from database
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { FeedType, Priority, League } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { FeedType, Priority, League } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,13 +13,13 @@ export async function GET(request: NextRequest) {
     const searchParams = url.searchParams;
 
     // Parse query parameters
-    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
-    const offset = parseInt(searchParams.get('offset') || '0');
-    const type = searchParams.get('type') as FeedType | null;
-    const priority = searchParams.get('priority') as Priority | null;
-    const league = searchParams.get('league') as League | null;
-    const sourceId = searchParams.get('sourceId');
-    const tags = searchParams.getAll('tag'); // Multiple tags support
+    const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
+    const offset = parseInt(searchParams.get("offset") || "0");
+    const type = searchParams.get("type") as FeedType | null;
+    const priority = searchParams.get("priority") as Priority | null;
+    const league = searchParams.get("league") as League | null;
+    const sourceId = searchParams.get("sourceId");
+    const tags = searchParams.getAll("tag"); // Multiple tags support
 
     // Build where clause
     const where: any = {
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
           },
         },
       },
-      orderBy: [{ priority: 'desc' }, { publishedAt: 'desc' }],
+      orderBy: [{ priority: "desc" }, { publishedAt: "desc" }],
       take: limit,
       skip: offset,
     });
@@ -114,10 +114,10 @@ export async function GET(request: NextRequest) {
       },
       tags: {
         clubs: item.tags
-          .filter((t) => t.tag.type === 'CLUB')
+          .filter((t) => t.tag.type === "CLUB")
           .map((t) => t.tag.name),
         players: item.tags
-          .filter((t) => t.tag.type === 'PLAYER')
+          .filter((t) => t.tag.type === "PLAYER")
           .map((t) => t.tag.name),
         sources: [item.source.name],
       },
@@ -166,15 +166,15 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Failed to fetch feed data:', error);
+    console.error("Failed to fetch feed data:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to fetch feed data',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to fetch feed data",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -184,12 +184,12 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const { content, sourceId, type = 'ITK', priority = 'MEDIUM' } = body;
+    const { content, sourceId, type = "ITK", priority = "MEDIUM" } = body;
 
     if (!content || !sourceId) {
       return NextResponse.json(
-        { error: 'Content and sourceId are required' },
-        { status: 400 }
+        { error: "Content and sourceId are required" },
+        { status: 400 },
       );
     }
 
@@ -218,17 +218,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: feedItem,
-      message: 'Feed item created successfully',
+      message: "Feed item created successfully",
     });
   } catch (error) {
-    console.error('Failed to create feed item:', error);
+    console.error("Failed to create feed item:", error);
 
     return NextResponse.json(
       {
-        error: 'Failed to create feed item',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to create feed item",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
