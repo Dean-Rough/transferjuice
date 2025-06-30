@@ -7,7 +7,6 @@ import { validateEnvironment } from "@/lib/validations/environment";
 import { TwitterTweetsResponseSchema } from "@/lib/validations/twitter";
 import { z } from "zod";
 import { applyTerryStyle } from "@/lib/terry-style";
-import { apifyClient, ApifyTweet } from "@/lib/apify/client";
 import { getHybridTwitterClient, SimplifiedTweet } from "./hybrid-client";
 
 // Twitter API v2 Response Schemas
@@ -130,7 +129,6 @@ interface TwitterClientConfig {
   defaultMaxResults?: number;
   retryAttempts?: number;
   retryDelay?: number;
-  useApifyFallback?: boolean;
 }
 
 export class TwitterAPIError extends Error {
@@ -163,7 +161,6 @@ export class TwitterClient {
   private retryDelay: number;
   private rateLimits: Map<string, RateLimitInfo> = new Map();
   private static instance: TwitterClient | null = null;
-  private useApifyFallback: boolean;
   private hybridClient = getHybridTwitterClient();
   private useHybridMode: boolean;
 
@@ -173,8 +170,7 @@ export class TwitterClient {
     this.defaultMaxResults = config.defaultMaxResults || 100;
     this.retryAttempts = config.retryAttempts || 3;
     this.retryDelay = config.retryDelay || 1000;
-    this.useApifyFallback = config.useApifyFallback ?? true;
-    this.useHybridMode = process.env.USE_HYBRID_TWITTER === "true";
+    this.useHybridMode = process.env.USE_HYBRID_TWITTER === "true" || process.env.USE_PLAYWRIGHT_SCRAPER === "true";
   }
 
   /**
@@ -313,7 +309,7 @@ export class TwitterClient {
       untilId?: string;
       startTime?: string;
       endTime?: string;
-      username?: string; // For Apify fallback
+      username?: string; // For hybrid client fallback
     } = {},
   ): Promise<TwitterTimelineResponse> {
     const params: Record<string, string> = {
@@ -356,16 +352,15 @@ export class TwitterClient {
 
       return TwitterTimelineResponseSchema.parse(data);
     } catch (error) {
-      // If rate limited and Apify fallback is enabled, use Apify
+      // If rate limited, use hybrid client (Playwright) as fallback
       if (
         error instanceof TwitterRateLimitError &&
-        this.useApifyFallback &&
         options.username
       ) {
         console.log(
-          `[Twitter] Rate limited, falling back to Apify for @${options.username}`,
+          `[Twitter] Rate limited, falling back to Playwright scraper for @${options.username}`,
         );
-        return this.getUserTimelineViaApify(options.username, options);
+        return this.getUserTimelineViaHybrid(options.username, options);
       }
 
       if (error instanceof z.ZodError) {
@@ -473,9 +468,9 @@ export class TwitterClient {
   }
 
   /**
-   * Get user timeline via Apify fallback
+   * Get user timeline via hybrid client (Playwright scraper) fallback
    */
-  private async getUserTimelineViaApify(
+  private async getUserTimelineViaHybrid(
     username: string,
     options: {
       maxResults?: number;
@@ -483,25 +478,30 @@ export class TwitterClient {
     } = {},
   ): Promise<TwitterTimelineResponse> {
     try {
-      const tweets = await apifyClient.fetchUserTweets(username, {
-        maxItems: options.maxResults || this.defaultMaxResults,
-        sinceId: options.sinceId,
-      });
+      // Ensure hybrid client is initialized
+      await this.hybridClient.initialize();
+      
+      const tweets = await this.hybridClient.getUserTweets(
+        username,
+        options.maxResults || this.defaultMaxResults
+      );
 
-      // Transform Apify tweets to Twitter API format
+      // Transform simplified tweets to Twitter API format
       const transformedTweets: TwitterTweet[] = tweets.map((tweet) => ({
         id: tweet.id,
         text: tweet.text,
-        author_id: username, // We don't have the actual ID from Apify
-        created_at: tweet.createdAt,
+        author_id: username, // We don't have the actual ID from scraper
+        created_at: tweet.createdAt.toISOString(),
         context_annotations: undefined,
         public_metrics: {
-          retweet_count: tweet.metrics?.retweetCount || 0,
-          like_count: tweet.metrics?.likeCount || 0,
-          reply_count: tweet.metrics?.replyCount || 0,
-          quote_count: 0, // Apify doesn't provide this
+          retweet_count: 0, // Scraper doesn't provide these
+          like_count: 0,
+          reply_count: tweet.replies || 0,
+          quote_count: 0,
         },
-        attachments: undefined, // TODO: Map media if needed
+        attachments: tweet.media.length > 0 ? {
+          media_keys: tweet.media.map((_, index) => `media_${index}`)
+        } : undefined,
         lang: undefined,
         referenced_tweets: undefined,
       }));
@@ -514,9 +514,9 @@ export class TwitterClient {
             {
               id: username, // Use username as ID for now
               username: username,
-              name: tweets[0]?.author.displayName || username,
-              verified: false,
-              profile_image_url: tweets[0]?.author.profileImageUrl,
+              name: tweets[0]?.author.name || username,
+              verified: tweets[0]?.author.verified || false,
+              profile_image_url: undefined,
               description: undefined,
               public_metrics: {
                 followers_count: 0,
@@ -525,6 +525,14 @@ export class TwitterClient {
               },
             },
           ],
+          media: tweets.flatMap((tweet, tweetIndex) => 
+            tweet.media.map((media, mediaIndex) => ({
+              media_key: `media_${mediaIndex}`,
+              type: media.type,
+              url: media.url,
+              preview_image_url: media.type === "video" ? media.url : undefined
+            }))
+          ),
         },
         meta: {
           result_count: transformedTweets.length,
@@ -535,9 +543,9 @@ export class TwitterClient {
 
       return response;
     } catch (error) {
-      console.error(`[Apify] Failed to fetch tweets for @${username}:`, error);
+      console.error(`[Hybrid] Failed to fetch tweets for @${username}:`, error);
       throw new TwitterAPIError(
-        `Failed to fetch tweets via Apify: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Failed to fetch tweets via Playwright scraper: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -576,91 +584,31 @@ export class TwitterClient {
       }
     }
 
-    // If we have rate limited users and Apify is enabled, batch fetch them
-    if (rateLimitedUsers.length > 0 && this.useApifyFallback) {
+    // If we have rate limited users, use hybrid client to fetch them
+    if (rateLimitedUsers.length > 0) {
       console.log(
-        `[Twitter] Fetching ${rateLimitedUsers.length} rate-limited users via Apify`,
+        `[Twitter] Fetching ${rateLimitedUsers.length} rate-limited users via Playwright scraper`,
       );
 
-      try {
-        const usernames = rateLimitedUsers.map((u) => u.username);
-        const apifyResults = await apifyClient.fetchMultipleUsersTweets(
-          usernames,
-          {
-            maxItemsPerUser: options.maxResults || this.defaultMaxResults,
-          },
-        );
+      // Ensure hybrid client is initialized
+      await this.hybridClient.initialize();
 
-        // Transform and add to results
-        for (const [username, tweets] of Object.entries(apifyResults)) {
-          const user = rateLimitedUsers.find(
-            (u) => u.username.toLowerCase() === username,
+      for (const user of rateLimitedUsers) {
+        try {
+          const timeline = await this.getUserTimelineViaHybrid(user.username, options);
+          results.set(user.username, timeline);
+        } catch (error) {
+          console.error(
+            `[Hybrid] Failed to fetch timeline for @${user.username}:`,
+            error,
           );
-          if (user) {
-            results.set(
-              user.username,
-              this.transformApifyToTwitterResponse(tweets, user.username),
-            );
-          }
         }
-      } catch (error) {
-        console.error("[Apify] Batch fetch failed:", error);
       }
     }
 
     return results;
   }
 
-  /**
-   * Transform Apify tweets to Twitter API response format
-   */
-  private transformApifyToTwitterResponse(
-    tweets: ApifyTweet[],
-    username: string,
-  ): TwitterTimelineResponse {
-    const transformedTweets: TwitterTweet[] = tweets.map((tweet) => ({
-      id: tweet.id,
-      text: tweet.text,
-      author_id: username,
-      created_at: tweet.createdAt,
-      context_annotations: undefined,
-      public_metrics: {
-        retweet_count: tweet.metrics?.retweetCount || 0,
-        like_count: tweet.metrics?.likeCount || 0,
-        reply_count: tweet.metrics?.replyCount || 0,
-        quote_count: 0,
-      },
-      attachments: undefined,
-      lang: undefined,
-      referenced_tweets: undefined,
-    }));
-
-    return {
-      data: transformedTweets.length > 0 ? transformedTweets : undefined,
-      includes: {
-        users: [
-          {
-            id: username,
-            username: username,
-            name: tweets[0]?.author.displayName || username,
-            verified: false,
-            profile_image_url: tweets[0]?.author.profileImageUrl,
-            description: undefined,
-            public_metrics: {
-              followers_count: 0,
-              following_count: 0,
-              tweet_count: 0,
-            },
-          },
-        ],
-      },
-      meta: {
-        result_count: transformedTweets.length,
-        newest_id: transformedTweets[0]?.id,
-        oldest_id: transformedTweets[transformedTweets.length - 1]?.id,
-      },
-    };
-  }
 
   /**
    * Get user tweets using hybrid approach (scraper + API fallback)

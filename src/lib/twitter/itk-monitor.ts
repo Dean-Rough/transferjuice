@@ -262,7 +262,7 @@ export class ITKMonitor {
     const response = await this.twitterClient.getUserTimeline(user.id, {
       maxResults: 50, // Reasonable batch size
       sinceId,
-      username: account.username, // For Apify fallback
+      username: account.username, // For hybrid client fallback
     });
 
     if (!response.data || response.data.length === 0) {

@@ -50,10 +50,6 @@ const TwitterConfigSchema = z.object({
       message: "TWITTER_FETCH_INTERVAL must not exceed 3600 seconds (1 hour)",
     })
     .default(900), // 15 minutes
-  APIFY_API_TOKEN: z
-    .string()
-    .min(1, { message: "APIFY_API_TOKEN is required for Twitter fallback" })
-    .optional(),
 });
 
 // AI service configuration

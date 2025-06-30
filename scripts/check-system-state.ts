@@ -139,7 +139,7 @@ async function checkSystemState() {
       USE_REAL_TWITTER_API: process.env.USE_REAL_TWITTER_API === 'true',
       X_BEARER_TOKEN: !!process.env.X_BEARER_TOKEN,
       TWITTER_BEARER_TOKEN: !!process.env.TWITTER_BEARER_TOKEN,
-      APIFY_API_TOKEN: !!process.env.APIFY_API_TOKEN,
+      USE_PLAYWRIGHT_SCRAPER: process.env.USE_PLAYWRIGHT_SCRAPER === 'true',
     };
     
     Object.entries(envVars).forEach(([key, value]) => {

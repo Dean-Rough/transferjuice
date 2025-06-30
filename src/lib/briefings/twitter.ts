@@ -165,7 +165,7 @@ async function fetchTweetsFromSource(
       startTime: since.toISOString(),
       endTime: until.toISOString(),
       sinceId: source.lastTweetId || undefined,
-      username: (source as any).username, // For Apify fallback
+      username: (source as any).username, // For hybrid client fallback
     });
 
     if (!timeline.data || timeline.data.length === 0) {

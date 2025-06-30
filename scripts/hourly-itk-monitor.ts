@@ -29,13 +29,8 @@ async function hourlyMonitoring() {
     return;
   }
 
-  // Initialize hybrid client with session scraper
-  const client = new HybridTwitterClient({
-    bearerToken: process.env.TWITTER_BEARER_TOKEN || '',
-    useApify: false,
-    usePlaywright: true, // Use session-based scraping
-    authUsername: 'juice_backer'
-  });
+  // Initialize hybrid client with Playwright scraper
+  const client = new HybridTwitterClient();
 
   const results = {
     totalSources: 0,
@@ -167,9 +162,6 @@ async function hourlyMonitoring() {
 
   // Close database
   await prisma.$disconnect();
-  
-  // Close scraper
-  await client.close();
 }
 
 const startTime = Date.now();
