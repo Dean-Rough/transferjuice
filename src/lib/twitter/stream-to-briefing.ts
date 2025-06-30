@@ -221,11 +221,10 @@ class StreamToBriefingProcessor {
       );
 
       // Generate briefing using our existing pipeline
-      const result = await generateBriefing({
+      const briefing = await generateBriefing({
         timestamp: new Date(),
         testMode: false, // Use real data now!
         forceRegenerate: true,
-        debugMode: true,
       });
 
       console.log(
@@ -235,9 +234,9 @@ class StreamToBriefingProcessor {
       );
 
       logger.info("Briefing generated from stream", {
-        success: result.success,
+        briefingId: briefing.id,
         triggerType,
-        message: result.message,
+        slug: briefing.slug,
       });
 
       // Clear buffer and update last briefing time

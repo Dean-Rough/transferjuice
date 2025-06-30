@@ -44,14 +44,14 @@ export async function POST(request: NextRequest): Promise<Response> {
     if (monitoringStats.totalTransferTweets >= 3) {
       console.log("📝 Generating hourly briefing...");
       try {
-        const result = await generateBriefing({
+        const briefing = await generateBriefing({
           timestamp: new Date(),
           testMode: false,
           forceRegenerate: true,
         });
         briefingGenerated = true;
-        briefingSlug = result.success ? "generated" : null;
-        console.log(`✅ Briefing generation attempted: ${result.success}`);
+        briefingSlug = briefing.slug || "generated";
+        console.log(`✅ Briefing generated successfully: ${briefing.id}`);
       } catch (error) {
         console.error("❌ Briefing generation failed:", error);
       }

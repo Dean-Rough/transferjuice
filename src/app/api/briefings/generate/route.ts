@@ -79,22 +79,23 @@ export async function POST(request: NextRequest) {
     console.log(`Starting briefing generation for ${timestamp}`);
 
     try {
-      const result = await generateBriefing({
+      const briefing = await generateBriefing({
         timestamp: currentHour,
         testMode,
         forceRegenerate: force,
       });
 
-      console.log(`Briefing generation attempted: ${result.success}`);
+      console.log(`Briefing generated successfully: ${briefing.id}`);
 
-      // Return stub response for now
+      // Return success response
       return NextResponse.json(
         {
-          success: result.success,
-          message: result.message || "Briefing generation temporarily disabled",
+          success: true,
+          message: "Briefing generated successfully",
           generatedAt: new Date().toISOString(),
+          briefingId: briefing.id,
         },
-        { status: result.success ? 201 : 500 },
+        { status: 201 },
       );
     } catch (generationError) {
       console.error("Briefing generation failed:", generationError);
