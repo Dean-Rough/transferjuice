@@ -13,12 +13,9 @@ import { getTweetsForBriefing, syncGlobalSourcesToDatabase } from "./twitter";
 import { generateTerryContent } from "./terry";
 import { mixPartnerContent } from "./partner";
 import { addPlayerImagesToContent } from "@/lib/images/playerImageFetcher";
+import { formatBriefingContent, generateTableOfContents } from "./contentFormatter";
 import { generateSlug } from "@/lib/utils/slug";
 import { findSimilarBriefedStories } from "@/lib/database/feedItems";
-import {
-  formatBriefingContent,
-  generateTableOfContents,
-} from "./contentFormatter";
 
 export interface GenerateBriefingOptions {
   timestamp: Date;
@@ -141,21 +138,20 @@ export async function generateBriefing(
         section.feedItemIds?.includes(item.id),
       );
 
-      // Temporarily disable HTML formatting due to malformed HTML issue
-      // TODO: Fix the formatBriefingContent function to generate valid HTML
-      // const formattedContent = formatBriefingContent(
-      //   section.content,
-      //   relatedFeedItems,
-      //   {
-      //     linkPlayers: true,
-      //     linkClubs: true,
-      //     boldEntities: true,
-      //     includeTweets: true,
-      //     baseUrl: process.env.APP_URL || "http://localhost:3000",
-      //   }
-      // );
+      // Re-enable rich HTML formatting with sophisticated content formatter
+      const formattedContent = formatBriefingContent(
+        section.content,
+        relatedFeedItems,
+        {
+          linkPlayers: true,
+          linkClubs: true,
+          boldEntities: true,
+          includeTweets: true,
+          baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "https://transferjuice.com",
+        }
+      );
 
-      return { ...section, content: section.content };
+      return { ...section, content: formattedContent };
     });
 
     // Step 6: Generate table of contents for long briefings

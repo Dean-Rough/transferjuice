@@ -1,8 +1,7 @@
-// Temporary stub for deployment
-export async function generateBriefing(options: any) {
-  console.log("Briefing generation temporarily disabled for deployment");
-  return {
-    success: false,
-    message: "Briefing generation temporarily disabled"
-  };
-}
+/**
+ * Briefing Generator Orchestrator
+ * Re-exports the actual implementation from lib/briefings
+ */
+
+export { generateBriefing } from "@/lib/briefings/generator";
+export type { GenerateBriefingOptions, GenerationResult } from "@/lib/briefings/generator";

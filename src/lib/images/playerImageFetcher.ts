@@ -1,16 +1,23 @@
 /**
- * Simple player image fetcher
- * Gets player images from Wikipedia or returns a default
+ * Advanced Image Pipeline
+ * Comprehensive image system with entity extraction, multiple image types, and confidence scoring
  */
 
 import { WikipediaImageService } from "@/lib/images/wikipediaService";
+import { 
+  searchRelevantImages, 
+  extractImageSearchTerms, 
+  validateImageUrls,
+  type ImageResult 
+} from "@/lib/media/imageSearch";
 
 export interface PlayerImageData {
   url: string;
   alt: string;
   caption: string;
-  source: "wikipedia" | "fallback";
+  source: "wikipedia" | "fallback" | "commons";
   confidence?: number;
+  type?: "player" | "club_badge" | "stadium" | "action";
 }
 
 /**
@@ -88,43 +95,54 @@ export function generatePlayerImageHTML(playerData: PlayerImageData): string {
 }
 
 /**
- * Extract and fetch images for all players in content
+ * Enhanced content image processing with multiple image types
  */
 export async function addPlayerImagesToContent(
   content: string,
   feedItems: any[],
 ): Promise<string> {
-  // Extract unique player names from feed items
-  const playerNames = new Set<string>();
+  console.log("🖼️ Starting advanced image pipeline processing...");
 
-  feedItems.forEach((item) => {
-    // Look for player names in various patterns
-    const patterns = [
-      /([A-Z][a-z]+ [A-Z][a-z]+)(?= to | from | has | agrees | signs | joins)/g,
-      /🚨[^:]*:\s*([A-Z][a-z]+ [A-Z][a-z]+)/g,
-      /EXCLUSIVE:\s*([A-Z][a-z]+ [A-Z][a-z]+)/g,
-    ];
-
-    patterns.forEach((pattern) => {
-      const matches = item.content.matchAll(pattern);
-      for (const match of matches) {
-        if (match[1]) {
-          playerNames.add(match[1]);
-        }
-      }
-    });
+  // Step 1: Extract all entities from content using advanced extraction
+  const entities = extractImageSearchTerms(content);
+  console.log(`📊 Extracted entities:`, {
+    players: entities.players.length,
+    clubs: entities.clubs.length,
+    locations: entities.locations.length
   });
 
-  // Fetch images for each player with enhanced data
-  const playerImages = new Map<string, PlayerImageData>();
+  // Step 2: Build comprehensive tag list for image search
+  const tags = [
+    ...entities.players.map(name => ({ name, type: "player" as const })),
+    ...entities.clubs.map(name => ({ name, type: "club" as const })),
+  ];
 
-  for (const playerName of playerNames) {
-    console.log(`🎯 Processing player: ${playerName}`);
-    const imageData = await getPlayerImageUrl(playerName);
-    playerImages.set(playerName, imageData);
+  // Step 3: Search for relevant images using advanced pipeline
+  console.log("🔍 Searching for relevant images...");
+  const searchResults = await searchRelevantImages(content, tags, {
+    maxResults: Math.min(6, tags.length), // Scale with content richness
+    preferredTypes: ["player", "club_badge", "stadium", "action"],
+    fallbackToGeneric: true
+  });
+
+  // Step 4: Validate images and ensure they're accessible
+  console.log("✅ Validating image URLs...");
+  const validatedImages = await validateImageUrls(searchResults);
+  console.log(`📸 ${validatedImages.length} valid images found`);
+
+  // Step 5: Legacy fallback - get high-confidence player images from Wikipedia service
+  const playerImages = new Map<string, PlayerImageData>();
+  
+  for (const playerName of entities.players.slice(0, 3)) { // Limit to prevent overwhelming
+    try {
+      const legacyImageData = await getPlayerImageUrl(playerName);
+      playerImages.set(playerName, legacyImageData);
+    } catch (error) {
+      console.warn(`⚠️ Failed to get image for ${playerName}:`, error);
+    }
   }
 
-  // Add images after paragraphs mentioning the players
+  // Step 6: Process content and add relevant images
   let enhancedContent = content;
   const paragraphs = content.split("</p>");
 
@@ -132,25 +150,84 @@ export async function addPlayerImagesToContent(
     .map((para, idx) => {
       if (!para.trim()) return para;
 
-      // Check which players are mentioned in this paragraph
+      // Find relevant images for this paragraph
+      const relevantImages: ImageResult[] = [];
       const mentionedPlayers: string[] = [];
-      playerImages.forEach((imageData, name) => {
-        if (para.includes(name)) {
-          mentionedPlayers.push(name);
+
+      // Check for entity mentions in this paragraph
+      entities.players.forEach(playerName => {
+        if (para.toLowerCase().includes(playerName.toLowerCase())) {
+          mentionedPlayers.push(playerName);
+          // Find corresponding images
+          const playerImages = validatedImages.filter(img => 
+            img.altText.toLowerCase().includes(playerName.toLowerCase()) && img.type === "player"
+          );
+          relevantImages.push(...playerImages.slice(0, 1));
         }
       });
 
-      // Add image after paragraph if player is mentioned
-      if (mentionedPlayers.length > 0 && idx < paragraphs.length - 1) {
-        const playerName = mentionedPlayers[0]; // Use first mentioned player
-        const imageData = playerImages.get(playerName)!;
-        const imageHtml = generatePlayerImageHTML(imageData);
-        return para + "</p>" + imageHtml;
+      entities.clubs.forEach(clubName => {
+        if (para.toLowerCase().includes(clubName.toLowerCase())) {
+          const clubImages = validatedImages.filter(img => 
+            img.altText.toLowerCase().includes(clubName.toLowerCase()) && img.type === "club_badge"
+          );
+          relevantImages.push(...clubImages.slice(0, 1));
+        }
+      });
+
+      // Add rich media after significant paragraphs
+      if (relevantImages.length > 0 && idx < paragraphs.length - 1) {
+        const mediaHtml = generateAdvancedImageHTML(relevantImages[0]);
+        return para + "</p>" + mediaHtml;
+      }
+
+      // Fallback to legacy player images if advanced search didn't find anything
+      if (mentionedPlayers.length > 0 && relevantImages.length === 0 && idx < paragraphs.length - 1) {
+        const playerName = mentionedPlayers[0];
+        const legacyImageData = playerImages.get(playerName);
+        if (legacyImageData) {
+          const legacyHtml = generatePlayerImageHTML(legacyImageData);
+          return para + "</p>" + legacyHtml;
+        }
       }
 
       return para + (para.trim() ? "</p>" : "");
     })
     .join("");
 
+  console.log("✨ Advanced image pipeline processing complete");
   return enhancedContent;
+}
+
+/**
+ * Generate HTML for advanced image types (club badges, stadiums, action shots)
+ */
+function generateAdvancedImageHTML(imageResult: ImageResult): string {
+  const typeLabels = {
+    player: "📸 Player Photo",
+    club_badge: "🛡️ Club Badge", 
+    stadium: "🏟️ Stadium",
+    action: "⚽ Action Shot"
+  };
+
+  const typeStyles = {
+    player: "max-width: 320px; border-radius: 12px;",
+    club_badge: "max-width: 120px; border-radius: 50%;",
+    stadium: "max-width: 400px; border-radius: 8px;",
+    action: "max-width: 400px; border-radius: 8px;"
+  };
+
+  return `
+    <figure class="advanced-image" style="margin: 24px auto; text-align: center; max-width: 500px;">
+      <img src="${imageResult.url}" 
+           alt="${imageResult.altText}" 
+           style="${typeStyles[imageResult.type]}; height: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.15); transition: transform 0.2s ease;"
+           loading="lazy" 
+           onerror="this.style.opacity='0.7'; this.style.filter='grayscale(1)';" />
+      <figcaption style="margin-top: 12px; font-size: 14px; color: #666; font-weight: 500;">
+        ${imageResult.altText}
+        <br><span style="font-size: 12px; color: #888;">${typeLabels[imageResult.type]} • ${imageResult.source}</span>
+      </figcaption>
+    </figure>
+  `;
 }

@@ -1,12 +1,19 @@
 /**
  * TikTok Embed Component
- * Embeds TikTok videos in briefings
+ * Embeds TikTok videos in briefings with YouTube fallback
  */
 
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Play } from "lucide-react";
+import { Play, ExternalLink } from "lucide-react";
+import {
+  getRandomFootballTikTok,
+  generateTikTokEmbed,
+  getTikTokFallbackYouTube,
+  formatTikTokStats,
+  type TikTokVideo,
+} from "@/lib/media/tikTokSearch";
 import {
   getRandomShithouseryVideo,
   type YouTubeVideo,
@@ -23,36 +30,88 @@ declare global {
 
 interface TikTokEmbedProps {
   videoId?: string;
+  useTikTok?: boolean; // Toggle between TikTok and YouTube
+  fallbackToYouTube?: boolean; // Auto-fallback on TikTok failure
   username?: string;
   description?: string;
   hashtag?: string;
 }
 
 export function TikTokEmbed({
-  videoId = "7380650297168596256", // Working shithouse TikTok
-  username = "433",
-  description = "Vintage shithousery compilation",
-  hashtag = "footballshithousery",
+  videoId,
+  useTikTok = true,
+  fallbackToYouTube = true,
+  username,
+  description,
+  hashtag,
 }: TikTokEmbedProps) {
-  const embedUrl = `https://www.tiktok.com/@${username}/video/${videoId}`;
+  const [tikTokVideo, setTikTokVideo] = useState<TikTokVideo | null>(null);
+  const [youTubeVideo, setYouTubeVideo] = useState<YouTubeVideo | null>(null);
+  const [showTikTok, setShowTikTok] = useState(useTikTok);
+  const [tikTokFailed, setTikTokFailed] = useState(false);
 
+  // Initialize content
   useEffect(() => {
-    // Create a small delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      // Load TikTok embed script if not already loaded
-      if (
-        !document.querySelector('script[src="https://www.tiktok.com/embed.js"]')
-      ) {
-        const script = document.createElement("script");
-        script.src = "https://www.tiktok.com/embed.js";
-        script.async = true;
-        script.setAttribute("data-video-id", videoId);
-        document.body.appendChild(script);
-      }
-    }, 100);
+    if (useTikTok) {
+      const randomTikTok = getRandomFootballTikTok();
+      setTikTokVideo(randomTikTok);
+    }
 
-    return () => clearTimeout(timer);
-  }, [videoId]);
+    // Always prepare YouTube fallback
+    const randomYouTube = getRandomShithouseryVideo();
+    setYouTubeVideo(randomYouTube);
+  }, [useTikTok]);
+
+  const embedUrl = tikTokVideo
+    ? tikTokVideo.url
+    : `https://www.tiktok.com/@${username || "433"}/video/${videoId || "7380650297168596256"}`;
+
+  // TikTok script loading with fallback handling
+  useEffect(() => {
+    if (showTikTok && !tikTokFailed) {
+      const timer = setTimeout(() => {
+        // Load TikTok embed script if not already loaded
+        if (
+          !document.querySelector(
+            'script[src="https://www.tiktok.com/embed.js"]',
+          )
+        ) {
+          const script = document.createElement("script");
+          script.src = "https://www.tiktok.com/embed.js";
+          script.async = true;
+
+          // Handle script load failure
+          script.onerror = () => {
+            console.warn(
+              "TikTok embed script failed to load, falling back to YouTube",
+            );
+            setTikTokFailed(true);
+            if (fallbackToYouTube) {
+              setShowTikTok(false);
+            }
+          };
+
+          document.body.appendChild(script);
+        }
+
+        // Set a timeout to fallback if TikTok doesn't load
+        const fallbackTimer = setTimeout(() => {
+          if (
+            fallbackToYouTube &&
+            !document.querySelector(".tiktok-embed iframe")
+          ) {
+            console.warn("TikTok embed timeout, falling back to YouTube");
+            setTikTokFailed(true);
+            setShowTikTok(false);
+          }
+        }, 5000);
+
+        return () => clearTimeout(fallbackTimer);
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showTikTok, tikTokFailed, fallbackToYouTube]);
 
   return (
     <div className="my-8">
@@ -69,40 +128,139 @@ export function TikTokEmbed({
           masters of the dark arts."
         </p>
 
-        {/* Video Embed - Fallback to YouTube for reliability */}
+        {/* Smart Video Embed - TikTok with YouTube fallback */}
         <div className="flex justify-center mb-6">
-          <div className="relative w-full max-w-[600px] aspect-video bg-zinc-800 rounded-lg overflow-hidden">
-            <iframe
-              src="https://www.youtube.com/embed/ALZHF5UqnU4"
-              className="absolute inset-0 w-full h-full"
-              allowFullScreen
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              loading="lazy"
-              title="Football Shithousery Compilation"
-            />
-          </div>
+          {showTikTok && tikTokVideo && !tikTokFailed ? (
+            // TikTok Embed
+            <div className="w-full max-w-[325px]">
+              <blockquote
+                className="tiktok-embed"
+                cite={tikTokVideo.url}
+                data-video-id={tikTokVideo.id}
+                style={{
+                  maxWidth: "605px",
+                  minWidth: "325px",
+                  background: "#0f0f0f",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                }}
+              >
+                <section>
+                  <a
+                    target="_blank"
+                    title={`@${tikTokVideo.author.username}`}
+                    href={`https://www.tiktok.com/@${tikTokVideo.author.username}?refer=embed`}
+                    className="text-orange-400 font-bold"
+                  >
+                    @{tikTokVideo.author.username}
+                  </a>
+                  <p className="text-white my-2">{tikTokVideo.description}</p>
+                  <a
+                    target="_blank"
+                    title={`♬ original sound - ${tikTokVideo.author.nickname}`}
+                    href={`${tikTokVideo.url}?refer=embed`}
+                    className="text-zinc-400 text-sm"
+                  >
+                    ♬ original sound - {tikTokVideo.author.nickname}
+                  </a>
+                </section>
+              </blockquote>
+              <div className="text-center mt-2">
+                <span className="text-xs text-zinc-500">
+                  {formatTikTokStats(tikTokVideo.stats)}
+                </span>
+              </div>
+            </div>
+          ) : (
+            // YouTube Fallback
+            <div className="relative w-full max-w-[600px] aspect-video bg-zinc-800 rounded-lg overflow-hidden">
+              <iframe
+                src={
+                  youTubeVideo?.embedUrl ||
+                  "https://www.youtube.com/embed/ALZHF5UqnU4"
+                }
+                className="absolute inset-0 w-full h-full"
+                allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                loading="lazy"
+                title={
+                  youTubeVideo?.title || "Football Shithousery Compilation"
+                }
+              />
+              {tikTokFailed && (
+                <div className="absolute top-2 right-2 bg-orange-600 text-white text-xs px-2 py-1 rounded">
+                  YouTube Backup
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Fallback link */}
-        <div className="text-center mb-4">
-          <a
-            href={embedUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors text-sm font-mono"
-          >
-            <Play className="w-4 h-4" />
-            Watch on TikTok
-          </a>
+        {/* Platform Toggle & Links */}
+        <div className="flex justify-center gap-4 mb-4">
+          {tikTokVideo && (
+            <a
+              href={tikTokVideo.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors text-sm font-mono"
+            >
+              <Play className="w-4 h-4" />
+              {showTikTok && !tikTokFailed
+                ? "Watch on TikTok"
+                : "View TikTok Version"}
+            </a>
+          )}
+
+          {youTubeVideo && (
+            <a
+              href={youTubeVideo.watchUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors text-sm font-mono"
+            >
+              <ExternalLink className="w-4 h-4" />
+              YouTube Version
+            </a>
+          )}
+
+          {!showTikTok && fallbackToYouTube && (
+            <button
+              onClick={() => {
+                setShowTikTok(true);
+                setTikTokFailed(false);
+              }}
+              className="inline-flex items-center gap-2 text-zinc-400 hover:text-zinc-300 transition-colors text-sm"
+            >
+              Try TikTok Again
+            </button>
+          )}
         </div>
 
         {/* Video info */}
         <div className="flex items-center justify-between text-sm mb-4">
           <p className="text-zinc-400">
-            @{username} - {description}
+            {showTikTok && tikTokVideo && !tikTokFailed ? (
+              <>
+                @{tikTokVideo.author.username} -{" "}
+                {tikTokVideo.description.substring(0, 60)}...
+              </>
+            ) : youTubeVideo ? (
+              <>
+                {youTubeVideo.channelName} - {youTubeVideo.title}
+              </>
+            ) : (
+              <>
+                @{username || "433"} - {description || "Football content"}
+              </>
+            )}
           </p>
           <a
-            href={`https://www.tiktok.com/tag/${hashtag}`}
+            href={
+              showTikTok
+                ? `https://www.tiktok.com/tag/footballshithousery`
+                : `https://www.youtube.com/results?search_query=football+shithousery`
+            }
             target="_blank"
             rel="noopener noreferrer"
             className="text-orange-400 hover:text-orange-300 transition-colors font-mono"
