@@ -17,10 +17,12 @@ export class PlaywrightTwitterScraper {
   private browser: Browser | null = null;
   private context: BrowserContext | null = null;
   private config: Required<PlaywrightScraperConfig>;
+  private isLoggedIn: boolean = false;
+  private loginPage: Page | null = null;
 
   constructor(config: PlaywrightScraperConfig = {}) {
     this.config = {
-      headless: config.headless ?? true,
+      headless: config.headless ?? (process.env.PLAYWRIGHT_HEADLESS !== 'false'),
       userAgent:
         config.userAgent ??
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -72,6 +74,94 @@ export class PlaywrightTwitterScraper {
     });
 
     console.log("✅ Playwright browser initialized");
+
+    // Attempt login if credentials are available for better tweet ordering
+    console.log(`🔑 Twitter credentials check: username=${process.env.TWITTER_SCRAPER_USERNAME ? 'present' : 'missing'}, password=${process.env.TWITTER_SCRAPER_PASSWORD ? 'present' : 'missing'}`);
+    if (process.env.TWITTER_SCRAPER_USERNAME && process.env.TWITTER_SCRAPER_PASSWORD) {
+      try {
+        await this.login();
+      } catch (error) {
+        console.error("Login failed, continuing without auth:", error);
+      }
+    } else {
+      console.log("📖 No credentials found - scraping public profiles without login");
+    }
+  }
+
+  async login(): Promise<void> {
+    if (this.isLoggedIn) return;
+    if (!this.context) await this.initialize();
+
+    const username = process.env.TWITTER_SCRAPER_USERNAME;
+    const password = process.env.TWITTER_SCRAPER_PASSWORD;
+
+    if (!username || !password) {
+      console.log("⚠️ Twitter credentials not found, proceeding without login");
+      return;
+    }
+
+    console.log(`🔐 Attempting Twitter login with username: ${username}`);
+    const page = await this.context!.newPage();
+
+    try {
+      // Navigate to Twitter login page
+      await page.goto("https://twitter.com/i/flow/login", {
+        waitUntil: "domcontentloaded",
+        timeout: this.config.timeout,
+      });
+
+      // Wait for username input
+      await page.waitForSelector('input[autocomplete="username"]', { timeout: 10000 });
+      await page.fill('input[autocomplete="username"]', username);
+      
+      // Click next button - find it by looking for the Next button after the username input
+      await page.waitForTimeout(1000); // Give UI time to update
+      const nextButton = await page.$('button:has-text("Next"), div[role="button"]:has-text("Next")');
+      if (nextButton) {
+        await nextButton.click();
+      } else {
+        // Try pressing Enter instead
+        await page.keyboard.press('Enter');
+      }
+      
+      // Sometimes Twitter asks for phone/email verification
+      try {
+        await page.waitForSelector('input[data-testid="ocfEnterTextTextInput"]', { timeout: 3000 });
+        // If we see this, enter username again as verification
+        await page.fill('input[data-testid="ocfEnterTextTextInput"]', username);
+        await page.click('div[role="button"]:has-text("Next")');
+      } catch {
+        // No verification needed, continue
+      }
+
+      // Wait for password input
+      await page.waitForSelector('input[type="password"]', { timeout: 10000 });
+      await page.fill('input[type="password"]', password);
+      
+      // Press Enter after password (Twitter's login flow expects this)
+      await page.keyboard.press('Enter');
+      
+      // Wait for navigation after login
+      await page.waitForTimeout(3000);
+      
+      // Check if we're logged in by looking for the URL change or home elements
+      const currentUrl = page.url();
+      if (currentUrl.includes('/home') || currentUrl === 'https://x.com/' || currentUrl === 'https://twitter.com/') {
+        this.isLoggedIn = true;
+        console.log("✅ Successfully logged into Twitter");
+      } else {
+        console.log("⚠️ Login status uncertain, continuing anyway");
+      }
+
+      // Don't close the page - keep it for session persistence
+      // await page.close();
+    } catch (error) {
+      console.error("❌ Twitter login error:", error);
+      try {
+        await page.close();
+      } catch {}
+      // Don't throw - continue without login
+    }
   }
 
   async scrapeUserTweets(
@@ -88,12 +178,27 @@ export class PlaywrightTwitterScraper {
     try {
       console.log(`🔍 Scraping tweets from @${username}...`);
 
-      // Navigate to user profile
+      // Navigate directly to user's tweets (not replies)
       const url = `https://twitter.com/${username}`;
       await page.goto(url, {
-        waitUntil: "networkidle",
+        waitUntil: "domcontentloaded",
         timeout: this.config.timeout,
       });
+      
+      // Wait a bit for dynamic content to load
+      await page.waitForTimeout(2000);
+      
+      // If we're on the home feed instead of a profile (happens when logged in sometimes)
+      // navigate again to the specific user
+      const currentUrl = page.url();
+      if (!currentUrl.includes(username)) {
+        console.log(`Redirected to ${currentUrl}, navigating back to user profile`);
+        await page.goto(`https://twitter.com/${username}`, {
+          waitUntil: "domcontentloaded",
+          timeout: this.config.timeout,
+        });
+        await page.waitForTimeout(2000);
+      }
 
       // Wait for content to load - Twitter might require different selectors
       const contentSelectors = [
@@ -101,6 +206,9 @@ export class PlaywrightTwitterScraper {
         'article[data-testid="tweet"]',
         'article[role="article"]',
         'div[data-testid="cellInnerDiv"]',
+        '[data-testid="tweetText"]', // Try text selector
+        'div[data-testid="primaryColumn"] article', // Column + article
+        'section[role="region"] article', // Timeline region
       ];
 
       let tweetsSelector = null;
@@ -116,8 +224,35 @@ export class PlaywrightTwitterScraper {
 
       if (!tweetsSelector) {
         console.log("Could not find tweets with any known selector");
-        // Try to continue anyway
+        // Debug: log the page URL and check if we're on the right page
+        const currentUrl = page.url();
+        console.log(`Current URL: ${currentUrl}`);
+        
+        // Additional debug info
+        const pageTitle = await page.title();
+        console.log(`Page title: ${pageTitle}`);
+        
+        // Check if we need to accept cookies or dismiss popups
+        try {
+          const cookieButton = await page.$('[data-testid="BottomBar"] button');
+          if (cookieButton) {
+            await cookieButton.click();
+            console.log("Dismissed cookie banner");
+            await page.waitForTimeout(1000);
+          }
+        } catch {}
+        
+        // Try a more general approach - look for any article elements
+        const articles = await page.$$('article');
+        console.log(`Found ${articles.length} article elements on page`);
+        
+        // Try to continue anyway with a more general selector
         tweetsSelector = "article";
+        
+        // Take a screenshot for debugging
+        if (process.env.DEBUG_SCREENSHOTS === 'true') {
+          await page.screenshot({ path: `debug-${username}-${Date.now()}.png` });
+        }
       }
 
       // Scroll to load more tweets if needed

@@ -3,7 +3,11 @@
  * Run the new modular briefing generator
  */
 
+import { config } from "dotenv";
 import { generateBriefing } from "../src/briefing-generator/orchestrator";
+
+// Load environment variables
+config({ path: ".env.local" });
 
 async function run() {
   const args = process.argv.slice(2);

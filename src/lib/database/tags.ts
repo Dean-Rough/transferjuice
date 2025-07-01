@@ -39,20 +39,40 @@ export async function findOrCreateTag(data: {
     return existing;
   }
 
-  // Create new tag
-  return await prisma.tag.create({
-    data: {
-      name: data.name,
-      type: data.type,
-      normalizedName,
-      league: data.league,
-      country: data.country,
-      position: data.position,
-      transferValue: data.transferValue,
-      usageCount: 1,
-      lastUsedAt: new Date(),
-    },
-  });
+  // Create new tag with race condition handling
+  try {
+    return await prisma.tag.create({
+      data: {
+        name: data.name,
+        type: data.type,
+        normalizedName,
+        league: data.league,
+        country: data.country,
+        position: data.position,
+        transferValue: data.transferValue,
+        usageCount: 1,
+        lastUsedAt: new Date(),
+      },
+    });
+  } catch (error: any) {
+    // Handle race condition - if tag was created by another process
+    if (error.code === 'P2002') {
+      const existing = await prisma.tag.findUnique({
+        where: { name: data.name },
+      });
+      if (existing) {
+        await prisma.tag.update({
+          where: { id: existing.id },
+          data: {
+            usageCount: { increment: 1 },
+            lastUsedAt: new Date(),
+          },
+        });
+        return existing;
+      }
+    }
+    throw error;
+  }
 }
 
 /**

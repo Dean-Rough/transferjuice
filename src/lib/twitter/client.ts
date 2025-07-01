@@ -312,6 +312,14 @@ export class TwitterClient {
       username?: string; // For hybrid client fallback
     } = {},
   ): Promise<TwitterTimelineResponse> {
+    // Skip Twitter API entirely when USE_PLAYWRIGHT_SCRAPER is true
+    if (process.env.USE_PLAYWRIGHT_SCRAPER === "true" && options.username) {
+      console.log(
+        `[Twitter] Playwright scraper enabled, bypassing Twitter API for @${options.username}`,
+      );
+      return this.getUserTimelineViaHybrid(options.username, options);
+    }
+
     const params: Record<string, string> = {
       max_results: (options.maxResults || this.defaultMaxResults).toString(),
       "tweet.fields": [
@@ -378,6 +386,28 @@ export class TwitterClient {
    * Get user by username
    */
   async getUserByUsername(username: string): Promise<TwitterUser> {
+    // Skip Twitter API entirely when USE_PLAYWRIGHT_SCRAPER is true
+    if (process.env.USE_PLAYWRIGHT_SCRAPER === "true") {
+      console.log(
+        `[Twitter] Playwright scraper enabled, returning mock user data for @${username}`,
+      );
+      // Return mock user data when using Playwright scraper
+      // The actual user details will be fetched by the scraper
+      return {
+        id: username, // Use username as ID since we don't have the real ID
+        username: username,
+        name: username,
+        verified: false,
+        profile_image_url: undefined,
+        description: undefined,
+        public_metrics: {
+          followers_count: 0,
+          following_count: 0,
+          tweet_count: 0,
+        },
+      };
+    }
+
     const params = {
       "user.fields": [
         "id",
@@ -562,7 +592,31 @@ export class TwitterClient {
   ): Promise<Map<string, TwitterTimelineResponse>> {
     const results = new Map<string, TwitterTimelineResponse>();
 
-    // Try Twitter API first for all users
+    // If Playwright scraper is enabled, use it for all users
+    if (process.env.USE_PLAYWRIGHT_SCRAPER === "true") {
+      console.log(
+        `[Twitter] Playwright scraper enabled, fetching ${users.length} users via scraper`,
+      );
+
+      // Ensure hybrid client is initialized
+      await this.hybridClient.initialize();
+
+      for (const user of users) {
+        try {
+          const timeline = await this.getUserTimelineViaHybrid(user.username, options);
+          results.set(user.username, timeline);
+        } catch (error) {
+          console.error(
+            `[Playwright] Failed to fetch timeline for @${user.username}:`,
+            error,
+          );
+        }
+      }
+
+      return results;
+    }
+
+    // Otherwise, try Twitter API first for all users
     const rateLimitedUsers: Array<{ id: string; username: string }> = [];
 
     for (const user of users) {

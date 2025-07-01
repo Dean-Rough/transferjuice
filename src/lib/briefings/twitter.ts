@@ -143,11 +143,12 @@ async function fetchTweetsFromSource(
   };
 
   try {
-    // Get user ID if we don't have it
-    if (!source.twitterId) {
-      const user = await client.getUserByUsername((source as any).username);
+    // Get user ID if we don't have it (skip if using Playwright)
+    if (!source.twitterId && process.env.USE_PLAYWRIGHT_SCRAPER !== "true") {
+      console.log(`[Twitter] Fetching user ID for @${source.username} (USE_PLAYWRIGHT_SCRAPER=${process.env.USE_PLAYWRIGHT_SCRAPER})`);
+      const user = await client.getUserByUsername(source.username);
       await upsertITKSource({
-        username: (source as any).username,
+        username: source.username,
         name: source.name,
         twitterId: user.id,
         profileImageUrl: user.profile_image_url,
@@ -159,13 +160,17 @@ async function fetchTweetsFromSource(
       source.twitterId = user.id;
     }
 
-    // Fetch timeline
-    const timeline = await client.getUserTimeline(source.twitterId, {
+    // Fetch timeline - when using Playwright, use username as ID
+    const userId = process.env.USE_PLAYWRIGHT_SCRAPER === "true" 
+      ? source.username 
+      : source.twitterId;
+    
+    const timeline = await client.getUserTimeline(userId!, {
       maxResults: 100,
       startTime: since.toISOString(),
       endTime: until.toISOString(),
       sinceId: source.lastTweetId || undefined,
-      username: (source as any).username, // For hybrid client fallback
+      username: source.username, // Always pass username for Playwright fallback
     });
 
     if (!timeline.data || timeline.data.length === 0) {
