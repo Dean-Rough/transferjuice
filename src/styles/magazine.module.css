@@ -1,0 +1,227 @@
+/**
+ * Clean Magazine Layout Styles
+ * Focused on typography and readability
+ */
+
+/* Typography Hierarchy */
+.magazineLayout {
+  --font-serif: "Georgia", "Times New Roman", serif;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --text-primary: #1a1a1a;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
+
+  --accent-blue: #2563eb;
+  --accent-orange: #f97316;
+
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Main Title */
+.briefingTitle {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.briefingSubtitle {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-bottom: 2rem;
+}
+
+/* Section Headers */
+.sectionTitle {
+  font-family: var(--font-serif);
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin: 3rem 0 1.5rem;
+  color: var(--text-primary);
+}
+
+/* Drop Cap for Introduction */
+.dropCap {
+  float: left;
+  font-family: var(--font-serif);
+  font-size: 4.5rem;
+  line-height: 0.8;
+  margin: 0.1em 0.1em 0 0;
+  font-weight: 900;
+  color: var(--accent-blue);
+}
+
+/* Clean Paragraph Styling */
+.paragraph {
+  font-size: 1.125rem;
+  line-height: 1.75;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.paragraph:first-of-type::first-letter {
+  @apply dropCap;
+}
+
+/* Blockquotes for Terry's Takes */
+.terryQuote {
+  border-left: 4px solid var(--accent-blue);
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+  font-style: italic;
+  color: var(--text-secondary);
+  background: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.terryQuote p {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.6;
+}
+
+/* Pull Quotes */
+.pullQuote {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-orange);
+  text-align: center;
+  margin: 3rem 2rem;
+  padding: 2rem 0;
+  border-top: 2px solid #e5e7eb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* Image Containers */
+.imageContainer {
+  margin: 2rem 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.imageCaption {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+/* Sidebar Sections */
+.sidebarSection {
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sidebarTitle {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+/* Stats Display */
+.statItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.statItem:last-child {
+  border-bottom: none;
+}
+
+.statLabel {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.statValue {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .magazineLayout {
+    padding: 1rem;
+  }
+
+  .briefingTitle {
+    font-size: 2rem;
+  }
+
+  .briefingSubtitle {
+    font-size: 1.25rem;
+  }
+
+  .paragraph {
+    font-size: 1rem;
+  }
+
+  .pullQuote {
+    margin: 2rem 0;
+    font-size: 1.25rem;
+  }
+}
+
+/* Transitions and Hover Effects */
+.imageContainer {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.imageContainer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+/* Links */
+.magazineLayout a {
+  color: var(--accent-blue);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.magazineLayout a:hover {
+  border-bottom-color: var(--accent-blue);
+}
+
+/* Focus States for Accessibility */
+.magazineLayout a:focus,
+.magazineLayout button:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .magazineLayout {
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  .sidebarSection {
+    break-inside: avoid;
+  }
+
+  .imageContainer {
+    break-inside: avoid;
+  }
+}

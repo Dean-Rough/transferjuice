@@ -5,17 +5,21 @@ This folder contains only the essential production scripts for Transfer Juice.
 ## Active Scripts
 
 ### 🚀 Briefing Generation
+
 - `run-briefing-generator.ts` - Main briefing generator (use `npm run briefing:generate`)
 
 ### 📊 Monitoring
+
 - `hourly-itk-monitor.ts` - Monitors 52 global ITK sources hourly
 
 ### 🛠 Utilities
+
 - `seed-database.ts` - Initialize database with sources
 - `clear-briefings.ts` - Clean up old briefings
 - `clean-and-regenerate.sh` - Full system reset
 
 ### 🗄 Archive
+
 All legacy, test, and demo scripts have been moved to `/archive/` subdirectories.
 
 ## Usage

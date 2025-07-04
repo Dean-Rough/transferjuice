@@ -1,100 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
+import { generateBriefing } from "@/lib/briefingGenerator";
 
-/**
- * Cron endpoint for briefing generation
- * Triggered 3x daily (9am, 2pm, 9pm)
- */
-export async function GET(request: NextRequest): Promise<Response> {
+export async function GET(request: NextRequest) {
   try {
-    // Verify authorization
+    // Verify cron secret to prevent unauthorized calls
     const authHeader = request.headers.get("authorization");
-    if (
-      process.env.CRON_SECRET &&
-      authHeader !== `Bearer ${process.env.CRON_SECRET}`
-    ) {
-      return new Response("Unauthorized", { status: 401 });
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    console.log("[CRON] Starting briefing generation...");
+    console.log(`🚀 Cron job triggered at ${new Date().toISOString()}`);
 
-    // Import and run briefing generation
-    const { spawn } = await import("child_process");
+    // Generate the briefing
+    const briefing = await generateBriefing();
 
-    return new Promise((resolve) => {
-      const child = spawn("npm", ["run", "briefing:generate"], {
-        cwd: process.cwd(),
-        stdio: "pipe",
-      });
-
-      let output = "";
-      child.stdout?.on("data", (data) => {
-        output += data.toString();
-      });
-
-      child.stderr?.on("data", (data) => {
-        output += data.toString();
-      });
-
-      child.on("close", (code) => {
-        if (code === 0) {
-          console.log("[CRON] Briefing generation completed successfully");
-
-          // Extract briefing URL from output
-          const urlMatch = output.match(/URL: (http:\/\/[^\s]+)/);
-          const briefingUrl = urlMatch ? urlMatch[1] : null;
-
-          resolve(
-            NextResponse.json({
-              success: true,
-              briefingUrl,
-              output: output.slice(-1000), // Last 1000 chars
-            }),
-          );
-        } else {
-          console.error("[CRON] Briefing generation failed with code:", code);
-          resolve(
-            NextResponse.json(
-              {
-                success: false,
-                error: `Process exited with code ${code}`,
-                output: output.slice(-1000),
-              },
-              { status: 500 },
-            ),
-          );
-        }
-      });
-
-      // Timeout after 10 minutes (briefing generation can be slow)
-      setTimeout(
-        () => {
-          child.kill();
-          resolve(
-            NextResponse.json(
-              {
-                success: false,
-                error: "Timeout after 10 minutes",
-              },
-              { status: 500 },
-            ),
-          );
-        },
-        10 * 60 * 1000,
-      );
+    return NextResponse.json({
+      success: true,
+      message: "Briefing generation completed",
+      briefing: {
+        id: briefing?.id,
+        title: briefing?.title,
+        storiesCount: briefing?.stories.length || 0,
+        publishedAt: briefing?.publishedAt,
+      },
     });
   } catch (error) {
-    console.error("[CRON] Briefing generation error:", error);
+    console.error("Cron job failed:", error);
     return NextResponse.json(
       {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: "Failed to generate briefing",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 },
     );
   }
-}
-
-export async function POST(request: NextRequest): Promise<Response> {
-  // Also support POST for webhook-style crons
-  return GET(request);
 }

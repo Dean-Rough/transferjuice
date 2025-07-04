@@ -21,7 +21,7 @@ Transfer Juice is a **football transfer briefing platform** that has been caught
 ## Quick Navigation for Developers
 
 - **Current Architecture**: See `CURRENT_ARCHITECTURE.md` for dual-system details
-- **Hidden Features**: See `HIDDEN_FEATURES.md` for built but unused capabilities  
+- **Hidden Features**: See `HIDDEN_FEATURES.md` for built but unused capabilities
 - **Migration Guide**: See `MIGRATION_GUIDE.md` to activate live feed
 - **API Reference**: See `API_SPECIFICATION.md` for actual endpoints (20 total)
 - **Product Vision**: See `PRD.md` for current reality vs `PIVOT_DOCUMENT.md` for intended vision
@@ -33,22 +33,26 @@ Transfer Juice is a **football transfer briefing platform** that has been caught
 ### ✅ **PRODUCTION-READY FEATURES**
 
 1. **Briefing Generation System**
+
    - Location: `src/briefing-generator/orchestrator.ts` (NEW system)
    - 9-step orchestration pipeline
    - Generates at 9am, 2pm, 9pm daily
    - Terry AI commentary fully integrated
 
 2. **Global ITK Monitoring**
+
    - 52 sources across 7 regions (UK, IT, DE, FR, ES, BR, GLOBAL)
    - Hourly data collection via cron
    - Twitter API with Apify/Playwright fallbacks
 
 3. **Terry AI Integration**
+
    - OpenAI GPT-4 for Joel Golby style commentary
    - Quality validation and consistency checks
    - Integrated into briefing pipeline
 
 4. **Web Interface**
+
    - Homepage with magazine-style briefings
    - 70/30 layout with sidebar
    - Tag and league filtering
@@ -66,6 +70,7 @@ Transfer Juice is a **football transfer briefing platform** that has been caught
 ### 🔄 **BUILT BUT NOT CONNECTED**
 
 1. **Live Feed System** (Primary Hidden Asset)
+
    - `LiveFeedContainer.tsx` - 508 lines of complete implementation
    - Real-time SSE updates ready
    - Infinite scroll with virtualization
@@ -73,6 +78,7 @@ Transfer Juice is a **football transfer briefing platform** that has been caught
    - Just needs to be connected to homepage
 
 2. **Real-time Infrastructure**
+
    - SSE broadcasting system (`RealTimeBroadcaster`)
    - `/api/live-feed` endpoint working
    - Heartbeat mechanism implemented
@@ -93,18 +99,21 @@ Transfer Juice is a **football transfer briefing platform** that has been caught
 ### ❌ **NOT IMPLEMENTED**
 
 1. **Email Delivery**
+
    - Config variables exist
    - Database schema ready
    - NO sending implementation
    - Signup forms don't work
 
 2. **Content Partnerships**
+
    - Data structures exist
    - NO RSS parsing
    - NO partner integration
    - Manual content only
 
 3. **WebSocket Support**
+
    - Docs claim WebSocket
    - Reality is SSE only
    - Mock WebSocket hook
@@ -133,6 +142,7 @@ ACTIVE SYSTEM (Briefings)          HIDDEN SYSTEM (Live Feed)
 ### ⚠️ **BROKEN LEGACY SCRIPTS**
 
 **DON'T USE THESE** (they reference old briefing system):
+
 - `scripts/generate-test-briefing.ts`
 - `scripts/test-briefing-generation.ts`
 - `scripts/generate-production-briefing.ts`
@@ -141,6 +151,7 @@ ACTIVE SYSTEM (Briefings)          HIDDEN SYSTEM (Live Feed)
 - `scripts/test-briefing-mock.ts`
 
 **USE THESE INSTEAD**:
+
 - `npm run briefing:generate`
 - `npm run briefing:test`
 
@@ -240,6 +251,7 @@ ENABLE_LIVE_FEED=false     # Not yet connected
 ### Documentation Rebuild Complete (June 2025)
 
 **What Was Done**:
+
 1. ✅ Created reality-based PRD.md
 2. ✅ Documented dual architecture in CURRENT_ARCHITECTURE.md
 3. ✅ Created step-by-step MIGRATION_GUIDE.md
@@ -248,6 +260,7 @@ ENABLE_LIVE_FEED=false     # Not yet connected
 6. ✅ Updated this CLAUDE.md with comprehensive reality check
 
 **Next Steps**:
+
 1. **DECIDE**: Live feed vs briefings vs both
 2. **EXECUTE**: Follow MIGRATION_GUIDE.md if choosing live feed
 3. **CLEAN UP**: Remove unused system after decision
@@ -272,5 +285,5 @@ When working on TransferJuice:
 
 ---
 
-*Updated June 2025 - Complete reality audit and documentation rebuild completed*
-*Previous versions contained significant aspirational content - this version reflects actual implementation*
+_Updated June 2025 - Complete reality audit and documentation rebuild completed_
+_Previous versions contained significant aspirational content - this version reflects actual implementation_

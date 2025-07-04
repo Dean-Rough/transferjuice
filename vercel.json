@@ -1,41 +1,28 @@
 {
   "crons": [
     {
-      "path": "/api/cron/monitoring",
-      "schedule": "0 * * * *"
+      "path": "/api/cron/briefing",
+      "schedule": "0 9 * * *"
     },
     {
-      "path": "/api/cron/briefing", 
-      "schedule": "0 * * * *"
+      "path": "/api/cron/briefing",
+      "schedule": "0 12 * * *"
     },
     {
-      "path": "/api/cron/cleanup",
-      "schedule": "0 3 * * *"
+      "path": "/api/cron/briefing",
+      "schedule": "0 16 * * *"
+    },
+    {
+      "path": "/api/cron/briefing",
+      "schedule": "0 20 * * *"
     }
   ],
   "functions": {
-    "src/app/api/cron/*/route.ts": {
-      "maxDuration": 600
+    "src/app/api/cron/briefing/route.ts": {
+      "maxDuration": 300
     },
     "src/app/api/briefings/generate/route.ts": {
       "maxDuration": 300
     }
-  },
-  "rewrites": [
-    {
-      "source": "/health",
-      "destination": "/api/health"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    }
-  ]
+  }
 }

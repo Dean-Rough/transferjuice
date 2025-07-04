@@ -6947,7 +6947,7 @@ var ImagePlacementService = /*#__PURE__*/function () {
               cov_1dieecog0().s[105]++;
               _context9.n = 2;
               return this.openai.chat.completions.create({
-                model: 'gpt-4-turbo-preview',
+                model: 'gpt-4o',
                 messages: [{
                   role: 'system',
                   content: 'You are an expert at matching images to content. Rate how well an image relates to the given text content on a scale of 0-100.'
@@ -7351,7 +7351,7 @@ var ImagePlacementService = /*#__PURE__*/function () {
               cov_1dieecog0().s[157]++;
               _context1.n = 2;
               return this.openai.chat.completions.create({
-                model: 'gpt-4-turbo-preview',
+                model: 'gpt-4o',
                 messages: [{
                   role: 'system',
                   content: 'Generate concise, informative captions for transfer news images. Include attribution and keep under 100 characters.'

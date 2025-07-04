@@ -12,6 +12,35 @@ const EnvironmentConfigSchema = z.object({
   OPENAI_API_KEY: z.string().min(1),
   TWITTER_BEARER_TOKEN: z.string().min(1),
 
+  // Playwright Scraping
+  USE_PLAYWRIGHT_SCRAPER: z
+    .string()
+    .transform((val) => val === "true")
+    .default("false"),
+  USE_SCRAPER_MANAGER: z
+    .string()
+    .transform((val) => val === "true")
+    .default("false"),
+  PLAYWRIGHT_HEADLESS: z
+    .string()
+    .transform((val) => val === "true")
+    .default("true"),
+  SCRAPER_MANAGER_INSTANCES: z
+    .string()
+    .transform(Number)
+    .pipe(z.number().min(1).max(10))
+    .default("3"),
+  DEBUG_SCREENSHOTS: z
+    .string()
+    .transform((val) => val === "true")
+    .default("false"),
+
+  // Proxy Configuration
+  PROXY_SERVER: z.string().optional(),
+  PROXY_USERNAME: z.string().optional(),
+  PROXY_PASSWORD: z.string().optional(),
+  PROXY_LIST: z.string().optional(),
+
   // Quality Thresholds
   TERRY_VOICE_THRESHOLD: z
     .string()
@@ -232,6 +261,42 @@ export const PIPELINE_CONFIG = {
     retryDelay: 5000, // 5 seconds
   },
 
+  scraping: {
+    enabled: ENV.USE_PLAYWRIGHT_SCRAPER || ENV.USE_SCRAPER_MANAGER,
+    manager: {
+      enabled: ENV.USE_SCRAPER_MANAGER,
+      instances: ENV.SCRAPER_MANAGER_INSTANCES,
+      rotationInterval: 3600000, // 1 hour
+      requestTimeout: 30000, // 30 seconds
+      maxRequestsPerInstance: 100,
+    },
+    playwright: {
+      headless: ENV.PLAYWRIGHT_HEADLESS,
+      antiDetection: true,
+      sessionRotation: true,
+      userAgentRotation: true,
+      debugScreenshots: ENV.DEBUG_SCREENSHOTS,
+    },
+    proxy: {
+      enabled: !!ENV.PROXY_SERVER,
+      server: ENV.PROXY_SERVER,
+      username: ENV.PROXY_USERNAME,
+      password: ENV.PROXY_PASSWORD,
+      rotationStrategy: "performance" as const,
+    },
+    cache: {
+      enabled: true,
+      ttl: 300000, // 5 minutes
+      maxSize: 1000,
+      warmupSources: ["FabrizioRomano", "David_Ornstein"],
+    },
+    rateLimit: {
+      requestsPerMinute: 30,
+      requestsPerHour: 500,
+      delayBetweenRequests: 2000, // 2 seconds
+    },
+  },
+
   processing: {
     aiModel: "gpt-4.1",
     maxTokens: 4000,
@@ -363,7 +428,20 @@ export const MONITORING_CONFIG = {
       "/api/health/database",
       "/api/health/ai",
       "/api/health/twitter",
+      "/api/health/scraping",
     ],
+  },
+
+  scrapingMonitor: {
+    enabled: ENV.USE_PLAYWRIGHT_SCRAPER || ENV.USE_SCRAPER_MANAGER,
+    checkInterval: 60000, // 1 minute
+    alertThresholds: {
+      successRate: 0.8,
+      responseTime: 10000, // 10 seconds
+      memoryUsage: 500 * 1024 * 1024, // 500MB
+      validationErrors: 10,
+    },
+    persistMetrics: true,
   },
 
   alerts: {
@@ -372,6 +450,8 @@ export const MONITORING_CONFIG = {
     qualityDegradationThreshold: 0.8, // 80% content passing
     performanceThreshold: 10000, // 10 second processing
     websocketFailureThreshold: 0.05, // 5% disconnections
+    scrapingFailureThreshold: 0.2, // 20% scraping failures
+    proxyHealthThreshold: 0.5, // 50% proxies must be healthy
   },
 
   metrics: {
@@ -466,9 +546,21 @@ export function validateConfiguration(): { valid: boolean; errors: string[] } {
     errors.push("Database: Invalid PostgreSQL connection string");
   }
 
-  // Validate Twitter token
-  if (!ENV.TWITTER_BEARER_TOKEN.startsWith("AAAA")) {
-    errors.push("Twitter: Invalid Bearer Token format");
+  // Validate Twitter token (only if not using scrapers)
+  if (!ENV.USE_PLAYWRIGHT_SCRAPER && !ENV.USE_SCRAPER_MANAGER) {
+    if (!ENV.TWITTER_BEARER_TOKEN.startsWith("AAAA")) {
+      errors.push("Twitter: Invalid Bearer Token format");
+    }
+  }
+
+  // Validate scraping configuration
+  if (ENV.USE_SCRAPER_MANAGER && ENV.SCRAPER_MANAGER_INSTANCES < 1) {
+    errors.push("Scraping: Invalid number of scraper instances");
+  }
+
+  // Validate proxy configuration
+  if (ENV.PROXY_SERVER && (!ENV.PROXY_USERNAME || !ENV.PROXY_PASSWORD)) {
+    errors.push("Proxy: Server specified but credentials missing");
   }
 
   return {
@@ -499,6 +591,17 @@ export function printConfiguration() {
       `   Partner Sources: ${Object.keys(CONFIG.partners).length} partners`,
     );
     console.log(`   Cache TTL: ${CONFIG.pipeline.performance.cacheTTL}s`);
+    console.log(
+      `   Scraping: ${CONFIG.pipeline.scraping.enabled ? "Enabled" : "Disabled"}`,
+    );
+    if (CONFIG.pipeline.scraping.enabled) {
+      console.log(
+        `   Scraper Manager: ${CONFIG.pipeline.scraping.manager.enabled ? `${CONFIG.pipeline.scraping.manager.instances} instances` : "Disabled"}`,
+      );
+      console.log(
+        `   Proxy: ${CONFIG.pipeline.scraping.proxy.enabled ? "Configured" : "Direct connection"}`,
+      );
+    }
   }
 }
 

@@ -7,388 +7,74 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model ITKSource {
-  id              String     @id @default(cuid())
-  name            String     @unique
-  username        String     @unique
-  twitterId       String?    @unique
-  tier            Int        @default(3)
-  reliability     Float      @default(0.5)
-  region          String     @default("GLOBAL")
-  isActive        Boolean    @default(true)
-  isVerified      Boolean    @default(false)
-  followerCount   Int?
-  followingCount  Int?
-  tweetCount      Int?
-  profileImageUrl String?
-  description     String?
-  lastFetchedAt   DateTime?
-  lastTweetId     String?
-  fetchInterval   Int        @default(900)
-  totalTweets     Int        @default(0)
-  relevantTweets  Int        @default(0)
-  avgRelevance    Float      @default(0.0)
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-  feedItems       FeedItem[]
-
-  @@map("itk_sources")
+// Simple source tracking - just name and handle
+model Source {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  handle    String   @unique
+  createdAt DateTime @default(now())
+  tweets    Tweet[]
+  
+  @@map("sources")
 }
 
-model FeedItem {
-  id              String             @id @default(cuid())
-  type            FeedType           @default(ITK)
-  content         String
-  terryCommentary String?
-  originalText    String?
-  sourceId        String
-  originalUrl     String?
-  twitterId       String?
-  transferType    TransferType?
-  priority        Priority           @default(MEDIUM)
-  relevanceScore  Float              @default(0.5)
-  league          League?
-  publishedAt     DateTime
-  processedAt     DateTime           @default(now())
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  originalShares  Int                @default(0)
-  originalLikes   Int                @default(0)
-  originalReplies Int                @default(0)
-  ourShares       Int                @default(0)
-  ourReactions    Int                @default(0)
-  ourClicks       Int                @default(0)
-  isProcessed     Boolean            @default(false)
-  isPublished     Boolean            @default(false)
-  isArchived      Boolean            @default(false)
-  briefings       BriefingFeedItem[]
-  media           FeedItemMedia[]
-  tags            FeedItemTag[]
-  source          ITKSource          @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-
-  @@index([type, publishedAt])
-  @@index([priority, publishedAt])
-  @@index([league, publishedAt])
-  @@index([sourceId, publishedAt])
-  @@index([isPublished, publishedAt])
-  @@map("feed_items")
-}
-
-model Tag {
-  id             String        @id @default(cuid())
-  name           String        @unique
-  type           TagType
-  normalizedName String
-  isPopular      Boolean       @default(false)
-  usageCount     Int           @default(0)
-  lastUsedAt     DateTime?
-  league         League?
-  country        String?
-  position       String?
-  transferValue  BigInt?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  briefings      BriefingTag[]
-  feedItems      FeedItemTag[]
-
-  @@index([type, normalizedName])
-  @@index([league, type])
-  @@index([usageCount])
-  @@map("tags")
-}
-
-model FeedItemTag {
+// Raw tweets scraped from sources
+model Tweet {
   id         String   @id @default(cuid())
-  feedItemId String
-  tagId      String
-  createdAt  DateTime @default(now())
-  feedItem   FeedItem @relation(fields: [feedItemId], references: [id], onDelete: Cascade)
-  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@unique([feedItemId, tagId])
-  @@map("feed_item_tags")
+  tweetId    String   @unique
+  sourceId   String
+  content    String
+  url        String
+  scrapedAt  DateTime @default(now())
+  source     Source   @relation(fields: [sourceId], references: [id])
+  stories    Story[]
+  
+  @@index([sourceId, scrapedAt])
+  @@map("tweets")
 }
 
-model FeedItemMedia {
-  id           String    @id @default(cuid())
-  feedItemId   String
-  type         MediaType
-  url          String
-  thumbnailUrl String?
-  altText      String?
-  width        Int?
-  height       Int?
-  size         BigInt?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  feedItem     FeedItem  @relation(fields: [feedItemId], references: [id], onDelete: Cascade)
-
-  @@map("feed_item_media")
+// Stories with Terry commentary for briefings
+model Story {
+  id            String    @id @default(cuid())
+  tweetId       String
+  terryComment  String
+  createdAt     DateTime  @default(now())
+  tweet         Tweet     @relation(fields: [tweetId], references: [id])
+  briefings     BriefingStory[]
+  
+  @@map("stories")
 }
 
-model EmailSubscriber {
-  id              String          @id @default(cuid())
-  email           String          @unique
-  isActive        Boolean         @default(true)
-  isVerified      Boolean         @default(false)
-  frequency       EmailFrequency  @default(DAILY)
-  preferredTime   String          @default("08:00")
-  timezone        String          @default("Europe/London")
-  source          String?
-  ipAddress       String?
-  userAgent       String?
-  lastEmailSent   DateTime?
-  lastOpenedAt    DateTime?
-  totalEmailsSent Int             @default(0)
-  totalOpens      Int             @default(0)
-  totalClicks     Int             @default(0)
-  subscribedAt    DateTime        @default(now())
-  unsubscribedAt  DateTime?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  briefingEmails  BriefingEmail[]
-
-  @@index([isActive, frequency])
-  @@map("email_subscribers")
-}
-
-model EmailSummary {
-  id              String    @id @default(cuid())
-  date            DateTime  @unique @db.Date
-  subject         String
-  previewText     String
-  content         String
-  terryIntro      String?
-  terryOutro      String?
-  itemCount       Int       @default(0)
-  topStoryId      String?
-  isGenerated     Boolean   @default(false)
-  isSent          Boolean   @default(false)
-  sentAt          DateTime?
-  recipientCount  Int       @default(0)
-  openRate        Float     @default(0.0)
-  clickRate       Float     @default(0.0)
-  unsubscribeRate Float     @default(0.0)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  @@map("email_summaries")
-}
-
-model AnalyticsEvent {
-  id         String   @id @default(cuid())
-  type       String
-  feedItemId String?
-  tagId      String?
-  sourceId   String?
-  sessionId  String?
-  ipAddress  String?
-  userAgent  String?
-  referer    String?
-  metadata   Json?
-  createdAt  DateTime @default(now())
-
-  @@index([type, createdAt])
-  @@index([feedItemId, createdAt])
-  @@map("analytics_events")
-}
-
-model SystemConfig {
-  id          String   @id @default(cuid())
-  key         String   @unique
-  value       String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("system_config")
-}
-
+// Simple briefings - just a collection of stories
 model Briefing {
-  id              String             @id @default(cuid())
-  slug            String             @unique
-  timestamp       DateTime           @unique
-  title           Json
-  content         Json
-  readTime        Int
-  wordCount       Int
-  terryScore      Float              @default(0.0)
-  visualTimeline  Json
-  sidebarSections Json
-  generatedAt     DateTime           @default(now())
-  publishedAt     DateTime?
-  isPublished     Boolean            @default(false)
-  version         Int                @default(1)
-  viewCount       Int                @default(0)
-  shareCount      Int                @default(0)
-  avgReadDepth    Float              @default(0.0)
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  emails          BriefingEmail[]
-  feedItems       BriefingFeedItem[]
-  media           BriefingMedia[]
-  tags            BriefingTag[]
-
-  @@index([timestamp])
-  @@index([isPublished, timestamp])
-  @@index([slug])
+  id          String    @id @default(cuid())
+  title       String
+  publishedAt DateTime  @default(now())
+  stories     BriefingStory[]
+  
+  @@index([publishedAt])
   @@map("briefings")
 }
 
-model BriefingFeedItem {
+// Many-to-many relation for briefing stories
+model BriefingStory {
   id         String   @id @default(cuid())
   briefingId String
-  feedItemId String
+  storyId    String
   position   Int
-  section    String
-  createdAt  DateTime @default(now())
   briefing   Briefing @relation(fields: [briefingId], references: [id], onDelete: Cascade)
-  feedItem   FeedItem @relation(fields: [feedItemId], references: [id])
-
-  @@unique([briefingId, feedItemId])
-  @@map("briefing_feed_items")
+  story      Story    @relation(fields: [storyId], references: [id])
+  
+  @@unique([briefingId, storyId])
+  @@map("briefing_stories")
 }
 
-model BriefingTag {
-  id         String   @id @default(cuid())
-  briefingId String
-  tagId      String
-  relevance  Float    @default(1.0)
-  createdAt  DateTime @default(now())
-  briefing   Briefing @relation(fields: [briefingId], references: [id], onDelete: Cascade)
-  tag        Tag      @relation(fields: [tagId], references: [id])
-
-  @@unique([briefingId, tagId])
-  @@map("briefing_tags")
-}
-
-model BriefingMedia {
-  id           String    @id @default(cuid())
-  briefingId   String
-  type         MediaType
-  url          String
-  thumbnailUrl String?
-  altText      String?
-  caption      String?
-  playerName   String?
-  clubName     String?
-  frameColor   String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  briefing     Briefing  @relation(fields: [briefingId], references: [id], onDelete: Cascade)
-
-  @@map("briefing_media")
-}
-
-model BriefingEmail {
-  id           String          @id @default(cuid())
-  briefingId   String
-  subscriberId String
-  sentAt       DateTime        @default(now())
-  openedAt     DateTime?
-  clickedAt    DateTime?
-  clickCount   Int             @default(0)
-  briefing     Briefing        @relation(fields: [briefingId], references: [id])
-  subscriber   EmailSubscriber @relation(fields: [subscriberId], references: [id])
-
-  @@unique([briefingId, subscriberId])
-  @@map("briefing_emails")
-}
-
-model Player {
-  id                String    @id @default(cuid())
-  name              String
-  normalizedName    String    @unique
-  wikipediaUrl      String?
-  wikipediaPageId   String?
-  imageUrl          String?
-  imageLicense      String?
-  lastImageUpdate   DateTime?
-  position          String?
-  currentClub       String?
-  nationality       String?
-  birthDate         DateTime?
-  polaroidUrl       String?
-  polaroidUpdatedAt DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  @@index([normalizedName])
-  @@map("players")
-}
-
-model PartnerContent {
-  id               String    @id @default(cuid())
-  sourceId         String
-  title            String
-  content          String
-  url              String
-  publishedAt      DateTime
-  usedInBriefingId String?
-  usedAt           DateTime?
-  category         String
-  tags             String[]
-  createdAt        DateTime  @default(now())
-
-  @@index([sourceId, publishedAt])
-  @@index([usedInBriefingId])
-  @@map("partner_content")
-}
-
-enum FeedType {
-  ITK
-  TERRY
-  PARTNER
-  BREAKING
-}
-
-enum TransferType {
-  SIGNING
-  RUMOUR
-  MEDICAL
-  CONFIRMED
-  BID
-  PERSONAL_TERMS
-  LOAN
-  EXTENSION
-}
-
-enum Priority {
-  LOW
-  MEDIUM
-  HIGH
-  BREAKING
-}
-
-enum League {
-  PL
-  LALIGA
-  SERIEA
-  BUNDESLIGA
-  LIGUE1
-  EREDIVISIE
-  PRIMEIRA
-  MLS
-  OTHER
-}
-
-enum TagType {
-  CLUB
-  PLAYER
-  SOURCE
-  GENERAL
-}
-
-enum MediaType {
-  IMAGE
-  VIDEO
-  GIF
-  POLAROID
-}
-
-enum EmailFrequency {
-  DAILY
-  WEEKLY
-  BREAKING_ONLY
-  DISABLED
+// Simple user for future email functionality
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  isActive      Boolean   @default(true)
+  subscribedAt  DateTime  @default(now())
+  
+  @@map("users")
 }

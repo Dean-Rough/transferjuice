@@ -1,22 +1,62 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# TransferJuice
+
+Football transfer news aggregator with AI-powered commentary in the style of Joel Golby.
+
+## Features
+
+- 4x daily briefings (9am, 12pm, 4pm, 8pm GMT)
+- Terry AI provides witty British commentary
+- Manual tweet entry system for content management
+- Dark theme UI with Geist fonts
+- Email summaries (coming soon)
+
+## Tech Stack
+
+- Next.js 14 with App Router
+- TypeScript
+- Prisma + PostgreSQL (Neon)
+- OpenAI GPT-4
+- Tailwind CSS + shadcn/ui
+- Vercel deployment
+
+## Environment Variables
+
+```env
+DATABASE_URL=         # Neon PostgreSQL
+OPENAI_API_KEY=      # GPT-4 access
+ADMIN_API_KEY=       # Admin authentication
+CRON_SECRET=         # Cron job security
+SENDGRID_API_KEY=    # Email delivery (optional)
+```
 
 ## Getting Started
 
 First, run the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:4433](http://localhost:4433) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Development Commands
+
+```bash
+# Generate test briefing
+npm run briefing:test
+
+# Access admin panel
+# http://localhost:4433/admin
+```
+
+## Deployment
+
+See DEPLOYMENT_CHECKLIST.md for detailed instructions.
+
+## Content Management
+
+Use the admin panel at `/admin` to manually add tweets from ITK sources. Terry AI will automatically generate commentary for each story.
 
 ## Testing
 

@@ -9,6 +9,7 @@ This investigation reveals significant discrepancies between documented API rout
 ### 1. Documented vs Actual Endpoints
 
 **Documented in CLAUDE.md:**
+
 - `/api/cron/hourly` - Primary hourly monitoring system
 - `/api/briefings/generate` - Legacy briefing generation
 - `/api/polaroids/default` - Mentioned for fallback images
@@ -16,6 +17,7 @@ This investigation reveals significant discrepancies between documented API rout
 - `/api/feed/` - Mentioned in architecture target
 
 **Actually Implemented (20 total):**
+
 ```
 ✅ Documented & Implemented:
 - /api/cron/hourly
@@ -50,12 +52,14 @@ This investigation reveals significant discrepancies between documented API rout
 The API layer reveals two parallel systems:
 
 **A. Briefing System (OLD/CURRENT):**
+
 - `/api/briefings/*` - Full suite of briefing endpoints
 - `/api/cron/hourly` - Generates briefings after monitoring
 - Magazine-style layout focus
 - 3x daily generation pattern
 
 **B. Live Feed System (NEW/PARTIAL):**
+
 - `/api/feed` - Real-time feed data
 - `/api/live-feed` - SSE streaming (not WebSocket)
 - `/api/twitter-stream` - Twitter filtered stream
@@ -65,10 +69,12 @@ The API layer reveals two parallel systems:
 ### 3. Real-Time Implementation Discrepancy
 
 **Documentation Claims:**
+
 - WebSocket infrastructure for live updates
 - Real-time feed as primary experience
 
 **Reality:**
+
 - NO WebSocket implementation exists
 - SSE (Server-Sent Events) implemented instead at `/api/live-feed`
 - Live feed endpoints exist but not connected to UI
@@ -79,17 +85,20 @@ The API layer reveals two parallel systems:
 Several important endpoints are not mentioned in CLAUDE.md:
 
 1. **`/api/feed`** - Main feed data endpoint with:
+
    - Full filtering (type, priority, league, tags)
    - Pagination support
    - Rich data transformation
    - POST endpoint for manual entries
 
 2. **`/api/twitter-stream`** - Twitter filtered stream control:
+
    - Start/stop stream functionality
    - Status monitoring
    - Not integrated with main system
 
 3. **`/api/briefing-processor`** - Bridge between systems:
+
    - Converts stream data to briefings
    - Buffer management
    - Force generation capabilities
@@ -101,6 +110,7 @@ Several important endpoints are not mentioned in CLAUDE.md:
 ### 5. Authentication Inconsistencies
 
 Different endpoints use different auth methods:
+
 - `/api/cron/hourly` - Bearer token (CRON_SECRET)
 - `/api/briefings/generate` - X-API-Key header
 - `/api/feed` - No authentication
@@ -109,6 +119,7 @@ Different endpoints use different auth methods:
 ### 6. Missing Implementations
 
 Per CLAUDE.md, these are NOT implemented:
+
 - WebSocket real-time updates (SSE exists instead)
 - RSS feed parsing for content partners
 - Email subscription system (endpoint exists but incomplete)
