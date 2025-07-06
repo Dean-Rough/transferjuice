@@ -31,7 +31,12 @@
     "test:full": "tsx scripts/test-full-system.ts",
     "test:ai-providers": "tsx scripts/test-ai-providers.ts",
     "test:ai-fallback": "tsx scripts/test-ai-fallback.ts",
-    "db:cleanup-legacy": "tsx scripts/cleanup-legacy-data.ts"
+    "db:cleanup-legacy": "tsx scripts/cleanup-legacy-data.ts",
+    "briefing:enhanced": "tsx scripts/test-enhanced-briefing.ts",
+    "briefing:generate-enhanced": "tsx scripts/generate-enhanced-briefing.ts",
+    "briefing:demo": "tsx scripts/demo-enhanced-briefing.ts",
+    "briefing:rss": "tsx scripts/generate-briefing-from-rss.ts",
+    "db:check": "tsx scripts/check-database.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",

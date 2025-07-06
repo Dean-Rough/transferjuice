@@ -38,6 +38,7 @@ model Story {
   id            String    @id @default(cuid())
   tweetId       String
   terryComment  String
+  metadata      Json?     // Store enhanced briefing data
   createdAt     DateTime  @default(now())
   tweet         Tweet     @relation(fields: [tweetId], references: [id])
   briefings     BriefingStory[]

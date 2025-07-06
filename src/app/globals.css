@@ -802,3 +802,56 @@
 .briefing-content .inline-media-break {
   @apply my-12;
 }
+
+/* RSS Widget Styling */
+.rss-feed-container {
+  @apply space-y-4;
+}
+
+/* Override RSS widget styles to match our theme */
+rssapp-feed {
+  --rssapp-primary-color: hsl(var(--tj-orange));
+  --rssapp-background: hsl(var(--card));
+  --rssapp-text-color: hsl(var(--foreground));
+  --rssapp-border-color: hsl(var(--border));
+}
+
+/* Ensure RSS widget content is scrollable */
+rssapp-feed::part(container) {
+  max-height: calc(100vh - 12rem);
+  overflow-y: auto;
+}
+
+/* Style RSS feed items */
+rssapp-feed::part(item) {
+  @apply border-b border-border pb-4 mb-4;
+}
+
+rssapp-feed::part(item-title) {
+  @apply text-sm font-semibold text-foreground hover:text-orange-500 transition-colors;
+}
+
+rssapp-feed::part(item-description) {
+  @apply text-sm text-muted-foreground mt-2;
+}
+
+rssapp-feed::part(item-date) {
+  @apply text-xs text-muted-foreground mt-1;
+}
+
+/* Scrollbar styling for RSS feed container */
+.sticky::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sticky::-webkit-scrollbar-track {
+  @apply bg-secondary;
+}
+
+.sticky::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground rounded;
+}
+
+.sticky::-webkit-scrollbar-thumb:hover {
+  @apply bg-foreground;
+}
