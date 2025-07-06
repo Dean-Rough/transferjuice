@@ -20,6 +20,7 @@ interface CohesiveBriefing {
     keyPlayers: string[];
     keyClubs: string[];
     mainImage?: string;
+    playerImages?: Record<string, string>;
   };
 }
 
@@ -90,13 +91,13 @@ export async function generateCohesiveBriefing(
   // Extract players and clubs
   const playerPattern = /\b([A-Z][a-z]+ [A-Z][a-zöäüßéè]+)\b/g;
   const playerMatches = allText.match(playerPattern) || [];
-  const keyPlayers = [...new Set(playerMatches)].slice(0, 5);
+  const keyPlayers = [...new Set(playerMatches)].slice(0, 8); // Get more players for images
   
   const clubPattern = /(Arsenal|Chelsea|Liverpool|Manchester United|Manchester City|Tottenham|Newcastle|West Ham|Bayern Munich|Real Madrid|Barcelona|PSG|Juventus|Milan|Inter|Dortmund|Sporting|Nottingham Forest)/gi;
   const clubMatches = allText.match(clubPattern) || [];
   const keyClubs = [...new Set(clubMatches.map(c => c))].slice(0, 5);
   
-  // Get main image
+  // Get main image for lead player
   let mainImage: string | undefined;
   if (keyPlayers[0]) {
     const playerImage = await getPlayerImage(keyPlayers[0]);
@@ -106,22 +107,42 @@ export async function generateCohesiveBriefing(
     if (clubBadge) mainImage = clubBadge;
   }
   
+  // Get images for other key players (tier 2)
+  const playerImages: Record<string, string> = {};
+  for (let i = 1; i < Math.min(keyPlayers.length, 4); i++) {
+    const image = await getPlayerImage(keyPlayers[i]);
+    if (image) {
+      playerImages[keyPlayers[i]] = image;
+    }
+  }
+  
   if (openai) {
     try {
       const prompt = `You are a football transfer journalist writing in the style of Joel Golby - witty, sardonic, but informative. 
       
-      Write a cohesive transfer briefing article (400-600 words) from these updates:
+      Write a cohesive transfer briefing article (600-800 words) from these updates:
       ${items.map(item => `- ${item.title}: ${item.content_text}`).join('\n')}
       
-      Requirements:
-      - Write as one flowing article, NOT separate sections
-      - Lead with the biggest story
-      - Weave all updates into a single narrative
-      - Include relevant stats naturally in the text
-      - Add dry humor and observations throughout
+      Format Requirements:
+      - Lead with the biggest story (2-3 paragraphs)
+      - Add a mini headline like "### Meanwhile in North London..." before transitioning to next story
+      - Each story gets 2-3 paragraphs with a mini headline transition
+      - Format player names as **Viktor Gyökeres**
+      - Format club names as **Arsenal** 
+      - Format fees as **€50m**
+      - Add relevant stats naturally in the text
+      - Include dry humor throughout
       - End with a punchy conclusion
-      - Do NOT use section headers or bullet points
-      - Write in a conversational, magazine style`;
+      - Mini headlines should be conversational like "### But wait, there's more..." or "### Over in Milan..."
+      
+      HTML Formatting:
+      - Use <h3> for mini headlines
+      - Use <strong class="text-orange-500"> for player names
+      - Use <strong class="text-orange-500"> for club names
+      - Use <strong class="text-green-500"> for fees (€50m, £30m, etc)
+      - Format Twitter handles as <a href="https://twitter.com/handle" class="text-orange-500 hover:underline" target="_blank">@handle</a>
+      - Keep paragraphs in <p> tags
+      - Add source attribution after each story section: <p class="text-sm text-muted-foreground">via <a href="url" class="text-orange-500 hover:underline" target="_blank">Source Name</a></p>`;
       
       const response = await openai.chat.completions.create({
         model: "gpt-4-turbo-preview",
@@ -148,9 +169,10 @@ export async function generateCohesiveBriefing(
         title: generateTitle(items, keyPlayers, keyClubs),
         content: finalContent,
         metadata: {
-          keyPlayers,
+          keyPlayers: keyPlayers.slice(0, 5), // Limit to top 5 for metadata
           keyClubs,
-          mainImage
+          mainImage,
+          playerImages
         }
       };
     } catch (error) {
@@ -159,7 +181,7 @@ export async function generateCohesiveBriefing(
   }
   
   // Fallback: Create cohesive narrative without AI
-  return generateFallbackBriefing(items, keyPlayers, keyClubs, mainImage);
+  return generateFallbackBriefing(items, keyPlayers, keyClubs, mainImage, playerImages);
 }
 
 function generateTitle(items: RSSItem[], players: string[], clubs: string[]): string {
@@ -189,7 +211,8 @@ function generateFallbackBriefing(
   items: RSSItem[],
   keyPlayers: string[],
   keyClubs: string[],
-  mainImage?: string
+  mainImage?: string,
+  playerImages?: Record<string, string>
 ): CohesiveBriefing {
   let content = "";
   
@@ -205,54 +228,120 @@ function generateFallbackBriefing(
   const leadStory = items[0];
   const leadText = leadStory.content_text.replace(/^[🚨🔴⚪️💣❤️🤍]+\s*/, '');
   
-  content += `The transfer window continues to deliver drama, and today's headline act features ${keyPlayers[0] || 'several key moves'}. ${leadText}\n\n`;
-  
-  // Weave in other stories
-  if (items.length > 1) {
-    content += `But that's not all punters. `;
+  // Format player and club names with highlighting
+  const formatContent = (text: string): string => {
+    // Format player names
+    keyPlayers.forEach(player => {
+      const regex = new RegExp(`\\b${player}\\b`, 'g');
+      text = text.replace(regex, `<strong class="text-orange-500">${player}</strong>`);
+    });
     
+    // Format club names
+    keyClubs.forEach(club => {
+      const regex = new RegExp(`\\b${club}\\b`, 'g');
+      text = text.replace(regex, `<strong class="text-orange-500">${club}</strong>`);
+    });
+    
+    // Format fees with green color
+    text = text.replace(/([€£$]\d+(?:\.\d+)?m(?:illion)?)/gi, '<strong class="text-green-500">$1</strong>');
+    
+    // Format Twitter handles
+    text = text.replace(/@(\w+)/g, '<a href="https://twitter.com/$1" class="text-orange-500 hover:underline" target="_blank">@$1</a>');
+    
+    return text;
+  };
+  
+  content += `<p>The transfer window continues to deliver drama, and today's headline act features ${keyPlayers[0] ? `<strong class="text-orange-500">${keyPlayers[0]}</strong>` : 'several key moves'}. ${formatContent(leadText)}</p>\n\n`;
+  
+  // Add source link if it's a tweet
+  if (leadStory.url && leadStory.authors[0]) {
+    content += `<p class="text-sm text-muted-foreground">via <a href="${leadStory.url}" class="text-orange-500 hover:underline" target="_blank">${leadStory.authors[0].name}</a></p>\n\n`;
+  }
+  
+  // Weave in other stories with mini headlines
+  if (items.length > 1) {
     items.slice(1).forEach((item, index) => {
       const text = item.content_text.replace(/^[🚨🔴⚪️💣❤️🤍]+\s*/, '');
       
+      // Add mini headline
       if (index === 0) {
-        content += text;
+        content += `<h3 class="text-xl font-bold mt-8 mb-4">But wait, there's more...</h3>\n`;
       } else if (index === items.length - 2) {
-        content += ` Meanwhile, ${text}`;
+        content += `<h3 class="text-xl font-bold mt-8 mb-4">And finally...</h3>\n`;
       } else {
-        content += ` In other news, ${text}`;
+        const headlines = [
+          "Meanwhile, across Europe...",
+          "In other news...",
+          "But that's not all...",
+          "Speaking of transfers...",
+          "Over at the negotiating table..."
+        ];
+        content += `<h3 class="text-xl font-bold mt-8 mb-4">${headlines[index % headlines.length]}</h3>\n`;
       }
-      content += " ";
+      
+      // Check if we should add an inline image for this story
+      let storyPlayerImage: string | undefined;
+      if (playerImages) {
+        // Find which player is mentioned in this story
+        for (const [player, image] of Object.entries(playerImages)) {
+          if (text.includes(player)) {
+            storyPlayerImage = image;
+            break;
+          }
+        }
+      }
+      
+      if (storyPlayerImage) {
+        content += `<div class="flex gap-4 items-start">
+          <div class="flex-1">
+            <p>${formatContent(text)}</p>
+          </div>
+          <figure class="briefing-image flex-shrink-0" style="width: 300px;">
+            <img src="${storyPlayerImage}" alt="Player" class="w-full h-auto rounded-lg shadow-lg" />
+          </figure>
+        </div>\n`;
+      } else {
+        content += `<p>${formatContent(text)}</p>\n`;
+      }
+      
+      // Add source link
+      if (item.url && item.authors[0]) {
+        content += `<p class="text-sm text-muted-foreground">via <a href="${item.url}" class="text-orange-500 hover:underline" target="_blank">${item.authors[0].name}</a></p>\n\n`;
+      }
     });
-    
-    content += "\n\n";
   }
   
-  // Add context about the window
+  // Add context about the window with mini headline
+  content += `<h3 class="text-xl font-bold mt-8 mb-4">The Bigger Picture</h3>\n`;
+  
   const hasAgreements = items.some(item => /agreement|agreed|deal/i.test(item.content_text));
   const hasNegotiations = items.some(item => /talks|negotiations|interested/i.test(item.content_text));
   
   if (hasAgreements) {
-    content += `With deals being struck left and right, it's clear the summer window is heating up. `;
+    content += `<p>With deals being struck left and right, it's clear the summer window is heating up. `;
   } else if (hasNegotiations) {
-    content += `Negotiations continue across Europe as clubs jostle for their targets. `;
+    content += `<p>Negotiations continue across Europe as clubs jostle for their targets. `;
   }
   
   // Extract any fees mentioned
-  const feeMatches = items.map(item => item.content_text.match(/[€£](\d+)m/)).filter(Boolean);
+  const feeMatches = items.map(item => item.content_text.match(/[€£$](\d+(?:\.\d+)?m(?:illion)?)/gi)).filter(Boolean);
   if (feeMatches.length > 0) {
-    content += `The money being thrown around - ${feeMatches.map(m => m![0]).join(', ')} - would make your eyes water. `;
+    content += `The money being thrown around - ${feeMatches.map(m => `<strong class="text-green-500">${m![0]}</strong>`).join(', ')} - would make your eyes water.</p>\n\n`;
+  } else {
+    content += `</p>\n\n`;
   }
   
   // Closing paragraph
-  content += `\n\nAs always in the beautiful game, it's not about the football anymore, is it? It's about which millionaire can convince another millionaire to swap their millionaire lifestyle in one city for a millionaire lifestyle in another. The kids in the playground picking teams have nothing on these suits with their spreadsheets and private jets. Still, we watch, we wait, and we refresh our feeds, because what else is there to do in July?`;
+  content += `<p>As always in the beautiful game, it's not about the football anymore, is it? It's about which millionaire can convince another millionaire to swap their millionaire lifestyle in one city for a millionaire lifestyle in another. The kids in the playground picking teams have nothing on these suits with their spreadsheets and private jets. Still, we watch, we wait, and we refresh our feeds, because what else is there to do in July?</p>`;
   
   return {
     title: generateTitle(items, keyPlayers, keyClubs),
     content,
     metadata: {
-      keyPlayers,
+      keyPlayers: keyPlayers.slice(0, 5), // Limit to top 5 for metadata
       keyClubs,
-      mainImage
+      mainImage,
+      playerImages
     }
   };
 }

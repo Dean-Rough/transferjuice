@@ -122,6 +122,7 @@ export async function GET(request: NextRequest) {
           keyPlayers: cohesiveBriefing.metadata.keyPlayers,
           keyClubs: cohesiveBriefing.metadata.keyClubs,
           mainImage: cohesiveBriefing.metadata.mainImage,
+          playerImages: cohesiveBriefing.metadata.playerImages,
           sources: [...new Set(recentItems.map(item => item.authors[0]?.name || "Unknown"))],
         },
       },
