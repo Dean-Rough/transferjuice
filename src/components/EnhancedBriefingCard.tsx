@@ -28,7 +28,8 @@ interface EnhancedStoryData {
 }
 
 interface EnhancedBriefingCardProps {
-  story: {
+  briefing?: any;
+  story?: {
     id: string;
     terryComment: string;
     metadata?: any;
@@ -41,9 +42,22 @@ interface EnhancedBriefingCardProps {
       };
     };
   };
+  isDetailPage?: boolean;
 }
 
-export const EnhancedBriefingCard: FC<EnhancedBriefingCardProps> = ({ story }) => {
+export const EnhancedBriefingCard: FC<EnhancedBriefingCardProps> = ({ briefing, story: singleStory, isDetailPage = false }) => {
+  // If briefing is provided, render all stories. Otherwise render single story
+  if (briefing) {
+    return (
+      <div className="space-y-6">
+        {briefing.stories.map(({ story }: any) => (
+          <EnhancedBriefingCard key={story.id} story={story} isDetailPage={isDetailPage} />
+        ))}
+      </div>
+    );
+  }
+  
+  const story = singleStory!;
   const metadata: EnhancedStoryData = story.metadata || {};
   
   return (

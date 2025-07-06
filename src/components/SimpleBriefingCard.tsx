@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 interface Story {
   id: string;
   terryComment: string;
@@ -16,22 +18,40 @@ interface Story {
 }
 
 interface SimpleBriefingCardProps {
-  title: string;
-  stories: Array<{
+  briefing?: any;
+  title?: string;
+  stories?: Array<{
     story: Story;
   }>;
-  publishedAt: Date;
+  publishedAt?: Date;
+  isDetailPage?: boolean;
 }
 
 export function SimpleBriefingCard({
-  title,
-  stories,
-  publishedAt,
+  briefing,
+  title: propTitle,
+  stories: propStories,
+  publishedAt: propPublishedAt,
+  isDetailPage = false,
 }: SimpleBriefingCardProps) {
+  const title = propTitle || briefing?.title;
+  const stories = propStories || briefing?.stories || [];
+  const publishedAt = propPublishedAt || briefing?.publishedAt || briefing?.createdAt;
+  const briefingId = briefing?.id;
   return (
     <div className="bg-card border border-border rounded-lg p-6 mb-6 hover:border-orange-500/20 transition-colors">
       <div className="mb-6 border-b border-border pb-4">
-        <h2 className="text-2xl font-bold text-foreground mb-2">{title}</h2>
+        {isDetailPage ? (
+          <h2 className="text-2xl font-bold text-foreground mb-2">{title}</h2>
+        ) : briefingId ? (
+          <Link href={`/briefing/${briefingId}`}>
+            <h2 className="text-2xl font-bold text-foreground mb-2 hover:text-orange-500 transition-colors cursor-pointer">
+              {title}
+            </h2>
+          </Link>
+        ) : (
+          <h2 className="text-2xl font-bold text-foreground mb-2">{title}</h2>
+        )}
         <p className="text-sm text-muted-foreground font-mono">
           {new Date(publishedAt).toLocaleDateString("en-GB", {
             day: "numeric",

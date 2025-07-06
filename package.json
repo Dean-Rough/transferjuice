@@ -36,6 +36,7 @@
     "briefing:generate-enhanced": "tsx scripts/generate-enhanced-briefing.ts",
     "briefing:demo": "tsx scripts/demo-enhanced-briefing.ts",
     "briefing:rss": "tsx scripts/generate-briefing-from-rss.ts",
+    "briefing:hourly": "node scripts/trigger-briefing.js",
     "db:check": "tsx scripts/check-database.ts"
   },
   "dependencies": {

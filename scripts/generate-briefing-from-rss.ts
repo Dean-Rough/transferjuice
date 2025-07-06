@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { generateTerryComment } from "../src/lib/terry";
+import { generateOptimizedHeadline, analyzeBriefingContent } from "../src/lib/seoOptimizer";
 import OpenAI from "openai";
 import dotenv from "dotenv";
 
@@ -330,10 +331,10 @@ async function generateEnhancedBriefingFromRSS(feedUrl: string) {
     // Initialize OpenAI (may be null if no API key)
     const openai = await getOpenAI();
     
-    // Create briefing
+    // Create briefing with placeholder title
     const briefing = await prisma.briefing.create({
       data: {
-        title: `Enhanced Transfer Briefing - ${new Date().toLocaleDateString("en-GB", {
+        title: `Transfer Briefing - ${new Date().toLocaleDateString("en-GB", {
           day: "numeric",
           month: "long",
           year: "numeric",
@@ -402,8 +403,40 @@ async function generateEnhancedBriefingFromRSS(feedUrl: string) {
       }
     }
     
-    console.log(`\n✅ Created briefing with ${successfulStories} stories`);
-    console.log(`Briefing ID: ${briefing.id}`);
+    // Update briefing with SEO-optimized title after analyzing content
+    const briefingWithStories = await prisma.briefing.findUnique({
+      where: { id: briefing.id },
+      include: {
+        stories: {
+          include: {
+            story: {
+              include: {
+                tweet: {
+                  include: {
+                    source: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: { position: "asc" },
+        },
+      },
+    });
+    
+    if (briefingWithStories && briefingWithStories.stories.length > 0) {
+      const analysis = analyzeBriefingContent(briefingWithStories.stories);
+      const optimizedTitle = generateOptimizedHeadline(analysis, new Date());
+      
+      await prisma.briefing.update({
+        where: { id: briefing.id },
+        data: { title: optimizedTitle },
+      });
+      
+      console.log(`\n✅ Created briefing with ${successfulStories} stories`);
+      console.log(`Briefing ID: ${briefing.id}`);
+      console.log(`Optimized Title: ${optimizedTitle}`);
+    }
     
     return briefing;
     

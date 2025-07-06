@@ -49,9 +49,7 @@ export function BriefingList({ briefings }: BriefingListProps) {
       {briefings.map((briefing) => (
         <SimpleBriefingCard
           key={briefing.id}
-          title={briefing.title}
-          stories={briefing.stories}
-          publishedAt={briefing.publishedAt}
+          briefing={briefing}
         />
       ))}
     </div>

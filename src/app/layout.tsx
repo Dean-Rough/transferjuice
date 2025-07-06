@@ -4,13 +4,70 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TransferJuice - Football Transfer News with Terry's Commentary",
-  description:
-    "Get the latest football transfer news with witty commentary from Terry in the style of Joel Golby",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://transferjuice.com"),
+  title: {
+    default: "TransferJuice - Latest Football Transfer News & Briefings",
+    template: "%s | TransferJuice",
+  },
+  description: "Hourly football transfer briefings with the latest news, rumours and confirmed deals. Get comprehensive transfer updates for Premier League, La Liga, Serie A and more.",
+  keywords: [
+    "football transfers",
+    "transfer news",
+    "transfer rumours",
+    "Premier League transfers",
+    "La Liga transfers",
+    "Serie A transfers",
+    "transfer briefings",
+    "football news",
+    "transfer updates",
+    "transfer window"
+  ],
+  authors: [{ name: "TransferJuice" }],
+  creator: "TransferJuice",
+  publisher: "TransferJuice",
   icons: {
     icon: "/favicon.ico",
   },
-  metadataBase: new URL("https://transferjuice.com"),
+  openGraph: {
+    type: "website",
+    locale: "en_GB",
+    url: "/",
+    siteName: "TransferJuice",
+    title: "TransferJuice - Latest Football Transfer News & Briefings",
+    description: "Hourly football transfer briefings with the latest news, rumours and confirmed deals.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "TransferJuice",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TransferJuice - Latest Football Transfer News",
+    description: "Hourly football transfer briefings with the latest news, rumours and confirmed deals.",
+    images: ["/twitter-image.png"],
+    creator: "@transferjuice",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "/",
+    types: {
+      "application/rss+xml": [{ url: "/api/feed/rss", title: "TransferJuice RSS Feed" }],
+    },
+  },
 };
 
 export default function RootLayout({
