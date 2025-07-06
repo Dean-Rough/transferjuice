@@ -66,8 +66,31 @@ export function SimpleBriefingCard({
       <div className="space-y-8">
         {stories.map(({ story }) => {
           const isEnhanced = story.metadata?.headline;
+          const isCohesive = story.metadata?.type === 'cohesive';
           
-          if (isEnhanced) {
+          if (isCohesive) {
+            // Cohesive briefing format - single flowing article
+            return (
+              <div
+                key={story.id}
+                className="prose prose-invert max-w-none"
+              >
+                <div 
+                  className="briefing-content enhanced-content"
+                  dangerouslySetInnerHTML={{ __html: story.metadata.content }}
+                />
+                
+                {/* Sources */}
+                {story.metadata.sources && (
+                  <div className="mt-8 pt-4 border-t border-border">
+                    <p className="text-sm text-muted-foreground">
+                      Sources: {story.metadata.sources.join(', ')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          } else if (isEnhanced) {
             // Enhanced briefing format
             const metadata = story.metadata;
             return (

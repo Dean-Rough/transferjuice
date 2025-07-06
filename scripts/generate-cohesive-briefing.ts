@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { generateCohesiveBriefing } from "@/lib/cohesiveBriefingGenerator";
+import { generateCohesiveBriefing } from "../src/lib/cohesiveBriefingGenerator";
 import OpenAI from "openai";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const prisma = new PrismaClient();
 
@@ -23,7 +25,6 @@ interface RSSFeed {
   items: RSSItem[];
 }
 
-// Helper function to get OpenAI instance
 async function getOpenAI(): Promise<OpenAI | null> {
   if (!process.env.OPENAI_API_KEY) {
     console.log("⚠️ No OpenAI API key found, using fallback mode");
@@ -34,18 +35,9 @@ async function getOpenAI(): Promise<OpenAI | null> {
   });
 }
 
-export async function GET(request: NextRequest) {
+async function generateBriefingFromRSS(feedUrl: string) {
   try {
-    // Verify cron secret to prevent unauthorized calls
-    const authHeader = request.headers.get("authorization");
-    if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    console.log(`🚀 RSS Briefing cron job triggered at ${new Date().toISOString()}`);
-
-    // Fetch RSS feed
-    const feedUrl = process.env.RSS_FEED_URL || "https://rss.app/feeds/v1.1/_zMqruZvtL6XIMNVY.json";
+    console.log("📡 Fetching RSS feed...");
     const response = await fetch(feedUrl);
     
     if (!response.ok) {
@@ -53,20 +45,20 @@ export async function GET(request: NextRequest) {
     }
     
     const feed: RSSFeed = await response.json();
+    console.log(`Found ${feed.items.length} items in feed`);
     
-    // Filter to recent items (last 2 hours for hourly updates)
+    // Filter to recent items (last 24 hours)
     const recentItems = feed.items.filter(item => {
       const itemDate = new Date(item.date_published);
-      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
-      return itemDate > twoHoursAgo;
+      const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      return itemDate > dayAgo;
     });
     
+    console.log(`Filtered to ${recentItems.length} recent items`);
+    
     if (recentItems.length === 0) {
-      console.log("No new items in RSS feed");
-      return NextResponse.json({
-        success: true,
-        message: "No new items to process",
-      });
+      console.log("No recent items to process");
+      return null;
     }
     
     // Initialize OpenAI (may be null if no API key)
@@ -106,12 +98,12 @@ export async function GET(request: NextRequest) {
       },
     });
     
+    // Create the story with the cohesive content
     // Clean the content to avoid encoding issues
     const cleanContent = cohesiveBriefing.content
       .replace(/[\u{D800}-\u{DFFF}]/gu, '') // Remove lone surrogates
       .replace(/[\x00-\x1F\x7F-\x9F]/g, ''); // Remove control characters
     
-    // Create the story with the cohesive content
     const story = await prisma.story.create({
       data: {
         tweetId: tweet.id,
@@ -136,28 +128,45 @@ export async function GET(request: NextRequest) {
       },
     });
     
-    await prisma.$disconnect();
+    console.log(`\n✅ Created cohesive briefing: ${cohesiveBriefing.title}`);
+    console.log(`Briefing ID: ${briefing.id}`);
+    console.log(`Key Players: ${cohesiveBriefing.metadata.keyPlayers.join(', ')}`);
+    console.log(`Key Clubs: ${cohesiveBriefing.metadata.keyClubs.join(', ')}`);
+    if (cohesiveBriefing.metadata.mainImage) {
+      console.log(`Main Image: ${cohesiveBriefing.metadata.mainImage}`);
+    }
     
-    return NextResponse.json({
-      success: true,
-      message: "RSS Briefing generation completed",
-      briefing: {
-        id: briefing.id,
-        title: briefing.title,
-        storiesCount: 1,
-        publishedAt: briefing.publishedAt,
-      },
-    });
+    return briefing;
+    
   } catch (error) {
-    console.error("RSS Briefing cron job failed:", error);
-    await prisma.$disconnect();
-    
-    return NextResponse.json(
-      {
-        error: "Failed to generate RSS briefing",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
-    );
+    console.error("❌ Error generating cohesive briefing:", error);
+    throw error;
   }
 }
+
+// Main execution
+async function main() {
+  const feedUrl = process.argv[2] || "https://rss.app/feeds/v1.1/_zMqruZvtL6XIMNVY.json";
+  
+  console.log("🚀 Starting cohesive briefing generation from RSS...");
+  console.log(`Feed URL: ${feedUrl}`);
+  
+  try {
+    const briefing = await generateBriefingFromRSS(feedUrl);
+    
+    if (briefing) {
+      console.log("\n✅ Cohesive briefing generated successfully!");
+      console.log("\n🌐 Check your homepage at http://localhost:4433");
+    } else {
+      console.log("\n⚠️ No recent items to process");
+    }
+    
+  } catch (error) {
+    console.error("❌ Failed to generate cohesive briefing:", error);
+    process.exit(1);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+main();

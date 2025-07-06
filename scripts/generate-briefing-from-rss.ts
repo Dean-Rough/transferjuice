@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { generateTerryComment } from "../src/lib/terry";
 import { generateOptimizedHeadline, analyzeBriefingContent } from "../src/lib/seoOptimizer";
+import { generateCohesiveBriefing } from "../src/lib/cohesiveBriefingGenerator";
 import OpenAI from "openai";
 import dotenv from "dotenv";
 

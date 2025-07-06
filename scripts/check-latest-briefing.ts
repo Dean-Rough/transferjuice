@@ -43,8 +43,16 @@ async function main() {
       
       if (story.metadata) {
         const metadata = story.metadata as any;
-        console.log("   Headline:", metadata.headline || "No headline");
-        console.log("   Has enhanced content:", !!metadata.contextParagraph);
+        if (metadata.type === 'cohesive') {
+          console.log("   Type: COHESIVE BRIEFING");
+          console.log("   Key Players:", metadata.keyPlayers?.join(', ') || "None");
+          console.log("   Key Clubs:", metadata.keyClubs?.join(', ') || "None");
+          console.log("   Has image:", !!metadata.mainImage);
+          console.log("   Content length:", metadata.content?.length || 0, "chars");
+        } else {
+          console.log("   Headline:", metadata.headline || "No headline");
+          console.log("   Has enhanced content:", !!metadata.contextParagraph);
+        }
       } else {
         console.log("   No enhanced metadata");
       }
