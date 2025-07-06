@@ -125,15 +125,18 @@ export async function generateCohesiveBriefing(
       
       Format Requirements:
       - Lead with the biggest story (2-3 paragraphs)
-      - Add a mini headline like "### Meanwhile in North London..." before transitioning to next story
-      - Each story gets 2-3 paragraphs with a mini headline transition
+      - Before each new story, create a SPECIFIC mini headline that relates to that story's content
+      - Examples: "### Forest Lock Down Their Nigerian Wall" for Ola Aina story
+      - Or "### Milan's Midfield Makeover Takes Shape" for a Milan transfer
+      - Or "### Chelsea's Clear-out Continues at Cobham" for departures
+      - Make mini headlines punchy, specific, and relevant to the actual story
+      - Each story gets 2-3 paragraphs after its mini headline
       - Format player names as **Viktor Gyökeres**
       - Format club names as **Arsenal** 
       - Format fees as **€50m**
       - Add relevant stats naturally in the text
       - Include dry humor throughout
       - End with a punchy conclusion
-      - Mini headlines should be conversational like "### But wait, there's more..." or "### Over in Milan..."
       
       HTML Formatting:
       - Use <h3> for mini headlines
@@ -207,6 +210,69 @@ function generateTitle(items: RSSItem[], players: string[], clubs: string[]): st
   return `Transfer Briefing: Latest Updates - ${date}`;
 }
 
+function generateMiniHeadline(text: string, item: RSSItem): string {
+  // Extract key elements from the story
+  const playerMatch = text.match(/\b([A-Z][a-z]+ [A-Z][a-zöäüßéè]+)\b/);
+  const player = playerMatch ? playerMatch[1] : null;
+  
+  const clubPattern = /(Arsenal|Chelsea|Liverpool|Manchester United|Manchester City|Tottenham|Newcastle|West Ham|Bayern Munich|Real Madrid|Barcelona|PSG|Juventus|Milan|Inter|Dortmund|Sporting|Nottingham Forest|Roma|Napoli|Atletico|Valencia|Sevilla|Porto|Benfica|Ajax|Feyenoord|Celtic|Rangers)/gi;
+  const clubs = text.match(clubPattern) || [];
+  
+  // Check for specific keywords to determine story type
+  const isContract = /contract|deal|sign|pen|agree|extend/i.test(text);
+  const isRejected = /reject|turn down|refuse|snub/i.test(text);
+  const isMedical = /medical|tests|examination/i.test(text);
+  const isInterest = /interested|monitoring|tracking|considering|eye/i.test(text);
+  const isFee = /€\d+m|£\d+m|\$\d+m|fee|price|valuation/i.test(text);
+  const isLoan = /loan|temporary|season-long/i.test(text);
+  const isDeparture = /leave|exit|departure|farewell/i.test(text);
+  
+  // Generate relevant headline based on content
+  if (player && clubs.length >= 2) {
+    if (isContract) {
+      return `${player} Puts Pen to Paper`;
+    } else if (isRejected) {
+      return `${player} Snubs ${clubs[1] || 'Suitors'}`;
+    } else if (isMedical) {
+      return `${player} Medical Scheduled`;
+    } else if (isLoan) {
+      return `${player} Loan Deal Taking Shape`;
+    } else if (isDeparture) {
+      return `${player} Heads for the Exit`;
+    } else {
+      return `${clubs[0]} Make Their Move for ${player}`;
+    }
+  } else if (clubs.length >= 1) {
+    if (isContract && player) {
+      return `${clubs[0]} Secure ${player}`;
+    } else if (isInterest) {
+      return `${clubs[0]} Enter the Race`;
+    } else if (isFee) {
+      return `${clubs[0]}'s Big Money Move`;
+    } else {
+      return `Latest from ${clubs[0]}`;
+    }
+  } else if (player) {
+    if (isContract) {
+      return `${player} Signs New Deal`;
+    } else if (isInterest) {
+      return `Race Heats Up for ${player}`;
+    } else {
+      return `${player} Update`;
+    }
+  }
+  
+  // Fallback headlines based on content type
+  if (isContract) return "Another Deal Done";
+  if (isRejected) return "Transfer Bid Rejected";
+  if (isMedical) return "Medical Tests Ahead";
+  if (isInterest) return "New Suitors Emerge";
+  if (isFee) return "Big Money on the Table";
+  
+  // Generic fallback
+  return "Transfer Update";
+}
+
 function generateFallbackBriefing(
   items: RSSItem[],
   keyPlayers: string[],
@@ -263,21 +329,9 @@ function generateFallbackBriefing(
     items.slice(1).forEach((item, index) => {
       const text = item.content_text.replace(/^[🚨🔴⚪️💣❤️🤍]+\s*/, '');
       
-      // Add mini headline
-      if (index === 0) {
-        content += `<h3 class="text-xl font-bold mt-8 mb-4">But wait, there's more...</h3>\n`;
-      } else if (index === items.length - 2) {
-        content += `<h3 class="text-xl font-bold mt-8 mb-4">And finally...</h3>\n`;
-      } else {
-        const headlines = [
-          "Meanwhile, across Europe...",
-          "In other news...",
-          "But that's not all...",
-          "Speaking of transfers...",
-          "Over at the negotiating table..."
-        ];
-        content += `<h3 class="text-xl font-bold mt-8 mb-4">${headlines[index % headlines.length]}</h3>\n`;
-      }
+      // Create a relevant mini headline based on the story content
+      const miniHeadline = generateMiniHeadline(text, item);
+      content += `<h3 class="text-xl font-bold mt-8 mb-4">${miniHeadline}</h3>\n`;
       
       // Check if we should add an inline image for this story
       let storyPlayerImage: string | undefined;
