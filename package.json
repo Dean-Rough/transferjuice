@@ -38,6 +38,9 @@
     "briefing:rss": "tsx scripts/generate-briefing-from-rss.ts",
     "briefing:cohesive": "tsx scripts/generate-cohesive-briefing.ts",
     "briefing:hourly": "node scripts/trigger-briefing.js",
+    "briefing:trigger": "tsx scripts/trigger-rss-briefing.ts",
+    "briefing:cleanup": "tsx scripts/cleanup-old-briefings.ts",
+    "briefing:status": "tsx scripts/briefing-status.ts",
     "db:check": "tsx scripts/check-database.ts"
   },
   "dependencies": {

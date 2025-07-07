@@ -1,8 +1,6 @@
 "use client";
 
 import { FC } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Clock, TrendingUp, Users, Trophy } from "lucide-react";
 
 interface PlayerStats {
@@ -61,28 +59,28 @@ export const EnhancedBriefingCard: FC<EnhancedBriefingCardProps> = ({ briefing, 
   const metadata: EnhancedStoryData = story.metadata || {};
   
   return (
-    <Card className="mb-6 hover:shadow-lg transition-shadow">
-      <CardHeader>
+    <div className="bg-card border border-border rounded-lg mb-6 hover:shadow-lg transition-shadow">
+      <div className="p-6 pb-4">
         <div className="flex justify-between items-start mb-2">
-          <CardTitle className="text-2xl font-bold leading-tight">
+          <h3 className="text-2xl font-bold leading-tight">
             {metadata.headline || "Transfer Update"}
-          </CardTitle>
-          <Badge variant="secondary" className="ml-2">
-            <Clock className="w-3 h-3 mr-1" />
+          </h3>
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground ml-2">
+            <Clock className="w-3 h-3" />
             {new Date(story.tweet.createdAt).toLocaleTimeString("en-GB", {
               hour: "2-digit",
               minute: "2-digit",
             })}
-          </Badge>
+          </span>
         </div>
         
         {/* Source attribution */}
         <div className="text-sm text-muted-foreground">
           via {story.tweet.source.name} ({story.tweet.source.handle})
         </div>
-      </CardHeader>
+      </div>
       
-      <CardContent className="space-y-4">
+      <div className="px-6 pb-6 space-y-4">
         {/* Context Paragraph */}
         <div className="text-base leading-relaxed">
           {metadata.contextParagraph || story.tweet.content}
@@ -99,7 +97,9 @@ export const EnhancedBriefingCard: FC<EnhancedBriefingCardProps> = ({ briefing, 
             )}
             {metadata.playerStats.currentClub && (
               <div className="flex items-center gap-1">
-                <Badge variant="outline">{metadata.playerStats.currentClub}</Badge>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border border-border">
+                  {metadata.playerStats.currentClub}
+                </span>
               </div>
             )}
             {metadata.playerStats.goals !== undefined && (
@@ -165,7 +165,7 @@ export const EnhancedBriefingCard: FC<EnhancedBriefingCardProps> = ({ briefing, 
             {story.tweet.content}
           </div>
         </details>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

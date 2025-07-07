@@ -20,10 +20,17 @@
  */
 
 import { config } from "dotenv";
-import { generateBriefing } from "../src/lib/briefings/generator";
+import { PrismaClient } from "@prisma/client";
+import { generateCohesiveBriefing } from "../src/lib/cohesiveBriefingGenerator";
+import OpenAI from "openai";
 
 // Load environment variables
 config({ path: ".env.local" });
+if (!process.env.DATABASE_URL) {
+  config(); // Try default .env if .env.local doesn't have DATABASE_URL
+}
+
+const prisma = new PrismaClient();
 
 async function run() {
   // Validate environment
@@ -53,33 +60,119 @@ async function run() {
   console.log("");
 
   try {
-    const result = await generateBriefing({
-      timestamp: timestamp ? new Date(timestamp) : new Date(),
-      testMode,
-      debugMode: true,
+    // Fetch RSS feed
+    const feedUrl = "https://rss.app/feeds/v1.1/_zMqruZvtL6XIMNVY.json";
+    console.log("📡 Fetching RSS feed...");
+    const response = await fetch(feedUrl);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch RSS feed: ${response.statusText}`);
+    }
+    
+    const feed = await response.json();
+    console.log(`Found ${feed.items.length} items in feed`);
+    
+    // Filter to recent items
+    const cutoffTime = new Date();
+    cutoffTime.setHours(cutoffTime.getHours() - 3); // 3 hours for regular briefings
+    
+    const recentItems = feed.items.filter((item: any) => {
+      const itemDate = new Date(item.date_published);
+      return itemDate > cutoffTime;
+    });
+    
+    console.log(`Filtered to ${recentItems.length} recent items`);
+    
+    if (recentItems.length === 0) {
+      console.log("ℹ️  No new content to brief - skipping");
+      process.exit(2);
+    }
+    
+    // Check for existing briefing in last 2 hours
+    const twoHoursAgo = new Date();
+    twoHoursAgo.setHours(twoHoursAgo.getHours() - 2);
+    
+    const existingBriefing = await prisma.briefing.findFirst({
+      where: {
+        publishedAt: {
+          gte: twoHoursAgo
+        }
+      }
+    });
+    
+    if (existingBriefing && !testMode) {
+      console.log("ℹ️  Recent briefing already exists - skipping");
+      console.log(`   Last briefing: ${existingBriefing.title} at ${existingBriefing.publishedAt}`);
+      process.exit(2);
+    }
+    
+    // Generate cohesive briefing
+    console.log("📝 Generating cohesive briefing...");
+    const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
+    const cohesiveBriefing = await generateCohesiveBriefing(recentItems, openai);
+    
+    // Create briefing in database
+    const briefing = await prisma.briefing.create({
+      data: {
+        title: cohesiveBriefing.title,
+        publishedAt: timestamp ? new Date(timestamp) : new Date()
+      }
+    });
+    
+    // Create source for the briefing
+    const source = await prisma.source.upsert({
+      where: { handle: "TransferJuice" },
+      update: {},
+      create: {
+        name: "TransferJuice Editorial",
+        handle: "TransferJuice"
+      }
+    });
+    
+    // Create tweet for the story
+    const tweet = await prisma.tweet.create({
+      data: {
+        tweetId: `briefing-${briefing.id}`,
+        content: `Transfer Briefing: ${cohesiveBriefing.metadata.keyPlayers.slice(0, 3).join(', ')} and more`,
+        url: `https://transferjuice.com/briefing/${briefing.id}`,
+        sourceId: source.id,
+        scrapedAt: new Date()
+      }
+    });
+    
+    // Create story with cohesive content
+    const story = await prisma.story.create({
+      data: {
+        tweetId: tweet.id,
+        terryComment: "Another day, another briefing about millionaires kicking a ball around.",
+        metadata: {
+          type: 'cohesive',
+          content: cohesiveBriefing.content,
+          ...cohesiveBriefing.metadata
+        }
+      }
+    });
+    
+    // Link story to briefing
+    await prisma.briefingStory.create({
+      data: {
+        briefingId: briefing.id,
+        storyId: story.id,
+        position: 0
+      }
     });
 
     console.log("\n✅ Briefing Generation Complete!");
     console.log("================================");
-    console.log(`Briefing ID: ${result.id}`);
-    console.log(`Slug: ${result.slug}`);
-    console.log(`URL: http://localhost:4433/briefings/${result.slug}`);
+    console.log(`Briefing ID: ${briefing.id}`);
+    console.log(`Title: ${briefing.title}`);
+    console.log(`URL: http://localhost:4433/briefing/${briefing.id}`);
     console.log("\nDetails:");
-    console.log(`- Word count: ${result.wordCount}`);
-    console.log(`- Read time: ${result.readTime} minutes`);
-    console.log(`- Terry score: ${result.terryScore}`);
-    console.log(`- Published: ${result.isPublished ? "Yes" : "No"}`);
+    console.log(`- Key Players: ${cohesiveBriefing.metadata.keyPlayers.join(', ')}`);
+    console.log(`- Key Clubs: ${cohesiveBriefing.metadata.keyClubs.join(', ')}`);
+    console.log(`- Has main image: ${cohesiveBriefing.metadata.mainImage ? 'Yes' : 'No'}`);
+    console.log(`- Published: ${briefing.publishedAt}`);
 
-    // Log scraping health metrics if available
-    if ((result as any).stats) {
-      const stats = (result as any).stats;
-      console.log("\nScraping Metrics:");
-      console.log(`- Sources monitored: ${stats.sourcesMonitored || "N/A"}`);
-      console.log(`- Tweets processed: ${stats.tweetsProcessed || "N/A"}`);
-      console.log(
-        `- Processing time: ${stats.processingTime ? stats.processingTime + "ms" : "N/A"}`,
-      );
-    }
   } catch (error) {
     console.error("\n❌ Briefing generation failed:");
     console.error(error);
@@ -92,7 +185,7 @@ async function run() {
       }
       if (
         error.message.includes("No relevant tweets") ||
-        error.message.includes("All stories have been recently briefed")
+        error.message.includes("No new content")
       ) {
         console.log("ℹ️  No new content to brief - skipping");
         process.exit(2); // Skipped
@@ -100,6 +193,8 @@ async function run() {
     }
 
     process.exit(1); // Hard failure
+  } finally {
+    await prisma.$disconnect();
   }
 }
 

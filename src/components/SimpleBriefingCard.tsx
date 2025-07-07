@@ -64,16 +64,40 @@ export function SimpleBriefingCard({
       </div>
 
       <div className="space-y-8">
-        {stories.map(({ story }) => {
+        {stories.map(({ story }: { story: Story }) => {
           const isEnhanced = story.metadata?.headline;
           const isCohesive = story.metadata?.type === 'cohesive';
+          const isDailySummary = story.metadata?.type === 'daily_summary';
           
-          if (isCohesive) {
+          if (isDailySummary) {
+            // Daily summary format - HTML content with stats
+            return (
+              <div
+                key={story.id}
+                className="briefing-article max-w-none"
+              >
+                <div 
+                  className="briefing-content enhanced-content daily-summary-content"
+                  dangerouslySetInnerHTML={{ __html: story.metadata.content }}
+                />
+                
+                {/* Terry's Take on the Day */}
+                <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4 mt-6">
+                  <p className="text-xs font-mono text-orange-500 mb-2">
+                    TERRY&apos;S TAKE ON THE DAY:
+                  </p>
+                  <p className="text-foreground italic leading-relaxed">
+                    {story.terryComment}
+                  </p>
+                </div>
+              </div>
+            );
+          } else if (isCohesive) {
             // Cohesive briefing format - single flowing article
             return (
               <div
                 key={story.id}
-                className="prose prose-invert max-w-none"
+                className="briefing-article max-w-none"
               >
                 <div 
                   className="briefing-content enhanced-content"

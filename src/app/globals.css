@@ -164,6 +164,53 @@
   .engagement-mono {
     @apply font-mono text-sm;
   }
+  
+  /* Hero image styles for better framing */
+  .briefing-image.hero-image {
+    @apply mb-6 rounded-lg overflow-hidden bg-zinc-900;
+    aspect-ratio: 16 / 9;
+    max-height: 400px;
+    position: relative;
+  }
+  
+  .briefing-image.hero-image img {
+    @apply absolute inset-0 w-full h-full;
+    object-fit: cover;
+    object-position: center 25%; /* Focus on upper body/face area */
+  }
+  
+  /* Inline briefing images */
+  .briefing-image img {
+    @apply rounded-lg shadow-lg;
+    object-fit: cover;
+    object-position: center;
+  }
+  
+  .briefing-image figcaption {
+    @apply text-sm text-muted-foreground mt-2 text-center;
+  }
+  
+  /* Briefing article styles without prose conflicts */
+  .briefing-article {
+    @apply text-zinc-100;
+  }
+  
+  .briefing-article h3 {
+    @apply text-xl font-bold mt-8 mb-4 text-white;
+  }
+  
+  .briefing-article p {
+    @apply mb-4 leading-relaxed;
+  }
+  
+  .briefing-article figure {
+    @apply my-4;
+  }
+  
+  /* Ensure floated images work properly */
+  .briefing-article figure[style*="float"] {
+    @apply mb-4;
+  }
 }
 
 /* Mobile-First Touch Optimization */
@@ -854,4 +901,109 @@ rssapp-feed::part(item-date) {
 
 .sticky::-webkit-scrollbar-thumb:hover {
   @apply bg-foreground;
+}
+
+/* Daily Summary Specific Styles */
+.daily-summary-header {
+  @apply mb-8;
+}
+
+.daily-summary-header h1 {
+  @apply text-3xl font-bold mb-6 text-white;
+}
+
+/* Stats Grid for Daily Summary */
+.stats-grid {
+  @apply grid grid-cols-2 md:grid-cols-5 gap-4 mb-8;
+}
+
+.stat-card {
+  @apply rounded-lg p-4 text-center transition-all hover:scale-105;
+}
+
+.stat-number {
+  @apply text-3xl font-bold;
+}
+
+.stat-label {
+  @apply text-sm text-muted-foreground mt-1;
+}
+
+/* Section styling for daily summary */
+.completed-section,
+.negotiating-section,
+.top-stories-section,
+.clubs-section {
+  @apply mb-8;
+}
+
+.completed-section h2 {
+  @apply text-2xl font-bold mb-4 text-green-500;
+}
+
+.negotiating-section h2 {
+  @apply text-2xl font-bold mb-4 text-yellow-500;
+}
+
+.top-stories-section h2,
+.clubs-section h2 {
+  @apply text-2xl font-bold mb-4 text-white;
+}
+
+/* Transfer list items */
+.transfer-list {
+  @apply space-y-4;
+}
+
+.transfer-item {
+  @apply bg-card border border-border rounded-lg p-4 transition-all hover:border-orange-500/30;
+}
+
+.transfer-item h3 {
+  @apply text-lg font-semibold mb-1;
+}
+
+/* Stories list */
+.stories-list {
+  @apply space-y-4;
+}
+
+.story-item {
+  @apply pb-4 border-b border-border/50 last:border-0;
+}
+
+.story-item h3 {
+  @apply text-lg font-semibold mb-1;
+}
+
+/* Clubs table */
+.clubs-table {
+  @apply bg-card border border-border rounded-lg p-4;
+}
+
+.clubs-table table {
+  @apply w-full;
+}
+
+.clubs-table tr {
+  @apply border-b border-border/50 last:border-0;
+}
+
+.clubs-table td {
+  @apply py-2;
+}
+
+/* Summary footer */
+.summary-footer {
+  @apply mt-8 pt-4 border-t border-border text-sm text-muted-foreground;
+}
+
+/* RSS Wall Widget Styling */
+rssapp-wall {
+  --rssapp-primary-color: hsl(var(--tj-orange));
+  --rssapp-background: hsl(var(--card));
+  --rssapp-text-color: hsl(var(--foreground));
+  --rssapp-border-color: hsl(var(--border));
+  --rssapp-hover-color: hsl(var(--tj-orange-light));
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
 }

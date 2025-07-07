@@ -18,7 +18,7 @@ export function BriefingDetail({ briefing }: BriefingDetailProps) {
   return (
     <article className="space-y-8">
       <Link
-        href="/"
+        href="/briefings"
         className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />

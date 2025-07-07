@@ -11,7 +11,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     select: {
       id: true,
       publishedAt: true,
-      createdAt: true,
     },
     orderBy: {
       publishedAt: "desc",
@@ -23,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Generate sitemap entries
   const briefingUrls = briefings.map((briefing) => ({
     url: `${baseUrl}/briefing/${briefing.id}`,
-    lastModified: briefing.publishedAt || briefing.createdAt,
+    lastModified: briefing.publishedAt,
     changeFrequency: "hourly" as const,
     priority: 0.8,
   }));

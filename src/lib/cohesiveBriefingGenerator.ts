@@ -1,31 +1,13 @@
 import OpenAI from "openai";
-import { generateTerryComment } from "./terry";
+import { aggregateStories, AggregatedStory } from "./storyAggregator";
+import { generateGolbyNarrative, generateSectionHeader, generateRoundupParagraph } from "./golbyNarrativeGenerator";
+import { RSSItem, CohesiveBriefing } from "./types";
+import { factCheckStory, validateRSSItem, cleanStoryContent, extractFactualContent } from "./factChecker";
 
-interface RSSItem {
-  id: string;
-  url: string;
-  title: string;
-  content_text: string;
-  content_html: string;
-  image?: string;
-  date_published: string;
-  authors: { name: string }[];
-  attachments?: { url: string }[];
-}
-
-interface CohesiveBriefing {
-  title: string;
-  content: string;
-  metadata: {
-    keyPlayers: string[];
-    keyClubs: string[];
-    mainImage?: string;
-    playerImages?: Record<string, string>;
-  };
-}
+// Remove old interfaces, now using types from ./types
 
 // Fetch player image from Wikipedia
-async function getPlayerImage(playerName: string): Promise<string | null> {
+async function getPlayerImage(playerName: string, usedImages: Set<string>, preferLandscape: boolean = false): Promise<string | null> {
   try {
     const wikiName = playerName.replace(' ', '_');
     const response = await fetch(
@@ -34,7 +16,45 @@ async function getPlayerImage(playerName: string): Promise<string | null> {
     
     if (response.ok) {
       const data = await response.json();
-      return data.thumbnail?.source || null;
+      
+      // For hero images, try to get a landscape-friendly image
+      let imageUrl = null;
+      if (preferLandscape && data.originalimage) {
+        // Check aspect ratio if dimensions are available
+        if (data.originalimage.width && data.originalimage.height) {
+          const aspectRatio = data.originalimage.width / data.originalimage.height;
+          // Only use if it's reasonably landscape (aspect ratio > 0.8)
+          if (aspectRatio > 0.8) {
+            imageUrl = data.originalimage.source;
+          } else {
+            console.log(`Skipping portrait image for ${playerName} (aspect ratio: ${aspectRatio})`);
+            return null;
+          }
+        } else {
+          // If no dimensions, use thumbnail which tends to be better cropped
+          imageUrl = data.thumbnail?.source || null;
+        }
+      } else {
+        // For inline images, use thumbnail
+        imageUrl = data.thumbnail?.source || null;
+      }
+      
+      // Don't use the same image twice
+      if (imageUrl && usedImages.has(imageUrl)) {
+        return null;
+      }
+      
+      if (imageUrl) {
+        usedImages.add(imageUrl);
+        
+        // For hero images, modify the URL to get a wider crop if it's a Wikipedia thumbnail
+        if (preferLandscape && imageUrl.includes('/thumb/') && imageUrl.includes('px-')) {
+          // Change thumbnail size to be wider for hero images
+          imageUrl = imageUrl.replace(/\/\d+px-/, '/800px-');
+        }
+      }
+      
+      return imageUrl;
     }
   } catch (error) {
     console.error(`Failed to fetch image for ${playerName}:`, error);
@@ -82,224 +102,141 @@ export async function generateCohesiveBriefing(
   items: RSSItem[],
   openai: OpenAI | null
 ): Promise<CohesiveBriefing> {
+  // Filter out invalid items
+  const validItems = items.filter(item => validateRSSItem(item));
+  
+  // Clean content for each item
+  validItems.forEach(item => {
+    item.content_text = cleanStoryContent(item.content_text);
+  });
+  
   // Sort by date
-  items.sort((a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime());
+  validItems.sort((a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime());
   
-  // Extract key information
-  const allText = items.map(item => `${item.title} ${item.content_text}`).join(' ');
+  // Aggregate stories by player using the new system
+  const aggregatedStories = aggregateStories(validItems);
   
-  // Extract players and clubs
-  const playerPattern = /\b([A-Z][a-z]+ [A-Z][a-zöäüßéè]+)\b/g;
-  const playerMatches = allText.match(playerPattern) || [];
-  const keyPlayers = [...new Set(playerMatches)].slice(0, 8); // Get more players for images
+  // Fact-check aggregated stories and filter out problematic ones
+  const factCheckedStories = aggregatedStories.filter(story => {
+    // Check the aggregated content from all items
+    const storyContent = story.items.map(item => item.content_text).join(' ');
+    const factCheck = factCheckStory(storyContent, story.facts[0]);
+    
+    if (!factCheck.isValid) {
+      console.log(`⚠️ Fact check failed for ${story.player}: ${factCheck.issues.join(', ')}`);
+      // Skip stories with major fact-checking issues
+      if (factCheck.issues.some(issue => 
+        issue.includes('Manager mismatch') || 
+        issue.includes('Invalid content')
+      )) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
   
-  const clubPattern = /(Arsenal|Chelsea|Liverpool|Manchester United|Manchester City|Tottenham|Newcastle|West Ham|Bayern Munich|Real Madrid|Barcelona|PSG|Juventus|Milan|Inter|Dortmund|Sporting|Nottingham Forest)/gi;
-  const clubMatches = allText.match(clubPattern) || [];
-  const keyClubs = [...new Set(clubMatches.map(c => c))].slice(0, 5);
+  // If no valid stories after fact-checking, return a minimal briefing
+  if (factCheckedStories.length === 0) {
+    console.log("❌ No valid stories after fact-checking");
+    return {
+      title: "Transfer News Update - Limited Coverage",
+      content: "<p>We're experiencing some technical difficulties with our news sources. Please check back later for the latest transfer updates.</p>",
+      metadata: {
+        keyPlayers: [],
+        keyClubs: [],
+        mainImage: undefined,
+        playerImages: {}
+      }
+    };
+  }
   
-  // Get main image for lead player
+  // Track used images to avoid duplicates
+  const usedImages = new Set<string>();
+  
+  // Extract key players and clubs from fact-checked stories
+  const keyPlayers = factCheckedStories.slice(0, 8).map(s => s.player);
+  const keyClubs = [...new Set(factCheckedStories.flatMap(s => s.primaryClubs))].slice(0, 5);
+  
+  // Determine the actual lead player based on story importance
+  const leadStory = factCheckedStories[0]; // Highest importance story
+  const leadPlayer = leadStory?.player;
+  
+  // Get main image for the ACTUAL lead player - prefer landscape for hero images
   let mainImage: string | undefined;
-  if (keyPlayers[0]) {
-    const playerImage = await getPlayerImage(keyPlayers[0]);
-    if (playerImage) mainImage = playerImage;
-  } else if (keyClubs[0]) {
+  let mainImagePlayer: string | undefined;
+  
+  if (leadPlayer) {
+    const playerImage = await getPlayerImage(leadPlayer, usedImages, true);
+    if (playerImage) {
+      mainImage = playerImage;
+      mainImagePlayer = leadPlayer;
+    }
+  }
+  
+  // Try other high-importance players if lead didn't have a good landscape image
+  if (!mainImage && factCheckedStories.length > 1) {
+    // Only try tier 1 stories (importance >= 7)
+    const tier1Stories = factCheckedStories.filter(s => s.importance >= 7);
+    for (let i = 0; i < Math.min(tier1Stories.length, 3); i++) {
+      if (tier1Stories[i].player === leadPlayer) continue; // Skip already tried
+      const playerImage = await getPlayerImage(tier1Stories[i].player, usedImages, true);
+      if (playerImage) {
+        mainImage = playerImage;
+        mainImagePlayer = tier1Stories[i].player;
+        break;
+      }
+    }
+  }
+  
+  // Fall back to club badge if no good player images
+  if (!mainImage && keyClubs[0]) {
     const clubBadge = await getClubBadge(keyClubs[0]);
     if (clubBadge) mainImage = clubBadge;
   }
   
-  // Get images for other key players (tier 2)
+  // Get ONE tier 2 image - best story that's not the lead
   const playerImages: Record<string, string> = {};
-  for (let i = 1; i < Math.min(keyPlayers.length, 4); i++) {
-    const image = await getPlayerImage(keyPlayers[i]);
+  let tier2Image: string | undefined;
+  let tier2Player: string | undefined;
+  
+  // Find the best tier 2 story (high importance but not the lead)
+  const tier2Stories = factCheckedStories.filter(s => s.importance >= 4 && s.player !== mainImagePlayer);
+  if (tier2Stories.length > 0) {
+    const bestTier2 = tier2Stories[0]; // Already sorted by importance
+    const image = await getPlayerImage(bestTier2.player, usedImages, false);
     if (image) {
-      playerImages[keyPlayers[i]] = image;
+      tier2Image = image;
+      tier2Player = bestTier2.player;
+      playerImages[bestTier2.player] = image;
     }
   }
   
-  if (openai) {
-    try {
-      const prompt = `You are a football transfer journalist writing in the style of Joel Golby - witty, sardonic, but informative. 
-      
-      Write a cohesive transfer briefing article (600-800 words) from these updates:
-      ${items.map(item => `- ${item.title}: ${item.content_text}`).join('\n')}
-      
-      Format Requirements:
-      - Lead with the biggest story (2-3 paragraphs)
-      - Before each new story, create a SPECIFIC mini headline that relates to that story's content
-      - Examples: "### Forest Lock Down Their Nigerian Wall" for Ola Aina story
-      - Or "### Milan's Midfield Makeover Takes Shape" for a Milan transfer
-      - Or "### Chelsea's Clear-out Continues at Cobham" for departures
-      - Make mini headlines punchy, specific, and relevant to the actual story
-      - Each story gets 2-3 paragraphs after its mini headline
-      - Format player names as **Viktor Gyökeres**
-      - Format club names as **Arsenal** 
-      - Format fees as **€50m**
-      - Add relevant stats naturally in the text
-      - Include dry humor throughout
-      - End with a punchy conclusion
-      
-      HTML Formatting:
-      - Use <h3> for mini headlines
-      - Use <strong class="text-orange-500"> for player names
-      - Use <strong class="text-orange-500"> for club names
-      - Use <strong class="text-green-500"> for fees (€50m, £30m, etc)
-      - Format Twitter handles as <a href="https://twitter.com/handle" class="text-orange-500 hover:underline" target="_blank">@handle</a>
-      - Keep paragraphs in <p> tags
-      - Add source attribution after each story section: <p class="text-sm text-muted-foreground">via <a href="url" class="text-orange-500 hover:underline" target="_blank">Source Name</a></p>`;
-      
-      const response = await openai.chat.completions.create({
-        model: "gpt-4-turbo-preview",
-        messages: [
-          { role: "system", content: prompt },
-          { role: "user", content: "Write the briefing now." }
-        ],
-        max_tokens: 800,
-        temperature: 0.8,
-      });
-      
-      const content = response.choices[0]?.message?.content || "";
-      
-      // Add image if found
-      let finalContent = content;
-      if (mainImage) {
-        finalContent = `<figure class="briefing-image hero-image">
-<img src="${mainImage}" alt="${keyPlayers[0] || keyClubs[0]}" />
-<figcaption>${keyPlayers[0] || keyClubs[0]}</figcaption>
-</figure>\n\n${content}`;
-      }
-      
-      return {
-        title: generateTitle(items, keyPlayers, keyClubs),
-        content: finalContent,
-        metadata: {
-          keyPlayers: keyPlayers.slice(0, 5), // Limit to top 5 for metadata
-          keyClubs,
-          mainImage,
-          playerImages
-        }
-      };
-    } catch (error) {
-      console.error("OpenAI error:", error);
-    }
-  }
-  
-  // Fallback: Create cohesive narrative without AI
-  return generateFallbackBriefing(items, keyPlayers, keyClubs, mainImage, playerImages);
+  // Generate content using new aggregation approach
+  return generateAggregatedBriefing(factCheckedStories, keyPlayers, keyClubs, mainImage, playerImages, mainImagePlayer);
 }
 
-function generateTitle(items: RSSItem[], players: string[], clubs: string[]): string {
-  const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
-  
-  // Check for confirmed deals
-  const hasConfirmed = items.some(item => 
-    /agreement|agreed|deal reached|here we go|confirmed/i.test(item.title + item.content_text)
-  );
-  
-  if (hasConfirmed && players[0]) {
-    return `${players[0]} Deal Agreed - Transfer Briefing ${date}`;
-  }
-  
-  if (players.length >= 2) {
-    return `${players.slice(0, 2).join(' and ')} Lead Transfer News - ${date}`;
-  }
-  
-  if (clubs.length >= 2) {
-    return `${clubs.slice(0, 2).join(' vs ')} Battle for Transfers - ${date}`;
-  }
-  
-  return `Transfer Briefing: Latest Updates - ${date}`;
-}
+// Old functions removed - now using aggregation system
 
-function generateMiniHeadline(text: string, item: RSSItem): string {
-  // Extract key elements from the story
-  const playerMatch = text.match(/\b([A-Z][a-z]+ [A-Z][a-zöäüßéè]+)\b/);
-  const player = playerMatch ? playerMatch[1] : null;
-  
-  const clubPattern = /(Arsenal|Chelsea|Liverpool|Manchester United|Manchester City|Tottenham|Newcastle|West Ham|Bayern Munich|Real Madrid|Barcelona|PSG|Juventus|Milan|Inter|Dortmund|Sporting|Nottingham Forest|Roma|Napoli|Atletico|Valencia|Sevilla|Porto|Benfica|Ajax|Feyenoord|Celtic|Rangers)/gi;
-  const clubs = text.match(clubPattern) || [];
-  
-  // Check for specific keywords to determine story type
-  const isContract = /contract|deal|sign|pen|agree|extend/i.test(text);
-  const isRejected = /reject|turn down|refuse|snub/i.test(text);
-  const isMedical = /medical|tests|examination/i.test(text);
-  const isInterest = /interested|monitoring|tracking|considering|eye/i.test(text);
-  const isFee = /€\d+m|£\d+m|\$\d+m|fee|price|valuation/i.test(text);
-  const isLoan = /loan|temporary|season-long/i.test(text);
-  const isDeparture = /leave|exit|departure|farewell/i.test(text);
-  
-  // Generate relevant headline based on content
-  if (player && clubs.length >= 2) {
-    if (isContract) {
-      return `${player} Puts Pen to Paper`;
-    } else if (isRejected) {
-      return `${player} Snubs ${clubs[1] || 'Suitors'}`;
-    } else if (isMedical) {
-      return `${player} Medical Scheduled`;
-    } else if (isLoan) {
-      return `${player} Loan Deal Taking Shape`;
-    } else if (isDeparture) {
-      return `${player} Heads for the Exit`;
-    } else {
-      return `${clubs[0]} Make Their Move for ${player}`;
-    }
-  } else if (clubs.length >= 1) {
-    if (isContract && player) {
-      return `${clubs[0]} Secure ${player}`;
-    } else if (isInterest) {
-      return `${clubs[0]} Enter the Race`;
-    } else if (isFee) {
-      return `${clubs[0]}'s Big Money Move`;
-    } else {
-      return `Latest from ${clubs[0]}`;
-    }
-  } else if (player) {
-    if (isContract) {
-      return `${player} Signs New Deal`;
-    } else if (isInterest) {
-      return `Race Heats Up for ${player}`;
-    } else {
-      return `${player} Update`;
-    }
-  }
-  
-  // Fallback headlines based on content type
-  if (isContract) return "Another Deal Done";
-  if (isRejected) return "Transfer Bid Rejected";
-  if (isMedical) return "Medical Tests Ahead";
-  if (isInterest) return "New Suitors Emerge";
-  if (isFee) return "Big Money on the Table";
-  
-  // Generic fallback
-  return "Transfer Update";
-}
-
-function generateFallbackBriefing(
-  items: RSSItem[],
+// New aggregated briefing generator using Golby-style narratives
+async function generateAggregatedBriefing(
+  stories: AggregatedStory[],
   keyPlayers: string[],
   keyClubs: string[],
   mainImage?: string,
-  playerImages?: Record<string, string>
-): CohesiveBriefing {
+  playerImages?: Record<string, string>,
+  mainImagePlayer?: string
+): Promise<CohesiveBriefing> {
   let content = "";
-  
-  // Add image if available
-  if (mainImage) {
-    content += `<figure class="briefing-image hero-image">
-<img src="${mainImage}" alt="${keyPlayers[0] || keyClubs[0]}" />
-<figcaption>${keyPlayers[0] || keyClubs[0]}</figcaption>
-</figure>\n\n`;
-  }
-  
-  // Lead story
-  const leadStory = items[0];
-  const leadText = leadStory.content_text.replace(/^[🚨🔴⚪️💣❤️🤍]+\s*/, '');
   
   // Format player and club names with highlighting
   const formatContent = (text: string): string => {
     // Format player names
     keyPlayers.forEach(player => {
-      const regex = new RegExp(`\\b${player}\\b`, 'g');
-      text = text.replace(regex, `<strong class="text-orange-500">${player}</strong>`);
+      if (player) { // Check for undefined
+        const regex = new RegExp(`\\b${player}\\b`, 'g');
+        text = text.replace(regex, `<strong class="text-orange-500">${player}</strong>`);
+      }
     });
     
     // Format club names
@@ -311,91 +248,204 @@ function generateFallbackBriefing(
     // Format fees with green color
     text = text.replace(/([€£$]\d+(?:\.\d+)?m(?:illion)?)/gi, '<strong class="text-green-500">$1</strong>');
     
-    // Format Twitter handles
-    text = text.replace(/@(\w+)/g, '<a href="https://twitter.com/$1" class="text-orange-500 hover:underline" target="_blank">@$1</a>');
-    
     return text;
   };
   
-  content += `<p>The transfer window continues to deliver drama, and today's headline act features ${keyPlayers[0] ? `<strong class="text-orange-500">${keyPlayers[0]}</strong>` : 'several key moves'}. ${formatContent(leadText)}</p>\n\n`;
-  
-  // Add source link if it's a tweet
-  if (leadStory.url && leadStory.authors[0]) {
-    content += `<p class="text-sm text-muted-foreground">via <a href="${leadStory.url}" class="text-orange-500 hover:underline" target="_blank">${leadStory.authors[0].name}</a></p>\n\n`;
+  // Add hero image if available
+  if (mainImage && mainImagePlayer) {
+    content += `<figure class="briefing-image hero-image">
+<img src="${mainImage}" alt="${mainImagePlayer}" />
+<figcaption>${mainImagePlayer}</figcaption>
+</figure>\n\n`;
+  } else if (mainImage) {
+    // Fallback for club badges
+    content += `<figure class="briefing-image hero-image">
+<img src="${mainImage}" alt="${keyClubs[0]}" />
+<figcaption>${keyClubs[0]}</figcaption>
+</figure>\n\n`;
   }
   
-  // Weave in other stories with mini headlines
-  if (items.length > 1) {
-    items.slice(1).forEach((item, index) => {
-      const text = item.content_text.replace(/^[🚨🔴⚪️💣❤️🤍]+\s*/, '');
+  // Separate stories by importance
+  const tier1Stories = stories.filter(s => s.importance >= 7); // High importance
+  const tier2Stories = stories.filter(s => s.importance >= 4 && s.importance < 7); // Medium
+  const tier3Stories = stories.filter(s => s.importance < 4); // Low
+  
+  // Process Tier 1 stories - full individual treatment
+  if (tier1Stories.length > 0) {
+    for (let i = 0; i < tier1Stories.length; i++) {
+      const story = tier1Stories[i];
       
-      // Create a relevant mini headline based on the story content
-      const miniHeadline = generateMiniHeadline(text, item);
-      content += `<h3 class="text-xl font-bold mt-8 mb-4">${miniHeadline}</h3>\n`;
-      
-      // Check if we should add an inline image for this story
-      let storyPlayerImage: string | undefined;
-      if (playerImages) {
-        // Find which player is mentioned in this story
-        for (const [player, image] of Object.entries(playerImages)) {
-          if (text.includes(player)) {
-            storyPlayerImage = image;
-            break;
-          }
-        }
-      }
-      
-      if (storyPlayerImage) {
-        content += `<div class="flex gap-4 items-start">
-          <div class="flex-1">
-            <p>${formatContent(text)}</p>
-          </div>
-          <figure class="briefing-image flex-shrink-0" style="width: 300px;">
-            <img src="${storyPlayerImage}" alt="Player" class="w-full h-auto rounded-lg shadow-lg" />
-          </figure>
-        </div>\n`;
+      if (i === 0) {
+        // Lead story - no headline, just start
+        const narrative = generateGolbyNarrative(story);
+        content += `<p>${formatContent(narrative)}</p>\n\n`;
       } else {
-        content += `<p>${formatContent(text)}</p>\n`;
+        // Other tier 1 stories get specific headlines based on story type
+        let storyHeader = `${story.player} Update`;
+        
+        if (story.storyType === 'confirmed' && story.primaryClubs.length > 0) {
+          storyHeader = `${story.player} to ${story.primaryClubs[0]} Done`;
+        } else if (story.storyType === 'negotiating' && story.primaryClubs.length > 0) {
+          storyHeader = `${story.primaryClubs[0]} Close In on ${story.player}`;
+        } else if (story.storyType === 'contract') {
+          const hasPacut = story.facts.some(f => f.payCut);
+          storyHeader = hasPacut ? `${story.player} Takes Pay Cut to Stay` : `${story.player} Signs New Deal`;
+        } else if (story.storyType === 'rejected' && story.primaryClubs.length > 0) {
+          storyHeader = `${story.player} Rejects ${story.primaryClubs[0]}`;
+        } else if (story.storyType === 'interest' && story.primaryClubs.length > 0) {
+          storyHeader = `${story.primaryClubs[0]} Eye ${story.player}`;
+        }
+        
+        content += `<h3 class="text-xl font-bold mt-8 mb-4">${storyHeader}</h3>\n`;
+        const narrative = generateGolbyNarrative(story);
+        
+        // No inline images for tier 1 stories anymore
+        content += `<p>${formatContent(narrative)}</p>\n\n`;
       }
-      
-      // Add source link
-      if (item.url && item.authors[0]) {
-        content += `<p class="text-sm text-muted-foreground">via <a href="${item.url}" class="text-orange-500 hover:underline" target="_blank">${item.authors[0].name}</a></p>\n\n`;
+    }
+  }
+  
+  // Process Tier 2 stories - grouped under relevant header
+  if (tier2Stories.length > 0) {
+    // Generate a header based on what's actually happening
+    const sectionHeader = generateRelevantSectionHeader(tier2Stories);
+    content += `<h3 class="text-xl font-bold mt-8 mb-4">${sectionHeader}</h3>\n`;
+    
+    // Add the single tier 2 image at the start of this section
+    const tier2Image = Object.values(playerImages)[0];
+    const tier2Player = Object.keys(playerImages)[0];
+    if (tier2Image && tier2Player) {
+      content += `<figure class="briefing-image mb-4" style="width: 300px; float: right; margin-left: 1rem;">
+        <img src="${tier2Image}" alt="${tier2Player}" class="w-full h-auto rounded-lg shadow-lg" />
+        <figcaption class="text-sm text-muted-foreground mt-2">${tier2Player}</figcaption>
+      </figure>\n`;
+    }
+    
+    // Each tier 2 story gets a paragraph (no inline images)
+    for (const story of tier2Stories.slice(0, 3)) { // Limit to top 3
+      const narrative = generateGolbyNarrative(story);
+      content += `<p>${formatContent(narrative)}</p>\n\n`;
+    }
+    
+    // Clear float after tier 2 section
+    content += '<div style="clear: both;"></div>\n';
+  }
+  
+  // Process Tier 3 stories - roundup paragraph with relevant header
+  if (tier3Stories.length > 0) {
+    // Generate header based on what these stories are about
+    let tier3Header = "Quick Round-Up";
+    
+    const interestStories = tier3Stories.filter(s => s.storyType === 'interest');
+    const rejectedStories = tier3Stories.filter(s => s.storyType === 'rejected');
+    
+    if (interestStories.length === tier3Stories.length) {
+      tier3Header = "Clubs Monitoring Situations";
+    } else if (rejectedStories.length > 0) {
+      tier3Header = "Deals That Won't Happen";
+    } else if (tier3Stories.every(s => s.storyType === 'contract')) {
+      tier3Header = "Contract Situations";
+    } else {
+      // Mix of stories - mention the clubs involved
+      const clubs = [...new Set(tier3Stories.flatMap(s => s.primaryClubs))];
+      if (clubs.length <= 3) {
+        tier3Header = `${clubs.slice(0, 2).join(' and ')} Busy`;
       }
-    });
+    }
+    
+    content += `<h3 class="text-xl font-bold mt-8 mb-4">${tier3Header}</h3>\n`;
+    const roundup = generateRoundupParagraph(tier3Stories);
+    content += `<p>${formatContent(roundup)}</p>\n\n`;
   }
-  
-  // Add context about the window with mini headline
-  content += `<h3 class="text-xl font-bold mt-8 mb-4">The Bigger Picture</h3>\n`;
-  
-  const hasAgreements = items.some(item => /agreement|agreed|deal/i.test(item.content_text));
-  const hasNegotiations = items.some(item => /talks|negotiations|interested/i.test(item.content_text));
-  
-  if (hasAgreements) {
-    content += `<p>With deals being struck left and right, it's clear the summer window is heating up. `;
-  } else if (hasNegotiations) {
-    content += `<p>Negotiations continue across Europe as clubs jostle for their targets. `;
-  }
-  
-  // Extract any fees mentioned
-  const feeMatches = items.map(item => item.content_text.match(/[€£$](\d+(?:\.\d+)?m(?:illion)?)/gi)).filter(Boolean);
-  if (feeMatches.length > 0) {
-    content += `The money being thrown around - ${feeMatches.map(m => `<strong class="text-green-500">${m![0]}</strong>`).join(', ')} - would make your eyes water.</p>\n\n`;
-  } else {
-    content += `</p>\n\n`;
-  }
-  
-  // Closing paragraph
-  content += `<p>As always in the beautiful game, it's not about the football anymore, is it? It's about which millionaire can convince another millionaire to swap their millionaire lifestyle in one city for a millionaire lifestyle in another. The kids in the playground picking teams have nothing on these suits with their spreadsheets and private jets. Still, we watch, we wait, and we refresh our feeds, because what else is there to do in July?</p>`;
   
   return {
-    title: generateTitle(items, keyPlayers, keyClubs),
+    title: generateBriefingTitle(stories),
     content,
     metadata: {
-      keyPlayers: keyPlayers.slice(0, 5), // Limit to top 5 for metadata
+      keyPlayers: keyPlayers.filter(Boolean).slice(0, 5),
       keyClubs,
       mainImage,
       playerImages
     }
   };
+}
+
+// Generate title based on aggregated stories
+function generateBriefingTitle(stories: AggregatedStory[]): string {
+  const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+  
+  const confirmedStories = stories.filter(s => s.storyType === 'confirmed');
+  if (confirmedStories.length > 0) {
+    return `${confirmedStories[0].player} Done Deal - Transfer Briefing ${date}`;
+  }
+  
+  const bigStories = stories.filter(s => s.importance >= 7);
+  if (bigStories.length > 0) {
+    return `${bigStories[0].player} Latest - Transfer Briefing ${date}`;
+  }
+  
+  return `Transfer Briefing ${date}: The Usual Chaos`;
+}
+
+// Generate relevant section headers based on actual content
+function generateRelevantSectionHeader(stories: AggregatedStory[]): string {
+  if (stories.length === 0) return "Other Business";
+  
+  // Check what types of stories we have
+  const confirmedStories = stories.filter(s => s.storyType === 'confirmed');
+  const negotiatingStories = stories.filter(s => s.storyType === 'negotiating');
+  const contractStories = stories.filter(s => s.storyType === 'contract');
+  
+  // If all confirmed, mention the clubs/players
+  if (confirmedStories.length === stories.length) {
+    if (confirmedStories.length === 1) {
+      const story = confirmedStories[0];
+      return `${story.player} to ${story.primaryClubs[0]} Confirmed`;
+    } else if (confirmedStories.length === 2) {
+      return `${confirmedStories[0].player} and ${confirmedStories[1].player} Deals Done`;
+    } else {
+      // Multiple confirmations
+      const clubs = [...new Set(confirmedStories.flatMap(s => s.primaryClubs[0]))];
+      if (clubs.length === 1) {
+        return `${clubs[0]} Complete Multiple Signings`;
+      } else {
+        return `More Confirmed Deals`;
+      }
+    }
+  }
+  
+  // If all negotiations
+  if (negotiatingStories.length === stories.length) {
+    if (negotiatingStories.length === 1) {
+      const story = negotiatingStories[0];
+      return `${story.primaryClubs[0]} Push for ${story.player}`;
+    } else {
+      const clubs = [...new Set(negotiatingStories.map(s => s.primaryClubs[0]))];
+      if (clubs.length === 1) {
+        return `${clubs[0]} Working on Multiple Deals`;
+      }
+      return `Clubs Circle for Targets`;
+    }
+  }
+  
+  // If contract extensions dominate
+  if (contractStories.length > stories.length / 2) {
+    if (contractStories.length === 1) {
+      return `${contractStories[0].player} ${contractStories[0].facts[0]?.payCut ? 'Takes Pay Cut' : 'Extends Contract'}`;
+    } else {
+      return `Contract Updates`;
+    }
+  }
+  
+  // Mixed bag - create specific header based on lead story
+  const leadStory = stories[0];
+  if (leadStory.storyType === 'confirmed' && leadStory.primaryClubs.length > 0) {
+    return `${leadStory.player} to ${leadStory.primaryClubs[0]} Plus More`;
+  } else if (leadStory.storyType === 'negotiating' && leadStory.primaryClubs.length > 0) {
+    return `${leadStory.primaryClubs[0]} Lead Chase for ${leadStory.player}`;
+  } else if (leadStory.primaryClubs.length > 0) {
+    return `${leadStory.primaryClubs[0]} in the Market`;
+  }
+  
+  return "Today's Other Moves";
 }

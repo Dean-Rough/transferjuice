@@ -9,20 +9,10 @@ async function main() {
       include: {
         stories: {
           include: {
-            story: {
-              include: {
-                tweet: {
-                  include: {
-                    source: true,
-                  },
-                },
-              },
-            },
-          },
-          orderBy: { position: "asc" },
-          take: 3, // Just show first 3 stories
-        },
-      },
+            story: true
+          }
+        }
+      }
     });
 
     if (!latestBriefing) {
@@ -34,32 +24,30 @@ async function main() {
     console.log("ID:", latestBriefing.id);
     console.log("Title:", latestBriefing.title);
     console.log("Published:", latestBriefing.publishedAt);
-    console.log("Total Stories:", latestBriefing.stories.length);
-
-    console.log("\n📝 First 3 Stories:");
-    latestBriefing.stories.forEach((item, index) => {
-      const story = item.story;
-      console.log(`\n${index + 1}. Story ID: ${story.id}`);
+    
+    // Get the cohesive story content
+    if (latestBriefing.stories.length > 0) {
+      const story = latestBriefing.stories[0].story;
+      const metadata = story.metadata as any;
       
-      if (story.metadata) {
-        const metadata = story.metadata as any;
-        if (metadata.type === 'cohesive') {
-          console.log("   Type: COHESIVE BRIEFING");
-          console.log("   Key Players:", metadata.keyPlayers?.join(', ') || "None");
-          console.log("   Key Clubs:", metadata.keyClubs?.join(', ') || "None");
-          console.log("   Has image:", !!metadata.mainImage);
-          console.log("   Content length:", metadata.content?.length || 0, "chars");
-        } else {
-          console.log("   Headline:", metadata.headline || "No headline");
-          console.log("   Has enhanced content:", !!metadata.contextParagraph);
-        }
-      } else {
-        console.log("   No enhanced metadata");
+      if (metadata?.type === 'cohesive' && metadata.content) {
+        console.log("\n📝 Content Preview (first 3000 chars):");
+        console.log(metadata.content.substring(0, 3000));
+        console.log("\n... [content truncated]");
+        
+        // Find section headers to see structure
+        const headers = metadata.content.match(/<h3[^>]*>([^<]+)<\/h3>/g);
+        console.log("\n📑 Section Headers:");
+        headers?.forEach((h: string) => console.log("- " + h.replace(/<[^>]+>/g, '')));
+        
+        console.log("\n🔍 Metadata:");
+        console.log("Key Players:", metadata.keyPlayers?.join(', ') || "None");
+        console.log("Key Clubs:", metadata.keyClubs?.join(', ') || "None");
+        console.log("Main Image:", metadata.mainImage ? "Yes" : "No");
+        console.log("Player Images:", Object.keys(metadata.playerImages || {}).length);
+        console.log("Sources:", metadata.sources?.join(', ') || "None");
       }
-      
-      console.log("   Source:", story.tweet.source.name);
-      console.log("   Terry comment:", story.terryComment.substring(0, 100) + "...");
-    });
+    }
 
   } catch (error) {
     console.error("Error:", error);

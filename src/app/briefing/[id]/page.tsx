@@ -50,7 +50,7 @@ export async function generateMetadata({ params }: BriefingPageProps): Promise<M
       title: seoData.ogTags.title,
       description: seoData.ogTags.description,
       type: "article",
-      publishedTime: briefing.publishedAt?.toISOString() || briefing.createdAt.toISOString(),
+      publishedTime: briefing.publishedAt.toISOString(),
       authors: ["TransferJuice"],
       images: seoData.ogTags.image ? [seoData.ogTags.image] : undefined,
     },

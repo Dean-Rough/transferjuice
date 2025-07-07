@@ -43,7 +43,7 @@ async function generateEnhancedStory(tweets: any[]): Promise<EnhancedStory | nul
   
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",

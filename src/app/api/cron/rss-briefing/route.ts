@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
     
     // Clean the content to avoid encoding issues
     const cleanContent = cohesiveBriefing.content
-      .replace(/[\u{D800}-\u{DFFF}]/gu, '') // Remove lone surrogates
+      .replace(/[\uD800-\uDFFF]/g, '') // Remove lone surrogates
       .replace(/[\x00-\x1F\x7F-\x9F]/g, ''); // Remove control characters
     
     // Create the story with the cohesive content

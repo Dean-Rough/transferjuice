@@ -130,7 +130,7 @@ async function generateEnhancedStory(items: RSSItem[], openai: OpenAI | null): P
   if (openai) {
     try {
       const response = await openai.chat.completions.create({
-        model: "gpt-4-turbo-preview",
+        model: "gpt-4o",
         messages: [
           {
             role: "system",

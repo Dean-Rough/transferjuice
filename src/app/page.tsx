@@ -1,36 +1,9 @@
-import { PrismaClient } from "@prisma/client";
-import { BriefingList } from "@/components/BriefingList";
-import { RSSFeedWidget } from "@/components/RSSFeedWidget";
+import Script from "next/script";
+import Link from "next/link";
 
-const prisma = new PrismaClient();
-
-export default async function Home() {
-  // Fetch briefings using our new simple schema
-  const briefings = await prisma.briefing.findMany({
-    include: {
-      stories: {
-        include: {
-          story: {
-            include: {
-              tweet: {
-                include: {
-                  source: true,
-                },
-              },
-            },
-          },
-        },
-        orderBy: { position: "asc" },
-      },
-    },
-    orderBy: { publishedAt: "desc" },
-    take: 10,
-  });
-
-  await prisma.$disconnect();
-
+export default function Home() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <div className="container mx-auto px-8 max-w-7xl">
         <header className="mb-12 border-b border-border py-8">
           <div className="flex items-center">
@@ -51,27 +24,32 @@ export default async function Home() {
             {/* Spacer */}
             <div className="flex-1"></div>
             
-            {/* Get the news button aligned with right edge of widget column */}
-            <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-bouchers text-lg transition-colors">
-              GET THE NEWS
-            </button>
+            {/* Links to briefings */}
+            <Link 
+              href="/briefings" 
+              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-bouchers text-lg transition-colors"
+            >
+              VIEW BRIEFINGS
+            </Link>
           </div>
         </header>
+      </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Main content - briefings */}
-          <div className="flex-1">
-            <BriefingList briefings={briefings} />
-          </div>
-
-          {/* Right sidebar - RSS feed */}
-          <div className="w-full lg:w-[400px] flex-shrink-0 flex justify-center">
-            <div className="sticky top-8 max-h-[calc(100vh-8rem)] overflow-y-auto w-full max-w-[350px]">
-              <RSSFeedWidget />
-            </div>
-          </div>
+      {/* Main content - centered RSS widget */}
+      <div className="flex-1 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-6xl">
+          <div dangerouslySetInnerHTML={{ 
+            __html: '<rssapp-wall id="_zMqruZvtL6XIMNVY"></rssapp-wall>' 
+          }} />
         </div>
       </div>
+
+      {/* RSS Widget Script */}
+      <Script 
+        src="https://widget.rss.app/v1/wall.js" 
+        strategy="afterInteractive"
+        async
+      />
     </div>
   );
 }
