@@ -312,8 +312,8 @@ async function generateAggregatedBriefing(
     content += `<h3 class="text-xl font-bold mt-8 mb-4">${sectionHeader}</h3>\n`;
     
     // Add the single tier 2 image at the start of this section
-    const tier2Image = Object.values(playerImages)[0];
-    const tier2Player = Object.keys(playerImages)[0];
+    const tier2Image = playerImages ? Object.values(playerImages)[0] : undefined;
+    const tier2Player = playerImages ? Object.keys(playerImages)[0] : undefined;
     if (tier2Image && tier2Player) {
       content += `<figure class="briefing-image mb-4" style="width: 300px; float: right; margin-left: 1rem;">
         <img src="${tier2Image}" alt="${tier2Player}" class="w-full h-auto rounded-lg shadow-lg" />
