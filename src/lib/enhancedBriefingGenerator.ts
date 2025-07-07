@@ -145,15 +145,15 @@ export async function generateEnhancedBriefing() {
               tweetId: tweet.id,
               terryComment: enhancedStory.terrysTake,
               // Store enhanced content in metadata
-              metadata: {
+              metadata: JSON.parse(JSON.stringify({
                 headline: enhancedStory.headline,
                 contextParagraph: enhancedStory.contextParagraph,
                 careerContext: enhancedStory.careerContext,
                 transferDynamics: enhancedStory.transferDynamics,
                 widerImplications: enhancedStory.widerImplications,
-                playerStats: enhancedStory.playerStats,
+                playerStats: enhancedStory.playerStats || null,
                 groupTopic: topic
-              }
+              }))
             },
           });
 
