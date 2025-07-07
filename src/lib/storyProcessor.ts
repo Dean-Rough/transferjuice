@@ -372,8 +372,9 @@ export async function getMegaStoriesForRecap(hours: number = 24, minImportance: 
   // Use raw query for JSON field filtering
   const stories = await prisma.$queryRaw`
     SELECT s.*, 
-           t.id as "tweet_id", t.content as "tweet_content", t.url as "tweet_url", t."scrapedAt" as "tweet_scrapedAt",
-           src.id as "source_id", src.name as "source_name", src.handle as "source_handle"
+           t.id as "tweet_id", t."tweetId" as "tweet_tweetId", t."sourceId" as "tweet_sourceId", 
+           t.content as "tweet_content", t.url as "tweet_url", t."scrapedAt" as "tweet_scrapedAt",
+           src.id as "source_id", src.name as "source_name", src.handle as "source_handle", src."createdAt" as "source_createdAt"
     FROM stories s
     JOIN tweets t ON s."tweetId" = t.id
     JOIN sources src ON t."sourceId" = src.id
@@ -391,13 +392,16 @@ export async function getMegaStoriesForRecap(hours: number = 24, minImportance: 
     createdAt: row.createdAt,
     tweet: {
       id: row.tweet_id,
+      tweetId: row.tweet_tweetId,
+      sourceId: row.tweet_sourceId,
       content: row.tweet_content,
       url: row.tweet_url,
       scrapedAt: row.tweet_scrapedAt,
       source: {
         id: row.source_id,
         name: row.source_name,
-        handle: row.source_handle
+        handle: row.source_handle,
+        createdAt: row.source_createdAt
       }
     }
   }));
