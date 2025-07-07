@@ -78,14 +78,20 @@ export async function generateBriefingFromStories(
   openai: OpenAI | null
 ): Promise<CohesiveBriefing> {
   // Get recent stories prioritized by importance
-  const stories = await getStoriesForBriefing(hours);
+  let stories = await getStoriesForBriefing(hours);
+  let usingMegaStories = false;
   
   if (stories.length === 0) {
     // If no new stories, get mega stories for recap
     const megaStories = await getMegaStoriesForRecap(24, 7);
     if (megaStories.length > 0) {
       console.log("No new stories - creating recap of mega stories");
-      stories.push(...megaStories.slice(0, 5)); // Top 5 mega stories
+      // Convert mega stories to match the expected format with empty briefings array
+      stories = megaStories.slice(0, 5).map(story => ({
+        ...story,
+        briefings: []
+      }));
+      usingMegaStories = true;
     }
   }
   
