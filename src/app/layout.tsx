@@ -4,12 +4,15 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://transferjuice.com"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL || "https://transferjuice.com",
+  ),
   title: {
     default: "TransferJuice - Latest Football Transfer News & Briefings",
     template: "%s | TransferJuice",
   },
-  description: "Hourly football transfer briefings with the latest news, rumours and confirmed deals. Get comprehensive transfer updates for Premier League, La Liga, Serie A and more.",
+  description:
+    "Hourly football transfer briefings with the latest news, rumours and confirmed deals. Get comprehensive transfer updates for Premier League, La Liga, Serie A and more.",
   keywords: [
     "football transfers",
     "transfer news",
@@ -20,7 +23,7 @@ export const metadata: Metadata = {
     "transfer briefings",
     "football news",
     "transfer updates",
-    "transfer window"
+    "transfer window",
   ],
   authors: [{ name: "TransferJuice" }],
   creator: "TransferJuice",
@@ -35,9 +38,7 @@ export const metadata: Metadata = {
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
-    other: [
-      { rel: "mask-icon", url: "/favicon.svg", color: "#FF6B35" },
-    ],
+    other: [{ rel: "mask-icon", url: "/favicon.svg", color: "#FF6B35" }],
   },
   manifest: "/manifest.json",
   openGraph: {
@@ -46,7 +47,8 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "TransferJuice",
     title: "TransferJuice - Latest Football Transfer News & Briefings",
-    description: "Hourly football transfer briefings with the latest news, rumours and confirmed deals.",
+    description:
+      "Hourly football transfer briefings with the latest news, rumours and confirmed deals.",
     images: [
       {
         url: "/og-image.png",
@@ -59,7 +61,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "TransferJuice - Latest Football Transfer News",
-    description: "Hourly football transfer briefings with the latest news, rumours and confirmed deals.",
+    description:
+      "Hourly football transfer briefings with the latest news, rumours and confirmed deals.",
     images: ["/twitter-image.png"],
     creator: "@transferjuice",
   },
@@ -77,7 +80,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
     types: {
-      "application/rss+xml": [{ url: "/api/feed/rss", title: "TransferJuice RSS Feed" }],
+      "application/rss+xml": [
+        { url: "/api/feed/rss", title: "TransferJuice RSS Feed" },
+      ],
     },
   },
 };

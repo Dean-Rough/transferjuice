@@ -43,21 +43,29 @@ interface EnhancedBriefingCardProps {
   isDetailPage?: boolean;
 }
 
-export const EnhancedBriefingCard: FC<EnhancedBriefingCardProps> = ({ briefing, story: singleStory, isDetailPage = false }) => {
+export const EnhancedBriefingCard: FC<EnhancedBriefingCardProps> = ({
+  briefing,
+  story: singleStory,
+  isDetailPage = false,
+}) => {
   // If briefing is provided, render all stories. Otherwise render single story
   if (briefing) {
     return (
       <div className="space-y-6">
         {briefing.stories.map(({ story }: any) => (
-          <EnhancedBriefingCard key={story.id} story={story} isDetailPage={isDetailPage} />
+          <EnhancedBriefingCard
+            key={story.id}
+            story={story}
+            isDetailPage={isDetailPage}
+          />
         ))}
       </div>
     );
   }
-  
+
   const story = singleStory!;
   const metadata: EnhancedStoryData = story.metadata || {};
-  
+
   return (
     <div className="bg-card border border-border rounded-lg mb-6 hover:shadow-lg transition-shadow">
       <div className="p-6 pb-4">
@@ -73,51 +81,56 @@ export const EnhancedBriefingCard: FC<EnhancedBriefingCardProps> = ({ briefing, 
             })}
           </span>
         </div>
-        
+
         {/* Source attribution */}
         <div className="text-sm text-muted-foreground">
           via {story.tweet.source.name} ({story.tweet.source.handle})
         </div>
       </div>
-      
+
       <div className="px-6 pb-6 space-y-4">
         {/* Context Paragraph */}
         <div className="text-base leading-relaxed">
           {metadata.contextParagraph || story.tweet.content}
         </div>
-        
+
         {/* Player Stats Bar */}
-        {metadata.playerStats && Object.keys(metadata.playerStats).length > 0 && (
-          <div className="flex flex-wrap gap-3 py-3 border-y">
-            {metadata.playerStats.age && (
-              <div className="flex items-center gap-1">
-                <Users className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{metadata.playerStats.age} years</span>
-              </div>
-            )}
-            {metadata.playerStats.currentClub && (
-              <div className="flex items-center gap-1">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border border-border">
-                  {metadata.playerStats.currentClub}
-                </span>
-              </div>
-            )}
-            {metadata.playerStats.goals !== undefined && (
-              <div className="flex items-center gap-1">
-                <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{metadata.playerStats.goals} goals</span>
-              </div>
-            )}
-            {metadata.playerStats.marketValue && (
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-medium text-green-600">
-                  {metadata.playerStats.marketValue}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-        
+        {metadata.playerStats &&
+          Object.keys(metadata.playerStats).length > 0 && (
+            <div className="flex flex-wrap gap-3 py-3 border-y">
+              {metadata.playerStats.age && (
+                <div className="flex items-center gap-1">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">
+                    {metadata.playerStats.age} years
+                  </span>
+                </div>
+              )}
+              {metadata.playerStats.currentClub && (
+                <div className="flex items-center gap-1">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border border-border">
+                    {metadata.playerStats.currentClub}
+                  </span>
+                </div>
+              )}
+              {metadata.playerStats.goals !== undefined && (
+                <div className="flex items-center gap-1">
+                  <TrendingUp className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">
+                    {metadata.playerStats.goals} goals
+                  </span>
+                </div>
+              )}
+              {metadata.playerStats.marketValue && (
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-medium text-green-600">
+                    {metadata.playerStats.marketValue}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
         {/* Career Context */}
         {metadata.careerContext && (
           <div className="bg-muted/50 rounded-lg p-4">
@@ -128,23 +141,27 @@ export const EnhancedBriefingCard: FC<EnhancedBriefingCardProps> = ({ briefing, 
             <p className="text-sm leading-relaxed">{metadata.careerContext}</p>
           </div>
         )}
-        
+
         {/* Transfer Dynamics */}
         {metadata.transferDynamics && (
           <div>
             <h4 className="font-semibold mb-2">The Deal</h4>
-            <p className="text-base leading-relaxed">{metadata.transferDynamics}</p>
+            <p className="text-base leading-relaxed">
+              {metadata.transferDynamics}
+            </p>
           </div>
         )}
-        
+
         {/* Wider Implications */}
         {metadata.widerImplications && (
           <div>
             <h4 className="font-semibold mb-2">What Happens Next</h4>
-            <p className="text-base leading-relaxed">{metadata.widerImplications}</p>
+            <p className="text-base leading-relaxed">
+              {metadata.widerImplications}
+            </p>
           </div>
         )}
-        
+
         {/* Terry's Take */}
         <div className="bg-accent/50 rounded-lg p-4 mt-4">
           <div className="flex items-start gap-3">
@@ -155,7 +172,7 @@ export const EnhancedBriefingCard: FC<EnhancedBriefingCardProps> = ({ briefing, 
             </div>
           </div>
         </div>
-        
+
         {/* Original Tweet (collapsed by default) */}
         <details className="mt-4">
           <summary className="text-sm text-muted-foreground cursor-pointer hover:text-foreground">

@@ -12,7 +12,7 @@ interface BriefingDetailProps {
 
 export function BriefingDetail({ briefing }: BriefingDetailProps) {
   const hasEnhancedContent = briefing.stories.some(
-    (story: any) => story.story.metadata?.headline
+    (story: any) => story.story.metadata?.headline,
   );
 
   return (

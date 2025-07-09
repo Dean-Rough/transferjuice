@@ -24,6 +24,12 @@
     "briefing:generate": "tsx scripts/run-briefing-generator.ts",
     "briefing:step": "tsx scripts/test-briefing-step.ts",
     "briefing:test": "tsx scripts/run-briefing-generator.ts --test",
+    "stories:process": "tsx scripts/run-simplified-stories.ts process",
+    "stories:update": "tsx scripts/run-simplified-stories.ts update",
+    "stories:daily": "tsx scripts/run-simplified-stories.ts daily",
+    "stories:all": "tsx scripts/run-simplified-stories.ts all",
+    "hourly": "tsx scripts/hourly-all.ts",
+    "daily": "tsx scripts/daily-rss-processor.ts",
     "briefing:rich": "tsx scripts/test-rich-media-briefing.ts",
     "briefing:mock-only": "tsx scripts/test-briefing-mock-only.ts",
     "test:openai": "tsx scripts/validate-openai-key.ts",
@@ -41,7 +47,8 @@
     "briefing:trigger": "tsx scripts/trigger-rss-briefing.ts",
     "briefing:cleanup": "tsx scripts/cleanup-old-briefings.ts",
     "briefing:status": "tsx scripts/briefing-status.ts",
-    "db:check": "tsx scripts/check-database.ts"
+    "db:check": "tsx scripts/check-database.ts",
+    "generate-password-hash": "tsx scripts/generate-password-hash.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
@@ -55,7 +62,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
-    "framer-motion": "^12.18.1",
+    "framer-motion": "^12.23.0",
     "geist": "^1.4.2",
     "isomorphic-dompurify": "^2.25.0",
     "lucide-react": "^0.522.0",

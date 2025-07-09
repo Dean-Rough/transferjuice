@@ -20,13 +20,14 @@ export function RSSFeedWidget() {
     if (!container) return;
 
     let scrollInterval: NodeJS.Timeout;
-    
+
     const startAutoScroll = () => {
       scrollInterval = setInterval(() => {
         if (!isHovering.current && container.parentElement) {
           const scrollContainer = container.parentElement;
-          const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight;
-          
+          const maxScroll =
+            scrollContainer.scrollHeight - scrollContainer.clientHeight;
+
           if (scrollContainer.scrollTop < maxScroll) {
             // Scroll down slowly
             scrollContainer.scrollTop += 0.5;
@@ -54,16 +55,16 @@ export function RSSFeedWidget() {
 
     const scrollContainer = container.parentElement;
     if (scrollContainer) {
-      scrollContainer.addEventListener('mouseenter', handleMouseEnter);
-      scrollContainer.addEventListener('mouseleave', handleMouseLeave);
+      scrollContainer.addEventListener("mouseenter", handleMouseEnter);
+      scrollContainer.addEventListener("mouseleave", handleMouseLeave);
     }
 
     return () => {
       clearInterval(scrollInterval);
       clearTimeout(startDelay);
       if (scrollContainer) {
-        scrollContainer.removeEventListener('mouseenter', handleMouseEnter);
-        scrollContainer.removeEventListener('mouseleave', handleMouseLeave);
+        scrollContainer.removeEventListener("mouseenter", handleMouseEnter);
+        scrollContainer.removeEventListener("mouseleave", handleMouseLeave);
       }
     };
   }, []);

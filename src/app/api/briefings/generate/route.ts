@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateBriefing } from "@/lib/briefingGenerator";
+import { processNewStories } from "@/lib/simplifiedStoryProcessor";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,23 +9,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    console.log("🚀 Starting briefing generation via API...");
+    console.log("🚀 Starting manual story generation via API...");
 
-    const briefing = await generateBriefing();
+    const stories = await processNewStories();
 
     return NextResponse.json({
       success: true,
-      briefing: {
-        id: briefing?.id,
-        title: briefing?.title,
-        storiesCount: briefing?.stories.length || 0,
-        publishedAt: briefing?.publishedAt,
+      results: {
+        storiesProcessed: stories.length,
+        stories: stories.map((s) => ({
+          id: s.id,
+          headline: s.headline,
+          isUpdate: s.isUpdate,
+          updateCount: s.updateCount,
+        })),
+        generatedAt: new Date().toISOString(),
       },
     });
   } catch (error) {
-    console.error("Failed to generate briefing:", error);
+    console.error("Failed to process stories:", error);
     return NextResponse.json(
-      { error: "Failed to generate briefing" },
+      { error: "Failed to process stories" },
       { status: 500 },
     );
   }

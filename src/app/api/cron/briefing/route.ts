@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateBriefing } from "@/lib/briefingGenerator";
+import {
+  processNewStories,
+  updateOldStories,
+  generateDailySummary,
+} from "@/lib/simplifiedStoryProcessor";
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,26 +13,41 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    console.log(`🚀 Cron job triggered at ${new Date().toISOString()}`);
+    console.log(
+      `🚀 Story processing cron triggered at ${new Date().toISOString()}`,
+    );
 
-    // Generate the briefing
-    const briefing = await generateBriefing();
+    // Get current hour to determine what to run
+    const currentHour = new Date().getHours();
+
+    // Process new stories every 2 hours
+    const newStories = await processNewStories();
+
+    // Update existing stories
+    const updatedCount = await updateOldStories();
+
+    // Generate daily summary at 9pm (21:00)
+    let dailySummaryGenerated = false;
+    if (currentHour === 21) {
+      await generateDailySummary();
+      dailySummaryGenerated = true;
+    }
 
     return NextResponse.json({
       success: true,
-      message: "Briefing generation completed",
-      briefing: {
-        id: briefing?.id,
-        title: briefing?.title,
-        storiesCount: briefing?.stories.length || 0,
-        publishedAt: briefing?.publishedAt,
+      message: "Story processing completed",
+      results: {
+        newStories: newStories.length,
+        updatedStories: updatedCount,
+        dailySummary: dailySummaryGenerated,
+        processedAt: new Date().toISOString(),
       },
     });
   } catch (error) {
-    console.error("Cron job failed:", error);
+    console.error("Story processing cron failed:", error);
     return NextResponse.json(
       {
-        error: "Failed to generate briefing",
+        error: "Failed to process stories",
         details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 },

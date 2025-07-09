@@ -36,7 +36,8 @@ export function SimpleBriefingCard({
 }: SimpleBriefingCardProps) {
   const title = propTitle || briefing?.title;
   const stories = propStories || briefing?.stories || [];
-  const publishedAt = propPublishedAt || briefing?.publishedAt || briefing?.createdAt;
+  const publishedAt =
+    propPublishedAt || briefing?.publishedAt || briefing?.createdAt;
   const briefingId = briefing?.id;
   return (
     <div className="bg-card border border-border rounded-lg p-6 mb-6 hover:border-orange-500/20 transition-colors">
@@ -66,21 +67,18 @@ export function SimpleBriefingCard({
       <div className="space-y-8">
         {stories.map(({ story }: { story: Story }) => {
           const isEnhanced = story.metadata?.headline;
-          const isCohesive = story.metadata?.type === 'cohesive';
-          const isDailySummary = story.metadata?.type === 'daily_summary';
-          
+          const isCohesive = story.metadata?.type === "cohesive";
+          const isDailySummary = story.metadata?.type === "daily_summary";
+
           if (isDailySummary) {
             // Daily summary format - HTML content with stats
             return (
-              <div
-                key={story.id}
-                className="briefing-article max-w-none"
-              >
-                <div 
+              <div key={story.id} className="briefing-article max-w-none">
+                <div
                   className="briefing-content enhanced-content daily-summary-content"
                   dangerouslySetInnerHTML={{ __html: story.metadata.content }}
                 />
-                
+
                 {/* Terry's Take on the Day */}
                 <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4 mt-6">
                   <p className="text-xs font-mono text-orange-500 mb-2">
@@ -95,20 +93,17 @@ export function SimpleBriefingCard({
           } else if (isCohesive) {
             // Cohesive briefing format - single flowing article
             return (
-              <div
-                key={story.id}
-                className="briefing-article max-w-none"
-              >
-                <div 
+              <div key={story.id} className="briefing-article max-w-none">
+                <div
                   className="briefing-content enhanced-content"
                   dangerouslySetInnerHTML={{ __html: story.metadata.content }}
                 />
-                
+
                 {/* Sources */}
                 {story.metadata.sources && (
                   <div className="mt-8 pt-4 border-t border-border">
                     <p className="text-sm text-muted-foreground">
-                      Sources: {story.metadata.sources.join(', ')}
+                      Sources: {story.metadata.sources.join(", ")}
                     </p>
                   </div>
                 )}
@@ -124,7 +119,7 @@ export function SimpleBriefingCard({
               >
                 {/* Headline */}
                 <h3 className="text-xl font-bold mb-3">{metadata.headline}</h3>
-                
+
                 {/* Source attribution */}
                 <div className="flex items-center gap-2 text-sm mb-4">
                   <span className="font-semibold text-orange-500">
@@ -143,35 +138,38 @@ export function SimpleBriefingCard({
                 </div>
 
                 {/* Player Stats if available */}
-                {metadata.playerStats && Object.keys(metadata.playerStats).length > 0 && (
-                  <div className="flex flex-wrap gap-3 py-3 mb-4 border-y">
-                    {metadata.playerStats.age && (
-                      <span className="text-sm font-medium">
-                        Age: {metadata.playerStats.age}
-                      </span>
-                    )}
-                    {metadata.playerStats.currentClub && (
-                      <span className="text-sm font-medium">
-                        Club: {metadata.playerStats.currentClub}
-                      </span>
-                    )}
-                    {metadata.playerStats.goals !== undefined && (
-                      <span className="text-sm font-medium">
-                        Goals: {metadata.playerStats.goals}
-                      </span>
-                    )}
-                    {metadata.playerStats.marketValue && (
-                      <span className="text-sm font-medium text-green-600">
-                        {metadata.playerStats.marketValue}
-                      </span>
-                    )}
-                  </div>
-                )}
+                {metadata.playerStats &&
+                  Object.keys(metadata.playerStats).length > 0 && (
+                    <div className="flex flex-wrap gap-3 py-3 mb-4 border-y">
+                      {metadata.playerStats.age && (
+                        <span className="text-sm font-medium">
+                          Age: {metadata.playerStats.age}
+                        </span>
+                      )}
+                      {metadata.playerStats.currentClub && (
+                        <span className="text-sm font-medium">
+                          Club: {metadata.playerStats.currentClub}
+                        </span>
+                      )}
+                      {metadata.playerStats.goals !== undefined && (
+                        <span className="text-sm font-medium">
+                          Goals: {metadata.playerStats.goals}
+                        </span>
+                      )}
+                      {metadata.playerStats.marketValue && (
+                        <span className="text-sm font-medium text-green-600">
+                          {metadata.playerStats.marketValue}
+                        </span>
+                      )}
+                    </div>
+                  )}
 
                 {/* Career Context */}
                 {metadata.careerContext && (
                   <div className="bg-secondary/50 rounded-lg p-4 mb-4">
-                    <p className="text-sm leading-relaxed">{metadata.careerContext}</p>
+                    <p className="text-sm leading-relaxed">
+                      {metadata.careerContext}
+                    </p>
                   </div>
                 )}
 

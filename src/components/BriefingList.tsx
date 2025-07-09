@@ -47,10 +47,7 @@ export function BriefingList({ briefings }: BriefingListProps) {
   return (
     <div className="max-w-4xl mx-auto">
       {briefings.map((briefing) => (
-        <SimpleBriefingCard
-          key={briefing.id}
-          briefing={briefing}
-        />
+        <SimpleBriefingCard key={briefing.id} briefing={briefing} />
       ))}
     </div>
   );

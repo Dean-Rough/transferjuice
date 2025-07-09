@@ -6,8 +6,9 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://transferjuice.com";
-    
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL || "https://transferjuice.com";
+
     // Get recent briefings
     const briefings = await prisma.briefing.findMany({
       include: {
@@ -29,41 +30,43 @@ export async function GET() {
       orderBy: { publishedAt: "desc" },
       take: 20,
     });
-    
+
     // Generate RSS XML
-    const rssItems = briefings.map(briefing => {
-      const metadata = generateRSSMetadata(briefing);
-      
-      // Build content from stories
-      let content = "<div>";
-      briefing.stories.forEach(({ story }: any) => {
-        if (story.metadata?.headline) {
-          content += `<h3>${story.metadata.headline}</h3>`;
-          content += `<p>${story.metadata.contextParagraph}</p>`;
-          if (story.metadata.transferDynamics) {
-            content += `<p>${story.metadata.transferDynamics}</p>`;
+    const rssItems = briefings
+      .map((briefing) => {
+        const metadata = generateRSSMetadata(briefing);
+
+        // Build content from stories
+        let content = "<div>";
+        briefing.stories.forEach(({ story }: any) => {
+          if (story.metadata?.headline) {
+            content += `<h3>${story.metadata.headline}</h3>`;
+            content += `<p>${story.metadata.contextParagraph}</p>`;
+            if (story.metadata.transferDynamics) {
+              content += `<p>${story.metadata.transferDynamics}</p>`;
+            }
+          } else {
+            content += `<p>${story.tweet.content}</p>`;
           }
-        } else {
-          content += `<p>${story.tweet.content}</p>`;
-        }
-        content += `<p><em>${story.terryComment}</em></p>`;
-        content += "<hr/>";
-      });
-      content += "</div>";
-      
-      return `
+          content += `<p><em>${story.terryComment}</em></p>`;
+          content += "<hr/>";
+        });
+        content += "</div>";
+
+        return `
         <item>
           <title><![CDATA[${metadata.title}]]></title>
           <description><![CDATA[${metadata.description}]]></description>
           <link>${baseUrl}/briefing/${briefing.id}</link>
           <guid isPermaLink="true">${baseUrl}/briefing/${briefing.id}</guid>
           <pubDate>${metadata.pubDate}</pubDate>
-          ${metadata.categories.map(cat => `<category>${cat}</category>`).join('')}
+          ${metadata.categories.map((cat) => `<category>${cat}</category>`).join("")}
           <content:encoded><![CDATA[${content}]]></content:encoded>
         </item>
       `;
-    }).join('');
-    
+      })
+      .join("");
+
     const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" 
   xmlns:content="http://purl.org/rss/1.0/modules/content/"
@@ -80,9 +83,9 @@ export async function GET() {
     ${rssItems}
   </channel>
 </rss>`;
-    
+
     await prisma.$disconnect();
-    
+
     return new NextResponse(rss, {
       headers: {
         "Content-Type": "application/rss+xml; charset=utf-8",
@@ -92,10 +95,10 @@ export async function GET() {
   } catch (error) {
     console.error("Error generating RSS feed:", error);
     await prisma.$disconnect();
-    
+
     return NextResponse.json(
       { error: "Failed to generate RSS feed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

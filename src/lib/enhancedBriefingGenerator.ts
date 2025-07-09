@@ -33,14 +33,18 @@ async function getOpenAI(): Promise<OpenAI> {
   });
 }
 
-async function generateEnhancedStory(tweets: any[]): Promise<EnhancedStory | null> {
+async function generateEnhancedStory(
+  tweets: any[],
+): Promise<EnhancedStory | null> {
   if (tweets.length === 0) return null;
 
   const openai = await getOpenAI();
-  
+
   // Combine tweet content for analysis
-  const combinedContent = tweets.map(t => `${t.source.name}: ${t.content}`).join("\n\n");
-  
+  const combinedContent = tweets
+    .map((t) => `${t.source.name}: ${t.content}`)
+    .join("\n\n");
+
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -59,12 +63,12 @@ async function generateEnhancedStory(tweets: any[]): Promise<EnhancedStory | nul
           Also extract any player statistics mentioned (age, goals, assists, trophies, etc.).
           
           Write in an authoritative but accessible style. Include specific numbers and facts.
-          Each section should flow naturally into the next, creating a cohesive narrative.`
+          Each section should flow naturally into the next, creating a cohesive narrative.`,
         },
         {
           role: "user",
-          content: `Create a cohesive briefing from these transfer updates:\n\n${combinedContent}`
-        }
+          content: `Create a cohesive briefing from these transfer updates:\n\n${combinedContent}`,
+        },
       ],
       response_format: { type: "json_object" },
       max_tokens: 1000,
@@ -72,10 +76,12 @@ async function generateEnhancedStory(tweets: any[]): Promise<EnhancedStory | nul
     });
 
     const result = JSON.parse(response.choices[0]?.message?.content || "{}");
-    
+
     // Generate Terry's take separately for better quality
-    const terrysTake = await generateTerryComment(result.headline || combinedContent);
-    
+    const terrysTake = await generateTerryComment(
+      result.headline || combinedContent,
+    );
+
     return {
       headline: result.headline || "Transfer Update",
       contextParagraph: result.context_paragraph || "",
@@ -84,7 +90,7 @@ async function generateEnhancedStory(tweets: any[]): Promise<EnhancedStory | nul
       widerImplications: result.wider_implications || "",
       terrysTake,
       playerStats: result.player_stats || {},
-      sources: tweets.map(t => t.source.name)
+      sources: tweets.map((t) => t.source.name),
     };
   } catch (error) {
     console.error("Error generating enhanced story:", error);
@@ -100,25 +106,25 @@ export async function generateEnhancedBriefing() {
     const recentTweets = await prisma.tweet.findMany({
       where: {
         stories: {
-          none: {}
+          none: {},
         },
         scrapedAt: {
-          gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
-        }
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
+        },
       },
       include: {
-        source: true
+        source: true,
       },
       orderBy: {
-        scrapedAt: 'desc'
-      }
+        scrapedAt: "desc",
+      },
     });
 
     console.log(`Found ${recentTweets.length} unprocessed tweets`);
 
     // Group tweets by related topics (simple grouping by player names mentioned)
     const tweetGroups = groupTweetsByTopic(recentTweets);
-    
+
     // Create briefing
     const briefing = await prisma.briefing.create({
       data: {
@@ -136,7 +142,7 @@ export async function generateEnhancedBriefing() {
     let position = 0;
     for (const [topic, tweets] of Object.entries(tweetGroups)) {
       const enhancedStory = await generateEnhancedStory(tweets);
-      
+
       if (enhancedStory) {
         // Create stories for each tweet in the group
         for (const tweet of tweets) {
@@ -145,15 +151,17 @@ export async function generateEnhancedBriefing() {
               tweetId: tweet.id,
               terryComment: enhancedStory.terrysTake,
               // Store enhanced content in metadata
-              metadata: JSON.parse(JSON.stringify({
-                headline: enhancedStory.headline,
-                contextParagraph: enhancedStory.contextParagraph,
-                careerContext: enhancedStory.careerContext,
-                transferDynamics: enhancedStory.transferDynamics,
-                widerImplications: enhancedStory.widerImplications,
-                playerStats: enhancedStory.playerStats || null,
-                groupTopic: topic
-              }))
+              metadata: JSON.parse(
+                JSON.stringify({
+                  headline: enhancedStory.headline,
+                  contextParagraph: enhancedStory.contextParagraph,
+                  careerContext: enhancedStory.careerContext,
+                  transferDynamics: enhancedStory.transferDynamics,
+                  widerImplications: enhancedStory.widerImplications,
+                  playerStats: enhancedStory.playerStats || null,
+                  groupTopic: topic,
+                }),
+              ),
             },
           });
 
@@ -190,9 +198,10 @@ export async function generateEnhancedBriefing() {
       },
     });
 
-    console.log(`Enhanced briefing created with ${completeBriefing?.stories.length} stories`);
+    console.log(
+      `Enhanced briefing created with ${completeBriefing?.stories.length} stories`,
+    );
     return completeBriefing;
-    
   } catch (error) {
     console.error("Error generating enhanced briefing:", error);
     throw error;
@@ -204,17 +213,17 @@ export async function generateEnhancedBriefing() {
 // Simple topic grouping - can be enhanced with NLP
 function groupTweetsByTopic(tweets: any[]): Record<string, any[]> {
   const groups: Record<string, any[]> = {};
-  
+
   // Common player name patterns
   const playerPatterns = [
     /\b([A-Z][a-z]+\s+[A-Z][a-z]+)\b/g, // First Last
     /\b([A-Z][a-z]+)\b(?=\s+to\s+)/g, // Name before "to"
   ];
-  
+
   for (const tweet of tweets) {
     let assigned = false;
     const content = tweet.content.toLowerCase();
-    
+
     // Check if tweet mentions any existing topics
     for (const [topic, group] of Object.entries(groups)) {
       if (content.includes(topic.toLowerCase())) {
@@ -223,7 +232,7 @@ function groupTweetsByTopic(tweets: any[]): Record<string, any[]> {
         break;
       }
     }
-    
+
     // If not assigned, try to extract a topic
     if (!assigned) {
       for (const pattern of playerPatterns) {
@@ -239,13 +248,13 @@ function groupTweetsByTopic(tweets: any[]): Record<string, any[]> {
         }
       }
     }
-    
+
     // If still not assigned, create a generic topic
     if (!assigned) {
       const genericTopic = `Update ${Object.keys(groups).length + 1}`;
       groups[genericTopic] = [tweet];
     }
   }
-  
+
   return groups;
 }

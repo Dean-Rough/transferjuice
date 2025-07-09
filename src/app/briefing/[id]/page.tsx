@@ -13,7 +13,9 @@ interface BriefingPageProps {
 }
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }: BriefingPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: BriefingPageProps): Promise<Metadata> {
   const briefing = await prisma.briefing.findUnique({
     where: { id: params.id },
     include: {

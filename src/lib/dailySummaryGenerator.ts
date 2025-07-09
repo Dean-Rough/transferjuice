@@ -16,69 +16,81 @@ interface DailySummaryData {
 }
 
 // Generate HTML content for daily summary
-export async function generateDailySummaryHTML(hours: number = 24): Promise<CohesiveBriefing> {
+export async function generateDailySummaryHTML(
+  hours: number = 24,
+): Promise<CohesiveBriefing> {
   const sinceTime = new Date();
   sinceTime.setHours(sinceTime.getHours() - hours);
-  
+
   // Get all stories from the time period
   const allStories = await prisma.story.findMany({
     where: {
       tweet: {
         scrapedAt: {
-          gte: sinceTime
-        }
-      }
+          gte: sinceTime,
+        },
+      },
     },
     include: {
       tweet: {
         include: {
-          source: true
-        }
-      }
+          source: true,
+        },
+      },
     },
     orderBy: {
       tweet: {
-        scrapedAt: 'desc'
-      }
-    }
+        scrapedAt: "desc",
+      },
+    },
   });
-  
+
   // Filter out cohesive briefing stories
-  const transferStories = allStories.filter(s => {
+  const transferStories = allStories.filter((s) => {
     const meta = s.metadata as any;
-    return meta?.type !== 'cohesive' && meta?.type !== 'daily_summary';
+    return meta?.type !== "cohesive" && meta?.type !== "daily_summary";
   });
-  
+
   // Group by status
-  const completed = transferStories.filter(s => (s.metadata as any)?.status === 'completed');
-  const negotiating = transferStories.filter(s => (s.metadata as any)?.status === 'negotiating');
-  const interest = transferStories.filter(s => (s.metadata as any)?.status === 'interest');
-  const rejected = transferStories.filter(s => (s.metadata as any)?.status === 'rejected');
-  const contracts = transferStories.filter(s => (s.metadata as any)?.type === 'contract_extension');
-  
+  const completed = transferStories.filter(
+    (s) => (s.metadata as any)?.status === "completed",
+  );
+  const negotiating = transferStories.filter(
+    (s) => (s.metadata as any)?.status === "negotiating",
+  );
+  const interest = transferStories.filter(
+    (s) => (s.metadata as any)?.status === "interest",
+  );
+  const rejected = transferStories.filter(
+    (s) => (s.metadata as any)?.status === "rejected",
+  );
+  const contracts = transferStories.filter(
+    (s) => (s.metadata as any)?.type === "contract_extension",
+  );
+
   // Calculate total fees
   const totalFees = completed.reduce((sum, story) => {
     const meta = story.metadata as any;
     if (meta.fee) {
-      const value = parseFloat(meta.fee.replace(/[^0-9.]/g, ''));
+      const value = parseFloat(meta.fee.replace(/[^0-9.]/g, ""));
       return sum + (value || 0);
     }
     return sum;
   }, 0);
-  
+
   // Get most active clubs
   const clubActivity = new Map<string, number>();
-  transferStories.forEach(story => {
+  transferStories.forEach((story) => {
     const meta = story.metadata as any;
-    [meta.fromClub, meta.toClub].filter(Boolean).forEach(club => {
+    [meta.fromClub, meta.toClub].filter(Boolean).forEach((club) => {
       clubActivity.set(club, (clubActivity.get(club) || 0) + 1);
     });
   });
-  
+
   const topClubs = Array.from(clubActivity.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
-  
+
   // Get top stories by importance
   const topStories = [...transferStories]
     .sort((a, b) => {
@@ -87,7 +99,7 @@ export async function generateDailySummaryHTML(hours: number = 24): Promise<Cohe
       return bImp - aImp;
     })
     .slice(0, 5);
-  
+
   // Prepare data
   const summaryData: DailySummaryData = {
     completed,
@@ -98,16 +110,18 @@ export async function generateDailySummaryHTML(hours: number = 24): Promise<Cohe
     totalStories: transferStories.length,
     totalFees,
     topClubs,
-    topStories
+    topStories,
   };
-  
+
   // Generate HTML content
   const content = generateSummaryHTML(summaryData);
-  
+
   // Get key players and clubs for metadata
-  const keyPlayers = [...new Set(topStories.map(s => (s.metadata as any).player))].slice(0, 8);
+  const keyPlayers = [
+    ...new Set(topStories.map((s) => (s.metadata as any).player)),
+  ].slice(0, 8);
   const keyClubs = [...new Set(topClubs.map(([club]) => club))];
-  
+
   // Try to get an image from top stories
   let mainImage: string | undefined;
   if (topStories.length > 0) {
@@ -117,9 +131,13 @@ export async function generateDailySummaryHTML(hours: number = 24): Promise<Cohe
       mainImage = playerImage;
     }
   }
-  
-  const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  
+
+  const date = new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
   return {
     title: `Daily Transfer Summary - ${date}`,
     content,
@@ -128,17 +146,21 @@ export async function generateDailySummaryHTML(hours: number = 24): Promise<Cohe
       keyClubs,
       mainImage,
       playerImages: {},
-      summaryData: summaryData
-    }
+      summaryData: summaryData,
+    },
   };
 }
 
 // Generate the HTML content
 function generateSummaryHTML(data: DailySummaryData): string {
-  const date = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-  
-  let html = '';
-  
+  const date = new Date().toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+
+  let html = "";
+
   // Header with stats grid
   html += `
 <div class="daily-summary-header mb-8">
@@ -172,14 +194,14 @@ function generateSummaryHTML(data: DailySummaryData): string {
   </div>
 </div>
 `;
-  
+
   // Completed transfers section
   if (data.completed.length > 0) {
     html += `
 <div class="completed-section mb-8">
   <h2 class="text-2xl font-bold mb-4 text-green-500">✅ Done Deals</h2>
   <div class="transfer-list space-y-4">`;
-    
+
     for (const story of data.completed) {
       const meta = story.metadata as any;
       html += `
@@ -190,52 +212,52 @@ function generateSummaryHTML(data: DailySummaryData): string {
             <strong class="text-orange-500">${meta.player}</strong>
           </h3>
           <p class="text-sm text-muted-foreground">
-            ${meta.fromClub || 'Unknown'} → <strong class="text-orange-500">${meta.toClub || 'Unknown'}</strong>
-            ${meta.fee ? `<strong class="text-green-500 ml-2">${meta.fee}</strong>` : ''}
+            ${meta.fromClub || "Unknown"} → <strong class="text-orange-500">${meta.toClub || "Unknown"}</strong>
+            ${meta.fee ? `<strong class="text-green-500 ml-2">${meta.fee}</strong>` : ""}
           </p>
-          ${meta.type === 'loan' ? `<p class="text-xs text-blue-500 mt-1">Loan (${meta.loanDuration || 'duration TBC'})</p>` : ''}
+          ${meta.type === "loan" ? `<p class="text-xs text-blue-500 mt-1">Loan (${meta.loanDuration || "duration TBC"})</p>` : ""}
         </div>
-        ${meta.isHereWeGo ? '<div class="text-green-500 font-semibold">✓ Here We Go!</div>' : ''}
+        ${meta.isHereWeGo ? '<div class="text-green-500 font-semibold">✓ Here We Go!</div>' : ""}
       </div>
     </div>`;
     }
-    
+
     html += `
   </div>
 </div>`;
   }
-  
+
   // Ongoing negotiations
   if (data.negotiating.length > 0) {
     html += `
 <div class="negotiating-section mb-8">
   <h2 class="text-2xl font-bold mb-4 text-yellow-500">🔄 Ongoing Negotiations</h2>
   <div class="transfer-list space-y-3">`;
-    
+
     for (const story of data.negotiating.slice(0, 5)) {
       const meta = story.metadata as any;
       html += `
     <div class="transfer-item bg-card/50 border border-border/50 rounded-lg p-3">
       <p>
         <strong class="text-orange-500">${meta.player}</strong> to 
-        <strong class="text-orange-500">${meta.toClub || 'Unknown'}</strong>
-        ${meta.fee ? `- Expected: <strong class="text-green-500">${meta.fee}</strong>` : ''}
+        <strong class="text-orange-500">${meta.toClub || "Unknown"}</strong>
+        ${meta.fee ? `- Expected: <strong class="text-green-500">${meta.fee}</strong>` : ""}
       </p>
     </div>`;
     }
-    
+
     html += `
   </div>
 </div>`;
   }
-  
+
   // Top stories section
   if (data.topStories.length > 0) {
     html += `
 <div class="top-stories-section mb-8">
   <h2 class="text-2xl font-bold mb-4">⭐ Biggest Stories of the Day</h2>
   <div class="stories-list space-y-4">`;
-    
+
     data.topStories.forEach((story, index) => {
       const meta = story.metadata as any;
       html += `
@@ -245,18 +267,18 @@ function generateSummaryHTML(data: DailySummaryData): string {
         <span class="text-sm text-muted-foreground ml-2">(${meta.importance}/10)</span>
       </h3>
       <p class="text-sm">
-        ${meta.fromClub || 'Unknown'} → <strong class="text-orange-500">${meta.toClub || 'Unknown'}</strong>
+        ${meta.fromClub || "Unknown"} → <strong class="text-orange-500">${meta.toClub || "Unknown"}</strong>
         <span class="text-muted-foreground"> - ${meta.status}</span>
-        ${meta.fee ? `<strong class="text-green-500 ml-2">${meta.fee}</strong>` : ''}
+        ${meta.fee ? `<strong class="text-green-500 ml-2">${meta.fee}</strong>` : ""}
       </p>
     </div>`;
     });
-    
+
     html += `
   </div>
 </div>`;
   }
-  
+
   // Most active clubs
   if (data.topClubs.length > 0) {
     html += `
@@ -265,42 +287,42 @@ function generateSummaryHTML(data: DailySummaryData): string {
   <div class="clubs-table bg-card border border-border rounded-lg p-4">
     <table class="w-full">
       <tbody>`;
-    
+
     data.topClubs.forEach(([club, count], index) => {
       html += `
         <tr class="border-b border-border/50 last:border-0">
           <td class="py-2 font-semibold">${index + 1}.</td>
           <td class="py-2"><strong class="text-orange-500">${club}</strong></td>
           <td class="py-2 text-right">
-            <span class="text-muted-foreground">${count} ${count === 1 ? 'deal' : 'deals'}</span>
+            <span class="text-muted-foreground">${count} ${count === 1 ? "deal" : "deals"}</span>
           </td>
         </tr>`;
     });
-    
+
     html += `
       </tbody>
     </table>
   </div>
 </div>`;
   }
-  
+
   // Summary footer
   html += `
 <div class="summary-footer mt-8 pt-4 border-t border-border text-sm text-muted-foreground">
   <p>Transfer activity from the last 24 hours. ${data.totalStories} total stories tracked.</p>
 </div>`;
-  
+
   return html;
 }
 
 // Fetch player image helper
 async function getPlayerImage(playerName: string): Promise<string | null> {
   try {
-    const wikiName = playerName.replace(' ', '_');
+    const wikiName = playerName.replace(" ", "_");
     const response = await fetch(
-      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiName)}`
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiName)}`,
     );
-    
+
     if (response.ok) {
       const data = await response.json();
       return data.thumbnail?.source || null;

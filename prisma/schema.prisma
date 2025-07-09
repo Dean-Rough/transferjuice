@@ -28,6 +28,7 @@ model Tweet {
   scrapedAt  DateTime @default(now())
   source     Source   @relation(fields: [sourceId], references: [id])
   stories    Story[]
+  storyTweets StoryTweet[]
   
   @@index([sourceId, scrapedAt])
   @@map("tweets")
@@ -37,13 +38,45 @@ model Tweet {
 model Story {
   id            String    @id @default(cuid())
   tweetId       String
-  terryComment  String
+  terryComment  String    @db.Text  // Keep for backward compatibility
+  
+  // New fields for article-style stories
+  headline      String?   // Punchy Golby-style headline
+  articleContent String?  @db.Text  // Full article content in Golby voice
+  headerImage   String?   // Wikipedia hero image URL
+  storyHash     String?   @unique   // For deduplication (player-clubs-type)
+  
+  // Flexible metadata for stats, context, sources
   metadata      Json?     // Store enhanced briefing data
+  contextData   Json?     // Stats, market values, recent news
+  
+  // Tracking
   createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  lastChecked   DateTime  @default(now())  // When we last checked for updates
+  updateCount   Int       @default(0)      // How many times story has been updated
+  
+  // Relations
   tweet         Tweet     @relation(fields: [tweetId], references: [id])
   briefings     BriefingStory[]
+  relatedTweets StoryTweet[]  // Track multiple tweets per story
   
+  @@index([storyHash])
+  @@index([updatedAt])
   @@map("stories")
+}
+
+// Many-to-many relation for stories and tweets (for updates)
+model StoryTweet {
+  id        String   @id @default(cuid())
+  storyId   String
+  tweetId   String
+  addedAt   DateTime @default(now())
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  tweet     Tweet    @relation(fields: [tweetId], references: [id])
+  
+  @@unique([storyId, tweetId])
+  @@map("story_tweets")
 }
 
 // Simple briefings - just a collection of stories

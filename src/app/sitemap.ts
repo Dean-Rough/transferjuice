@@ -4,8 +4,9 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://transferjuice.com";
-  
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL || "https://transferjuice.com";
+
   // Get all briefings
   const briefings = await prisma.briefing.findMany({
     select: {
@@ -16,9 +17,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       publishedAt: "desc",
     },
   });
-  
+
   await prisma.$disconnect();
-  
+
   // Generate sitemap entries
   const briefingUrls = briefings.map((briefing) => ({
     url: `${baseUrl}/briefing/${briefing.id}`,
@@ -26,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "hourly" as const,
     priority: 0.8,
   }));
-  
+
   return [
     {
       url: baseUrl,
