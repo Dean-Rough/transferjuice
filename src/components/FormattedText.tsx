@@ -1,6 +1,6 @@
 "use client";
 
-import { formatTextWithHighlights } from "@/lib/textFormatting";
+import { formatTextWithHighlights } from "@/lib/textHighlighting";
 
 export function FormattedText({ text }: { text: string }) {
   const formattedHtml = formatTextWithHighlights(text);
