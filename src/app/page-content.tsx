@@ -30,7 +30,7 @@ export function PageContent({ stories }: { stories: Story[] }) {
     <>
       {/* Hero Section - Latest Story */}
       {stories.length > 0 && (
-        <Link href={`/story/${stories[0].id}`} className="block mb-8 lg:mb-12">
+        <Link href={`/story/${stories[0].id}`} className="block mb-6 sm:mb-8 lg:mb-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8 items-center">
             {/* Square image on the left */}
             {stories[0].headerImage && (
@@ -45,10 +45,10 @@ export function PageContent({ stories }: { stories: Story[] }) {
             
             {/* Headline on the right */}
             <div className={!stories[0].headerImage ? "md:col-span-2" : ""}>
-              <h1 className="text-2xl lg:text-4xl xl:text-5xl font-bold mb-4 hover:text-orange-500 transition-colors">
+              <h1 className="text-xl sm:text-2xl lg:text-4xl xl:text-5xl font-bold mb-3 sm:mb-4 hover:text-orange-500 transition-colors leading-tight">
                 <FormattedText text={stories[0].headline?.replace(/\*\*/g, '') || ''} />
               </h1>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-xs sm:text-sm text-muted-foreground">
                 <span>Source: {stories[0].tweet.source.name}</span>
                 <span className="mx-2">•</span>
                 <span>{getTimeAgo(new Date(stories[0].createdAt))}</span>
@@ -59,15 +59,15 @@ export function PageContent({ stories }: { stories: Story[] }) {
       )}
 
       {/* More Transfer Stories */}
-      <h2 className="text-xl lg:text-2xl font-bold mb-6">More Transfer Stories</h2>
+      <h2 className="text-lg sm:text-xl lg:text-2xl font-bold mb-4 sm:mb-6">More Transfer Stories</h2>
       
       {/* Masonry grid */}
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
+      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 sm:gap-6">
         {stories.slice(1).map((story) => (
           <Link
             key={story.id}
             href={`/story/${story.id}`}
-            className="group block break-inside-avoid mb-6"
+            className="group block break-inside-avoid mb-4 sm:mb-6 touch-feedback"
           >
             <article className="bg-card border border-border rounded-lg overflow-hidden hover:border-orange-500/50 transition-colors">
               {/* Square Image */}
@@ -82,20 +82,20 @@ export function PageContent({ stories }: { stories: Story[] }) {
               )}
 
               {/* Content */}
-              <div className="p-4 lg:p-6">
-                <h3 className="text-base lg:text-lg font-bold mb-3 group-hover:text-orange-500 transition-colors">
+              <div className="p-3 sm:p-4 lg:p-6">
+                <h3 className="text-sm sm:text-base lg:text-lg font-bold mb-2 sm:mb-3 group-hover:text-orange-500 transition-colors leading-tight">
                   <FormattedText text={story.headline?.replace(/\*\*/g, '') || ''} />
                 </h3>
 
                 {/* Meta */}
                 <div className="text-xs text-muted-foreground">
-                  <span>Source: {story.tweet.source.name}</span>
-                  <span className="mx-2">•</span>
-                  <span>{getTimeAgo(new Date(story.createdAt))}</span>
+                  <span className="block sm:inline">Source: {story.tweet.source.name}</span>
+                  <span className="hidden sm:inline mx-2">•</span>
+                  <span className="block sm:inline">{getTimeAgo(new Date(story.createdAt))}</span>
                   {story.updateCount > 0 && (
                     <>
-                      <span className="mx-2">•</span>
-                      <span className="text-orange-500">
+                      <span className="hidden sm:inline mx-2">•</span>
+                      <span className="text-orange-500 block sm:inline">
                         {story.updateCount} update{story.updateCount !== 1 ? 's' : ''}
                       </span>
                     </>
@@ -158,12 +158,12 @@ export function PageContent({ stories }: { stories: Story[] }) {
       {/* Content with mobile tabs */}
       <MobileTabNavigation
         rssContent={
-          <div className="container mx-auto px-4 py-6">
+          <div className="container mx-auto px-4 py-4 sm:py-6">
             {rssContent}
           </div>
         }
         storiesContent={
-          <div className="container mx-auto px-4 py-6">
+          <div className="container mx-auto px-4 py-4 sm:py-6">
             {storiesContent}
           </div>
         }

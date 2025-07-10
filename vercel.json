@@ -1,11 +1,26 @@
 {
   "crons": [
     {
+      "path": "/api/cron/hourly",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/briefing",
+      "schedule": "0 9,14,21 * * *"
+    },
+    {
+      "path": "/api/cron/rss-briefing",
+      "schedule": "0 9,14,21 * * *"
+    },
+    {
       "path": "/api/cron/daily-stories",
       "schedule": "0 9 * * *"
     }
   ],
   "functions": {
+    "src/app/api/cron/hourly/route.ts": {
+      "maxDuration": 300
+    },
     "src/app/api/cron/briefing/route.ts": {
       "maxDuration": 300
     },

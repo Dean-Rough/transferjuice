@@ -25,11 +25,11 @@ export function MobileTabNavigation({
       {/* Mobile view - tabbed interface */}
       <div className="lg:hidden">
         {/* Tab navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50">
-          <div className="grid grid-cols-2 h-16">
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50 safe-area-bottom">
+          <div className="grid grid-cols-2">
             <button
               onClick={() => setActiveTab("stories")}
-              className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+              className={`flex flex-col items-center justify-center gap-1 transition-colors py-3 touch-feedback ${
                 activeTab === "stories" 
                   ? "text-orange-500 bg-orange-500/10" 
                   : "text-muted-foreground"
@@ -41,7 +41,7 @@ export function MobileTabNavigation({
             
             <button
               onClick={() => setActiveTab("rss")}
-              className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+              className={`flex flex-col items-center justify-center gap-1 transition-colors py-3 touch-feedback ${
                 activeTab === "rss" 
                   ? "text-orange-500 bg-orange-500/10" 
                   : "text-muted-foreground"
@@ -54,7 +54,7 @@ export function MobileTabNavigation({
         </div>
 
         {/* Content area with padding for fixed nav */}
-        <div className="pb-16">
+        <div className="pb-[calc(60px+env(safe-area-inset-bottom))]">
           {activeTab === "stories" ? storiesContent : rssContent}
         </div>
       </div>

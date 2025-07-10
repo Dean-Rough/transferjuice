@@ -28,6 +28,14 @@ export const metadata: Metadata = {
   authors: [{ name: "TransferJuice" }],
   creator: "TransferJuice",
   publisher: "TransferJuice",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+    viewportFit: "cover",
+  },
+  themeColor: "#FF6B35",
   icons: {
     icon: [
       { url: "/favicon.ico" },

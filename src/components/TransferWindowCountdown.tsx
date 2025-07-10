@@ -87,35 +87,39 @@ export function TransferWindowCountdown() {
 
   return (
     <div className="bg-black border-b border-orange-500/20">
-      <div className="container mx-auto px-4 lg:px-8 max-w-7xl py-3">
-        <div className="flex items-center justify-center gap-4 text-orange-500 font-mono">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold tabular-nums">
+      <div className="container mx-auto px-4 lg:px-8 max-w-7xl py-2 sm:py-3">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-orange-500 font-mono">
+          <div className="flex items-center gap-3 sm:gap-6">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <span className="text-lg sm:text-xl md:text-2xl font-bold tabular-nums">
                 {formatNumber(timeLeft.days)}
               </span>
-              <span className="text-sm uppercase tracking-wider opacity-70">Days</span>
+              <span className="text-xs sm:text-sm uppercase tracking-wider opacity-70 hidden sm:inline">Days</span>
+              <span className="text-xs uppercase opacity-70 sm:hidden">D</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold tabular-nums">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <span className="text-lg sm:text-xl md:text-2xl font-bold tabular-nums">
                 {formatNumber(timeLeft.hours)}
               </span>
-              <span className="text-sm uppercase tracking-wider opacity-70">Hours</span>
+              <span className="text-xs sm:text-sm uppercase tracking-wider opacity-70 hidden sm:inline">Hours</span>
+              <span className="text-xs uppercase opacity-70 sm:hidden">H</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold tabular-nums">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <span className="text-lg sm:text-xl md:text-2xl font-bold tabular-nums">
                 {formatNumber(timeLeft.minutes)}
               </span>
-              <span className="text-sm uppercase tracking-wider opacity-70">Mins</span>
+              <span className="text-xs sm:text-sm uppercase tracking-wider opacity-70 hidden sm:inline">Mins</span>
+              <span className="text-xs uppercase opacity-70 sm:hidden">M</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold tabular-nums text-orange-600 animate-pulse">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <span className="text-lg sm:text-xl md:text-2xl font-bold tabular-nums text-orange-600 animate-pulse">
                 {formatNumber(timeLeft.seconds)}
               </span>
-              <span className="text-sm uppercase tracking-wider opacity-70">Secs</span>
+              <span className="text-xs sm:text-sm uppercase tracking-wider opacity-70 hidden sm:inline">Secs</span>
+              <span className="text-xs uppercase opacity-70 sm:hidden">S</span>
             </div>
           </div>
-          <div className="text-sm uppercase tracking-wider ml-4">
+          <div className="text-xs sm:text-sm uppercase tracking-wider sm:ml-4 text-center">
             {timeLeft.message}
           </div>
         </div>
